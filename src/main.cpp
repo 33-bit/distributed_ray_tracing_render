@@ -14,6 +14,14 @@
 #include "render/tile.hpp"
 #include "scene/scene.hpp"
 
+#ifdef USE_MPI
+#include <mpi.h>
+#include "mpi/mpi_tags.hpp"
+#include "mpi/mpi_serializer.hpp"
+#include "mpi/mpi_master.hpp"
+#include "mpi/mpi_worker.hpp"
+#endif
+
 namespace fs = std::filesystem;
 
 struct Options {
@@ -63,8 +71,38 @@ double render_frame_sequential(const RenderParams& base, int frame, const std::s
 
 int main(int argc, char** argv) {
     Options o = parse_args(argc, argv);
-    fs::create_directories(o.out_dir);
 
+#ifdef USE_MPI
+    MPI_Init(&argc, &argv);
+    int rank, size;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+    // Broadcast the render configuration from the master to all ranks — the
+    // canonical "broadcast scene configuration" step (the scene geometry itself
+    // is reconstructed deterministically per frame, see mpi_serializer.hpp).
+    int pbuf[8];
+    if (rank == 0) mpi_proto::encode_params(o.params, pbuf);
+    MPI_Bcast(pbuf, 8, MPI_INT, 0, MPI_COMM_WORLD);
+    RenderParams params = (rank == 0) ? o.params : mpi_proto::decode_params(pbuf);
+    Schedule mode = (o.schedule == "static") ? Schedule::Static : Schedule::Dynamic;
+
+    if (rank == 0) {
+        fs::create_directories(o.out_dir);
+        std::printf("[mpi] %d proc(s)  %s  %dx%d spp=%d depth=%d shadow=%d frames=%d tile=%d -> %s/\n",
+                    size, o.schedule.c_str(), params.width, params.height, params.spp,
+                    params.max_depth, params.shadow_samples, params.total_frames,
+                    params.tile_size, o.out_dir.c_str());
+        double t0 = MPI_Wtime();
+        run_master(params, o.out_dir, mode);
+        std::printf("[mpi] done in %.3fs\n", MPI_Wtime() - t0);
+    } else {
+        run_worker(params);
+    }
+    MPI_Finalize();
+    return 0;
+#else
+    fs::create_directories(o.out_dir);
     std::printf("[seq] %dx%d  spp=%d  depth=%d  shadow=%d  frames=%d  tile=%d  -> %s/\n",
                 o.params.width, o.params.height, o.params.spp, o.params.max_depth,
                 o.params.shadow_samples, o.params.total_frames, o.params.tile_size,
@@ -77,4 +115,5 @@ int main(int argc, char** argv) {
     }
     std::printf("[seq] done in %.3fs\n", total.elapsed_s());
     return 0;
+#endif
 }
