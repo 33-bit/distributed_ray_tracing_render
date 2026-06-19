@@ -84,3 +84,32 @@ make one frame render correctly").
 PPM header `P6 600 450 255`, byte count = 600·450·3 + header. Converted to PNG
 and visually confirmed: four materials, hard shadows on the checker floor,
 the mirror sphere reflecting floor + sky, anti-aliased edges. 0.32 s/frame.
+
+### 2026-06-19 — Animation: orbiting camera + sweeping light
+
+**Idea.** Turn the still into a sequence by making the camera and light
+functions of the frame index — without introducing any per-frame mutable state.
+
+**What I did.** In `build_demo_scene`, compute `t = frame/total_frames ∈ [0,1)`.
+The camera orbits the scene center once over the sequence (`cam_angle = 2π·t`);
+the light revolves the opposite way with a phase offset
+(`light_angle = -2π·t + 0.7`). The geometry stays put. `main`'s frame loop
+already calls `build_demo_scene(aspect, f, F)` per frame, so nothing else
+changed.
+
+**Why this, not the alternative.**
+- *Camera and light as pure functions of `frame`*, not a scene I mutate frame to
+  frame. Same reasoning as the static scene: any rank can build any frame
+  independently with no animation state to broadcast or keep in sync. Animation
+  becomes embarrassingly parallel across frames *and* tiles.
+- *Light orbits opposite the camera.* If the light tracked the camera, shadows
+  would barely move on screen. Counter-rotating makes the moving shadows
+  obvious, which is exactly the visual the proposal asks the demo to show.
+- *Full 360° camera orbit* so the video showcases every sphere and the mirror
+  from all sides.
+
+**Verification.** `--frames 12`: 12 PPMs written. Frame 0 vs frame 6 (PNG,
+side by side) shows the viewpoint rotated 180° (sphere left/right order flips,
+the front gold sphere becomes occluded by the mirror) and the shadows pointing a
+different way — i.e. both camera and light animate. ~0.1 s/frame at 480×360 spp8.
+

@@ -48,10 +48,11 @@ struct Scene : ISceneQuery {
 };
 
 // The canonical demo scene: a checker floor + four spheres (diffuse / mirror /
-// glossy / gold) under one warm light. Camera and light motion are added in
-// Task 5; here the pose is fixed.
+// glossy / gold). The camera orbits the scene and the light sweeps the opposite
+// way over the animation, so shadows rotate across the floor. The geometry is
+// fixed; only the camera and light depend on the frame, keeping this a pure
+// function of (aspect, frame, total_frames).
 inline Scene build_demo_scene(double aspect, int frame, int total_frames) {
-    (void)frame; (void)total_frames;   // static for Task 4; animated in Task 5
     Scene s;
 
     int m_floor  = s.add_material(Material::checkerboard(Color(0.9, 0.9, 0.9), Color(0.15, 0.2, 0.3), 1.0));
@@ -66,8 +67,25 @@ inline Scene build_demo_scene(double aspect, int frame, int total_frames) {
     s.add_sphere(Vec3( 1.6, 1.0, 0.0), 1.0, m_green);
     s.add_sphere(Vec3( 0.0, 0.5, 2.0), 0.5, m_gold);
 
-    s.lights_.push_back(Light{ Vec3(4, 6, 3), Color(1.0, 0.95, 0.9), 0.0 });
+    // Normalized time in [0,1) over the whole sequence (0 for a single frame).
+    double t = (total_frames > 1) ? static_cast<double>(frame) / total_frames : 0.0;
 
-    s.camera = Camera(Vec3(0, 2.2, 7), Vec3(0, 1.0, 0), Vec3(0, 1, 0), 40.0, aspect);
+    // Camera orbits the scene center once over the full animation.
+    const Vec3 center(0.0, 1.0, 0.0);
+    double cam_angle = 2.0 * PI * t;
+    double cam_radius = 7.0, cam_height = 2.3;
+    Vec3 eye(center.x + cam_radius * std::sin(cam_angle),
+             cam_height,
+             center.z + cam_radius * std::cos(cam_angle));
+    s.camera = Camera(eye, center, Vec3(0, 1, 0), 40.0, aspect);
+
+    // Light sweeps the opposite direction (with a phase offset) so the shadows
+    // rotate across the floor and the demo clearly shows moving shadows.
+    double light_angle = -2.0 * PI * t + 0.7;
+    double light_radius = 5.0;
+    s.lights_.push_back(Light{
+        Vec3(light_radius * std::sin(light_angle), 6.0, light_radius * std::cos(light_angle)),
+        Color(1.0, 0.95, 0.9), 0.0 });
+
     return s;
 }
