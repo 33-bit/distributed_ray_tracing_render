@@ -24,12 +24,18 @@
 #include "render/renderer.hpp"
 #include "render/tile.hpp"
 #include "scene/scene.hpp"
+#include "core/timer.hpp"
+#include "benchmark/benchmark.hpp"
 
-inline void run_master(const RenderParams& base, const std::string& out_dir, Schedule mode) {
+inline void run_master(const RenderParams& base, const std::string& out_dir,
+                       Schedule mode, BenchLog& log) {
     int size;
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     const int nworkers = size - 1;
     const double aspect = static_cast<double>(base.width) / base.height;
+    log.rank = 0; log.role = 0;
+    Timer wall; wall.start();
+    Timer t;
 
     // Build every (frame, tile) task, frame-major so frames finish ~in order
     // and at most a few are buffered at once.
@@ -61,10 +67,14 @@ inline void run_master(const RenderParams& base, const std::string& out_dir, Sch
     if (nworkers <= 0) {
         for (const Task& tk : tasks) {
             RenderParams p = base; p.frame = tk.frame;
+            t.start();
             Scene sc = build_demo_scene(aspect, tk.frame, base.total_frames);
             Renderer::render_tile(sc, p, tk.tile, frame_buffer(tk.frame));
+            log.comp_s += t.elapsed_s();
+            ++log.tiles;
             if (--remaining[tk.frame] == 0) finish_frame(tk.frame);
         }
+        log.total_s = wall.elapsed_s();
         return;
     }
 
@@ -84,12 +94,16 @@ inline void run_master(const RenderParams& base, const std::string& out_dir, Sch
     auto send_task = [&](int rank, int ti) {
         int buf[5];
         mpi_proto::encode_task(tasks[ti].frame, tasks[ti].tile, buf);
+        t.start();
         MPI_Send(buf, 5, MPI_INT, rank, TAG_TASK, MPI_COMM_WORLD);
+        log.comm_s += t.elapsed_s();
         pending[rank] = ti;
     };
     auto send_stop = [&](int rank) {
         int z[5] = { 0, 0, 0, 0, 0 };
+        t.start();
         MPI_Send(z, 5, MPI_INT, rank, TAG_STOP, MPI_COMM_WORLD);
+        log.comm_s += t.elapsed_s();
     };
 
     // Seed each worker with one task (or stop it if there is nothing for it).
@@ -102,12 +116,16 @@ inline void run_master(const RenderParams& base, const std::string& out_dir, Sch
     int completed = 0;
     while (completed < T) {
         MPI_Status st;
+        t.start();
         MPI_Probe(MPI_ANY_SOURCE, TAG_RESULT, MPI_COMM_WORLD, &st);
+        log.idle_s += t.elapsed_s();           // master idle: waiting for any result
         int src = st.MPI_SOURCE;
         int count;
         MPI_Get_count(&st, MPI_UNSIGNED_CHAR, &count);
         std::vector<unsigned char> buf(count);
+        t.start();
         MPI_Recv(buf.data(), count, MPI_UNSIGNED_CHAR, src, TAG_RESULT, MPI_COMM_WORLD, &st);
+        log.comm_s += t.elapsed_s();           // receiving the tile bytes
 
         const Task& tk = tasks[pending[src]];
         mpi_proto::unpack_tile(frame_buffer(tk.frame), tk.tile, buf.data());
@@ -117,6 +135,7 @@ inline void run_master(const RenderParams& base, const std::string& out_dir, Sch
         int nt = next_task_for(src);
         if (nt >= 0) send_task(src, nt); else send_stop(src);
     }
+    log.total_s = wall.elapsed_s();
 }
 
 #endif  // USE_MPI

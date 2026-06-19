@@ -93,3 +93,33 @@ distributed renderer is provably correct: scheduling and worker count change
 > word-split those, so the flags were swallowed and every run silently used
 > `frames=1`. The renderer was right the whole time; the harness was wrong.
 > Lesson: pass flags literally (or use a zsh array) when scripting `mpirun`.
+
+### 2026-06-19 — Per-rank timing + gather (with Member D)
+
+**Idea.** To explain *where* time goes (and prove dynamic balances better than
+static), each rank must report how long it spent computing vs communicating vs
+waiting.
+
+**What I did.** Added `BenchLog{comp,comm,idle,tiles,total}` and instrumented
+both loops: a worker charges `idle` to the blocking `Recv` that waits for a
+task, `comp` to scene-build + `render_tile`, `comm` to the result `Send`; the
+master charges `idle` to `MPI_Probe` (waiting for any result) and `comm` to
+recv/send. After rendering, `gather_logs()` does one `MPI_Gather` of a 7-double
+record per rank to rank 0.
+
+**Why this, not the alternative.**
+- *Three-way split (comp/comm/idle), not just total.* The speedup experiment
+  needs "runtime with vs without communication," and the load-balance experiment
+  needs idle/compute per rank — both fall straight out of this split.
+- *`MPI_Gather` of a fixed 7-double record, not a custom MPI struct datatype.*
+  Packing to doubles is a few lines, portable, and avoids `MPI_Type_create_struct`
+  ceremony for what is a tiny one-shot collective.
+- *Charge the task-wait to `idle`, the transfer to `comm`.* With blocking calls
+  the two are physically interleaved, but attributing the `Recv`-for-task wait to
+  idle and the `Send`/result `Recv` to comm is the honest, defensible split.
+
+**Result.** 400×300, spp 8, depth 6, 6 frames, tile 32, `-np 4`: dynamic worker
+compute spread = **3.5 %** vs static **7.3 %**, and dynamic gave the slow worker
+*fewer* tiles (250 vs 265) to compensate while static forced 260 each. The
+balanced demo scene keeps the gap modest; coarser tiles widen it (granularity
+experiment, Task 8).

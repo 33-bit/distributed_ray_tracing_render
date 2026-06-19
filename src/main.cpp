@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <filesystem>
+#include <algorithm>
 
 #include "core/timer.hpp"
 #include "render/renderer.hpp"
@@ -20,6 +21,8 @@
 #include "mpi/mpi_serializer.hpp"
 #include "mpi/mpi_master.hpp"
 #include "mpi/mpi_worker.hpp"
+#include "benchmark/benchmark.hpp"
+#include "benchmark/csv_logger.hpp"
 #endif
 
 namespace fs = std::filesystem;
@@ -27,7 +30,8 @@ namespace fs = std::filesystem;
 struct Options {
     RenderParams params;
     std::string out_dir = "frames";
-    std::string schedule = "dynamic";   // used by the MPI build (Task 6)
+    std::string schedule = "dynamic";   // dynamic | static (MPI build)
+    std::string bench_csv;              // if set, append per-rank timing here
 };
 
 static Options parse_args(int argc, char** argv) {
@@ -44,6 +48,7 @@ static Options parse_args(int argc, char** argv) {
         else if (a == "--tile")           o.params.tile_size      = std::atoi(val());
         else if (a == "--out")            o.out_dir               = val();
         else if (a == "--schedule")       o.schedule              = val();
+        else if (a == "--bench")          o.bench_csv             = val();
         else { std::fprintf(stderr, "unknown arg: %s\n", a.c_str()); }
     }
     return o;
@@ -87,17 +92,37 @@ int main(int argc, char** argv) {
     RenderParams params = (rank == 0) ? o.params : mpi_proto::decode_params(pbuf);
     Schedule mode = (o.schedule == "static") ? Schedule::Static : Schedule::Dynamic;
 
+    BenchLog log;
     if (rank == 0) {
         fs::create_directories(o.out_dir);
         std::printf("[mpi] %d proc(s)  %s  %dx%d spp=%d depth=%d shadow=%d frames=%d tile=%d -> %s/\n",
                     size, o.schedule.c_str(), params.width, params.height, params.spp,
                     params.max_depth, params.shadow_samples, params.total_frames,
                     params.tile_size, o.out_dir.c_str());
-        double t0 = MPI_Wtime();
-        run_master(params, o.out_dir, mode);
-        std::printf("[mpi] done in %.3fs\n", MPI_Wtime() - t0);
+        run_master(params, o.out_dir, mode, log);
     } else {
-        run_worker(params);
+        run_worker(params, log);
+    }
+
+    std::vector<BenchLog> all = gather_logs(log, rank, size);
+    if (rank == 0) {
+        // Console summary: makespan + how balanced the workers' compute was.
+        double comp_min = 1e30, comp_max = 0.0, comp_sum = 0.0;
+        int nw = 0;
+        for (const BenchLog& b : all)
+            if (b.role == 1) { comp_min = std::min(comp_min, b.comp_s);
+                               comp_max = std::max(comp_max, b.comp_s);
+                               comp_sum += b.comp_s; ++nw; }
+        std::printf("[mpi] makespan %.3fs", log.total_s);
+        if (nw > 0)
+            std::printf("  | worker comp min %.3f max %.3f avg %.3f  imbalance %.1f%%",
+                        comp_min, comp_max, comp_sum / nw,
+                        comp_max > 0 ? 100.0 * (comp_max - comp_min) / comp_max : 0.0);
+        std::printf("\n");
+        if (!o.bench_csv.empty()) {
+            CsvLogger::write(o.bench_csv, o.schedule, params, size, all);
+            std::printf("[mpi] benchmark appended -> %s\n", o.bench_csv.c_str());
+        }
     }
     MPI_Finalize();
     return 0;

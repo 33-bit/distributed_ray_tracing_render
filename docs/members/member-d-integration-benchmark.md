@@ -113,3 +113,33 @@ side by side) shows the viewpoint rotated 180° (sphere left/right order flips,
 the front gold sphere becomes occluded by the mirror) and the shadows pointing a
 different way — i.e. both camera and light animate. ~0.1 s/frame at 480×360 spp8.
 
+### 2026-06-19 — CSV logging + correctness tool (with Member C)
+
+**Idea.** Persist Member C's per-rank timings for charting, and add a tool that
+*quantitatively* proves the MPI output equals the sequential baseline.
+
+**What I did.**
+- `csv_logger.hpp` — appends one row per rank (config + comp/comm/idle/tiles/
+  total), writing the header only when the file is new.
+- `tools/compare_frames.py` — reads two PPM directories and reports per-frame +
+  overall MSE, max abs diff, mean abs diff (numpy-accelerated, pure-Python
+  fallback). Exit 0 if within threshold; flags byte-identical specially.
+
+**Why this, not the alternative.**
+- *Append, not overwrite.* An experiment sweep (`-np 1,2,4,8`; tile 16…128) dumps
+  all runs into one CSV that `make_charts.py` reads — no per-run file juggling.
+- *Separate Python tool, not a C++ check.* Correctness validation should be
+  independent of the renderer it validates; a tiny external script that only
+  knows the PPM format is more convincing and is reusable on any two frame dirs.
+- *MSE + max + mean, not just "files equal."* The report wants the metrics named
+  in the proposal, and a max-abs of 0 is a stronger statement than a single bit.
+
+**Result.** seq vs `-np 4` dynamic and seq vs `-np 4` static both report
+**MSE = 0, max diff = 0** across all frames — byte-identical, confirming the
+determinism design end to end.
+
+> Debug note: my first `compare_frames.py` read the second buffer as `int32`
+> instead of `uint8`, so numpy saw mismatched array lengths and threw. The
+> renderer was never wrong (`cmp` had already shown the files identical) — the
+> bug was in the checker. Fixed the dtype.
+
