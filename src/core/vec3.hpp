@@ -51,3 +51,12 @@ inline bool near_zero(const Vec3& v) {
     const double s = 1e-8;
     return std::fabs(v.x) < s && std::fabs(v.y) < s && std::fabs(v.z) < s;
 }
+
+// Linear interpolation a→b — used by the sky-gradient background, the camera
+// orbit, and color blending.
+inline Vec3 lerp(const Vec3& a, const Vec3& b, double t) { return a * (1.0 - t) + b * t; }
+
+// Largest channel — handy for tone-mapping / reflectance checks.
+inline double max_component(const Vec3& v) {
+    return v.x > v.y ? (v.x > v.z ? v.x : v.z) : (v.y > v.z ? v.y : v.z);
+}
