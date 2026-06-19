@@ -1,0 +1,10 @@
+# clangd config so the editor resolves project-root includes (-Isrc), matching
+# the Makefile. Without this, headers like "core/vec3.hpp" show false
+# "file not found" because clangd otherwise searches relative to the file only.
+CompileFlags:
+  Add:
+    - -std=c++17
+    - -Isrc
+    - -DUSE_MPI
+    - -I/opt/homebrew/include
+    - -xc++
