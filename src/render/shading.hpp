@@ -34,6 +34,28 @@ inline Color gamma_correct(Color c, double gamma = 2.2) {
                  std::pow(clampd(c.z, 0.0, 1.0), inv));
 }
 
+// Reinhard tone map: compress unbounded HDR (e.g. bright specular highlights)
+// into [0,1) before gamma, instead of a hard clamp that flattens highlights.
+inline Color tone_map_reinhard(const Color& c) {
+    return Color(c.x / (1.0 + c.x), c.y / (1.0 + c.y), c.z / (1.0 + c.z));
+}
+
+// Schlick approximation of the Fresnel reflectance: reflection grows toward
+// grazing angles. cos_theta is |view·normal|; r0 is the head-on reflectance.
+inline double fresnel_schlick(double cos_theta, double r0) {
+    double m = clampd(1.0 - cos_theta, 0.0, 1.0);
+    return r0 + (1.0 - r0) * (m * m * m * m * m);
+}
+
+// Resolve the diffuse albedo at a point, applying the procedural checker if set.
+inline Color effective_albedo(const Material& m, const Vec3& p) {
+    if (!m.checker) return m.albedo;
+    long long cx = static_cast<long long>(std::floor(p.x * m.checker_scale));
+    long long cy = static_cast<long long>(std::floor(p.y * m.checker_scale));
+    long long cz = static_cast<long long>(std::floor(p.z * m.checker_scale));
+    return ((cx + cy + cz) & 1LL) ? m.albedo2 : m.albedo;
+}
+
 // Is the segment from p to light_pos blocked by any object?
 inline bool occluded(const ISceneQuery& s, const Vec3& p, const Vec3& light_pos) {
     Vec3   to   = light_pos - p;
@@ -57,9 +79,10 @@ inline Color shade(const ISceneQuery& scene, const Ray& r,
 
     const Vec3 n    = rec.normal;
     const Vec3 view = normalized(-r.dir);
+    const Color alb = effective_albedo(m, rec.p);
 
     // small ambient so shadowed regions are dark but not pure black
-    Color result = m.albedo * 0.08;
+    Color result = alb * 0.08;
 
     for (const Light& L : scene.lights()) {
         // point light -> 1 shadow ray (hard); area light -> N jittered (soft)
@@ -78,7 +101,7 @@ inline Color shade(const ISceneQuery& scene, const Ray& r,
             double ndl  = std::max(0.0, dot(n, ldir));
 
             // Lambertian diffuse
-            contribution += m.albedo * L.intensity * ndl;
+            contribution += alb * L.intensity * ndl;
 
             // Phong specular
             if (m.specular > 0.0 && ndl > 0.0) {
@@ -95,7 +118,9 @@ inline Color shade(const ISceneQuery& scene, const Ray& r,
         Vec3 rdir = normalized(reflect(r.dir, n));
         Ray  rray(rec.p + n * 1e-4, rdir);   // offset along normal to avoid self-hit
         Color reflected = shade(scene, rray, depth + 1, max_depth, shadow_samples, rng);
-        result = lerp(result, reflected, m.reflectivity);
+        // Fresnel (Schlick): reflect more at grazing angles; R0 = reflectivity.
+        double fres = fresnel_schlick(std::fabs(dot(view, n)), m.reflectivity);
+        result = lerp(result, reflected, fres);
     }
 
     return result;

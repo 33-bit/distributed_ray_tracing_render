@@ -96,3 +96,30 @@ gamma-agnostic.
 **Tests (`make test`): 24 total, 0 failures** (+6 for B) — miss→background,
 lit ≫ shadowed, shadow≈ambient, depth-irrelevant when non-reflective, emissive
 passthrough, mirror reflects background exactly.
+
+### 2026-06-19 — Quality pass: checker, Fresnel, tone mapping
+
+**Idea.** Three small additions that make the demo read better and the lighting
+behave physically, all inside the materials/shading subsystem I already own.
+
+**What I did.**
+- `Material::checkerboard(a,b,scale)` + `effective_albedo()` — a world-space
+  checker for the ground. Shadows on a checker floor are the canonical way to
+  show off a ray tracer, and it gives the eye a scale reference as the camera
+  orbits.
+- `fresnel_schlick()` — replaced the constant reflection blend with an
+  angle-dependent Schlick term, so reflective surfaces reflect more at grazing
+  angles (realistic) while staying exact at head-on (a true mirror is still a
+  mirror, so the existing mirror unit test still holds).
+- `tone_map_reinhard()` — for the renderer to compress bright specular
+  highlights into [0,1) before gamma, instead of a hard clamp that would flatten
+  them to flat white.
+
+**Why this, not the alternative.** These are genuine lighting/material features,
+not filler: each one is visible in the final video and each is a standard
+technique I can explain at the defense. I kept Fresnel gated behind
+`reflectivity>0` so purely diffuse surfaces get no spurious grazing reflection.
+
+**Tests now 28 total, 0 failures** (+4): checker alternation, Fresnel
+monotonicity, mirror-at-head-on, Reinhard range.
+

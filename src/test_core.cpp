@@ -155,6 +155,19 @@ int main() {
         sm.bg   = Color(0.2, 0.4, 0.6);
         Color refl = shade(sm, Ray(Vec3(0, 0, 0), Vec3(0, 0, -1)), 0, 4, 1, rng);
         CHECK(approx(refl.x, 0.2, 1e-6) && approx(refl.z, 0.6, 1e-6));
+
+        // checker albedo alternates between adjacent unit cells
+        Material chk = Material::checkerboard(Color(1, 1, 1), Color(0, 0, 0), 1.0);
+        CHECK(effective_albedo(chk, Vec3(0.5, 0, 0.5)).x !=
+              effective_albedo(chk, Vec3(1.5, 0, 0.5)).x);
+
+        // Fresnel grows from head-on to grazing
+        CHECK(fresnel_schlick(1.0, 0.04) < fresnel_schlick(0.02, 0.04));
+        CHECK(approx(fresnel_schlick(1.0, 1.0), 1.0));   // a mirror is fully reflective head-on
+
+        // Reinhard tone map compresses HDR into [0,1)
+        Color tm = tone_map_reinhard(Color(10, 10, 10));
+        CHECK(tm.x < 1.0 && tm.x > 0.9);
     }
 
     std::printf("%d checks, %d failures\n", g_checks, g_failures);

@@ -14,6 +14,12 @@ struct Material {
     double  reflectivity = 0.0;                  // mirror fraction in [0,1]
     Color   emission    = Color(0, 0, 0);        // self-emitted light
 
+    // Procedural checkerboard: when set, the diffuse albedo alternates between
+    // `albedo` and `albedo2` in world-space cells of size 1/checker_scale.
+    bool    checker      = false;
+    double  checker_scale = 1.0;
+    Color   albedo2     = Color(0.2, 0.2, 0.2);
+
     // Named constructors keep scene-building readable in Member D's code.
     static Material diffuse(const Color& a) {
         Material m; m.type = MatType::Diffuse; m.albedo = a;
@@ -29,5 +35,10 @@ struct Material {
     }
     static Material emissive(const Color& e) {
         Material m; m.type = MatType::Emissive; m.emission = e; return m;
+    }
+    static Material checkerboard(const Color& a, const Color& b, double scale) {
+        Material m; m.type = MatType::Diffuse; m.albedo = a; m.albedo2 = b;
+        m.checker = true; m.checker_scale = scale;
+        m.specular = 0.1; m.shininess = 8.0; return m;
     }
 };
