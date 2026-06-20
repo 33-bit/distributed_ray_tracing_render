@@ -4,15 +4,16 @@
 // run the Phong + reflection path) and is what Member C serializes over MPI.
 #include "core/color.hpp"
 
-enum class MatType { Diffuse, Specular, Reflective, Emissive };
+enum class MatType { Diffuse, Specular, Reflective, Emissive, Dielectric };
 
 struct Material {
     MatType type        = MatType::Diffuse;
-    Color   albedo      = Color(0.8, 0.8, 0.8);  // base color
+    Color   albedo      = Color(0.8, 0.8, 0.8);  // base color / glass tint
     double  specular    = 0.0;                   // Phong specular strength
     double  shininess   = 32.0;                  // Phong exponent
     double  reflectivity = 0.0;                  // mirror fraction in [0,1]
     Color   emission    = Color(0, 0, 0);        // self-emitted light
+    double  ior         = 1.5;                   // index of refraction (Dielectric)
 
     // Procedural checkerboard: when set, the diffuse albedo alternates between
     // `albedo` and `albedo2` in world-space cells of size 1/checker_scale.
@@ -40,5 +41,9 @@ struct Material {
         Material m; m.type = MatType::Diffuse; m.albedo = a; m.albedo2 = b;
         m.checker = true; m.checker_scale = scale;
         m.specular = 0.1; m.shininess = 8.0; return m;
+    }
+    static Material dielectric(double index_of_refraction, const Color& tint = Color(1, 1, 1)) {
+        Material m; m.type = MatType::Dielectric; m.albedo = tint;
+        m.ior = index_of_refraction; return m;
     }
 };

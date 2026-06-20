@@ -47,6 +47,23 @@ inline double fresnel_schlick(double cos_theta, double r0) {
     return r0 + (1.0 - r0) * (m * m * m * m * m);
 }
 
+// Head-on reflectance of a dielectric with index `ior` (surrounding medium air).
+inline double schlick_r0(double ior) {
+    double r = (1.0 - ior) / (1.0 + ior);
+    return r * r;
+}
+
+// Snell refraction of unit dir v through a surface whose normal n faces against
+// v; eta_ratio = n_incident / n_transmitted. Returns false on total internal
+// reflection (no transmitted ray exists).
+inline bool refract(const Vec3& v, const Vec3& n, double eta_ratio, Vec3& out) {
+    double cos_i  = std::min(dot(-v, n), 1.0);
+    double sin_t2 = eta_ratio * eta_ratio * (1.0 - cos_i * cos_i);
+    if (sin_t2 > 1.0) return false;
+    out = eta_ratio * (v + cos_i * n) - std::sqrt(1.0 - sin_t2) * n;
+    return true;
+}
+
 // Resolve the diffuse albedo at a point, applying the procedural checker if set.
 inline Color effective_albedo(const Material& m, const Vec3& p) {
     if (!m.checker) return m.albedo;
@@ -76,6 +93,26 @@ inline Color shade(const ISceneQuery& scene, const Ray& r,
     const Material& m = scene.material(rec.material_id);
     if (m.type == MatType::Emissive)
         return m.emission;
+
+    // Dielectric (glass): split into a Fresnel-weighted reflected + refracted ray.
+    if (m.type == MatType::Dielectric) {
+        if (depth >= max_depth) return scene.background(r);
+        Vec3   unit  = normalized(r.dir);
+        Vec3   nn    = rec.normal;                                   // faces against the ray
+        double eta   = rec.front_face ? (1.0 / m.ior) : m.ior;       // air->glass or glass->air
+        double cos_i = std::min(dot(-unit, nn), 1.0);
+        double fres  = fresnel_schlick(cos_i, schlick_r0(m.ior));
+
+        Color reflected = shade(scene, Ray(rec.p + nn * 1e-4, reflect(unit, nn)),
+                                depth + 1, max_depth, shadow_samples, rng);
+        Vec3 refr;
+        if (refract(unit, nn, eta, refr)) {
+            Color transmitted = shade(scene, Ray(rec.p - nn * 1e-4, normalized(refr)),
+                                      depth + 1, max_depth, shadow_samples, rng);
+            return m.albedo * lerp(transmitted, reflected, fres);
+        }
+        return m.albedo * reflected;   // total internal reflection -> all reflected
+    }
 
     const Vec3 n    = rec.normal;
     const Vec3 view = normalized(-r.dir);

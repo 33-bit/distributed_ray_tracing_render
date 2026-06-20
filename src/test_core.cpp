@@ -168,6 +168,17 @@ int main() {
         // Reinhard tone map compresses HDR into [0,1)
         Color tm = tone_map_reinhard(Color(10, 10, 10));
         CHECK(tm.x < 1.0 && tm.x > 0.9);
+
+        // refraction (Snell): entering a denser medium bends the ray toward the
+        // normal, so its horizontal component shrinks
+        Vec3 in = normalized(Vec3(1, -1, 0));
+        Vec3 refr;
+        CHECK(refract(in, Vec3(0, 1, 0), 1.0 / 1.5, refr));      // air -> glass, not TIR
+        CHECK(std::fabs(refr.x) < std::fabs(in.x));
+        CHECK(approx(refr.length(), 1.0, 1e-9));                 // stays unit length
+        // total internal reflection: glass -> air at a grazing angle has no exit ray
+        Vec3 dummy;
+        CHECK(!refract(normalized(Vec3(1, -0.1, 0)), Vec3(0, 1, 0), 1.5, dummy));
     }
 
     std::printf("%d checks, %d failures\n", g_checks, g_failures);

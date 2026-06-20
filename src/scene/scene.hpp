@@ -58,14 +58,14 @@ inline Scene build_demo_scene(double aspect, int frame, int total_frames) {
     int m_floor  = s.add_material(Material::checkerboard(Color(0.9, 0.9, 0.9), Color(0.15, 0.2, 0.3), 1.0));
     int m_red    = s.add_material(Material::diffuse(Color(0.85, 0.15, 0.15)));
     int m_mirror = s.add_material(Material::mirror(Color(1, 1, 1), 0.9));
-    int m_green  = s.add_material(Material::glossy(Color(0.2, 0.6, 0.3), 0.8, 64.0));
+    int m_glass  = s.add_material(Material::dielectric(1.5));            // clear glass sphere
     int m_gold   = s.add_material(Material::glossy(Color(0.9, 0.7, 0.2), 0.6, 48.0));
 
     s.add_plane(Vec3(0, 0, 0), Vec3(0, 1, 0), m_floor);
-    s.add_sphere(Vec3(-1.6, 1.0, 0.0), 1.0, m_red);
-    s.add_sphere(Vec3( 0.0, 1.0, 0.0), 1.0, m_mirror);
-    s.add_sphere(Vec3( 1.6, 1.0, 0.0), 1.0, m_green);
-    s.add_sphere(Vec3( 0.0, 0.5, 2.0), 0.5, m_gold);
+    s.add_sphere(Vec3(-1.6, 1.0, 0.0), 1.0, m_red);     // diffuse
+    s.add_sphere(Vec3( 0.0, 1.0, 0.0), 1.0, m_mirror);  // mirror
+    s.add_sphere(Vec3( 1.6, 1.0, 0.0), 1.0, m_glass);   // refractive glass
+    s.add_sphere(Vec3( 0.0, 0.5, 2.0), 0.5, m_gold);    // glossy gold
 
     // Normalized time in [0,1) over the whole sequence (0 for a single frame).
     double t = (total_frames > 1) ? static_cast<double>(frame) / total_frames : 0.0;

@@ -123,3 +123,36 @@ technique I can explain at the defense. I kept Fresnel gated behind
 **Tests now 28 total, 0 failures** (+4): checker alternation, Fresnel
 monotonicity, mirror-at-head-on, Reinhard range.
 
+### 2026-06-20 — Refraction / dielectric glass (`material.hpp`, `shading.hpp`)
+
+**Idea.** Add a glass material — the natural next step for a "materials"
+subsystem and the most recognisable ray-tracing effect. It also turns the demo
+into a proper showcase (diffuse + mirror + glass + glossy) and, as a bonus, adds
+the variable per-tile cost that makes the load-balancing experiment meaningful.
+
+**What I did.** New `MatType::Dielectric` + `ior` field + `Material::dielectric()`.
+A `refract()` helper (Snell's law, returns false on total internal reflection)
+and `schlick_r0()`. In `shade()`, a dielectric spawns a Fresnel-weighted pair:
+a reflected ray and (unless TIR) a refracted ray, blended by the Schlick term.
+The center-right sphere in the demo is now clear glass.
+
+**Why this, not the alternative.**
+- *Deterministic Fresnel blend (reflect + refract weighted by Schlick), not a
+  stochastic pick-one-by-random.* Stochastic refraction is cheaper per ray but
+  needs many samples to denoise; a deterministic blend gives clean glass at low
+  spp AND, crucially, draws no random numbers — so the seq-vs-MPI byte-identity
+  survives (re-verified: MSE = 0 with glass + soft shadows).
+- *Reused Member A's oriented normal.* Because `set_face_normal` already points
+  the normal against the ray, the air→glass vs glass→air distinction collapses
+  to one line: `eta = front_face ? 1/ior : ior`. No special-casing the inside.
+- *Handle total internal reflection explicitly* (no transmitted ray ⇒ all
+  reflected) instead of ignoring it, so steep internal angles look right.
+
+This was scoped as "optional" in the proposal, but it is the cleanest way for my
+subsystem to clear the 250-LOC bar with a genuine, defensible feature rather than
+filler — and it visibly improved both the render and the experiments.
+
+**Tests now 32 total, 0 failures** (+4): Snell bends toward the normal entering
+glass, refracted ray stays unit-length, and grazing glass→air is total internal
+reflection.
+
