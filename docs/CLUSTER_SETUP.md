@@ -49,6 +49,61 @@ most reliable for MPI. macOS-specific commands are called out where they differ.
 
 ---
 
+## 1b. Recommended: phone hotspot + one bridged Ubuntu VM per PC
+
+This is the architecture to use: a phone broadcasts a Wi-Fi hotspot; each Windows
+PC joins it and runs **one** Ubuntu VM with a **Bridged Adapter**. Each VM then
+gets its own IP on the phone's LAN and the VMs see each other → an N-node Ubuntu
+cluster. (One VM per physical machine.)
+
+```
+        ┌───────── phone Wi-Fi hotspot (the LAN) ─────────┐
+        │                      │                      │
+   Windows PC 1           Windows PC 2           Windows PC 3
+   └ Ubuntu VM (bridged)  └ Ubuntu VM (bridged)  └ Ubuntu VM (bridged)
+     IP 192.168.x.11        IP 192.168.x.12        IP 192.168.x.13
+        └──────────── all on one subnet, MPI talks freely ────────────┘
+```
+
+**Why bridged (not NAT):** bridged puts the VM *directly* on the phone's Wi-Fi
+LAN with its own IP, so the other VMs can reach it. NAT would hide the VM behind
+the host and MPI's peer-to-peer connections would fail. Bridged is mandatory here.
+
+**On every PC:**
+1. Install **VirtualBox** (free) — or VMware Workstation Player.
+2. Create **one** VM from the **same Ubuntu LTS ISO** on all PCs (e.g. Ubuntu
+   24.04). Give it most of the PC's CPU cores and ≥ 4 GB RAM. **The VM's core
+   count = its MPI `slots`.**
+3. VM → **Settings → Network → Adapter 1 → Attached to: Bridged Adapter**;
+   **Name = the host's Wi-Fi adapter**; Advanced → **Promiscuous Mode: Allow All**
+   (helps bridging over Wi-Fi).
+
+**Bring the network up:**
+4. Connect all PCs to the **phone hotspot**.
+5. Boot the VMs; in each run `ip -4 addr` (or `hostname -I`) and note its IP
+   (handed out by the phone's DHCP, e.g. `192.168.x.y` / `172.20.10.y`).
+6. **Make-or-break test:** from VM-1, `ping <VM-2-IP>` — every pair must reply.
+   If a ping fails, fix it now (see gotchas) before going further.
+
+**Then do the normal steps below:** §2 toolchain → §3 `/etc/hosts` (map names to
+those VM IPs) → §4 passwordless SSH → §5 clone + `make mpi` → §6 smoke test → §8
+run. Pick one VM as `master` (it runs `mpirun`, writes frames, makes the video).
+
+**Gotchas specific to phone hotspot + bridged Wi-Fi:**
+- **Client (AP) isolation:** some hotspots block client-to-client traffic, so the
+  ping in step 6 fails. Disable "client isolation" in the phone's hotspot
+  settings if present; iPhone Personal Hotspot and most Android hotspots allow it,
+  but verify. If you can't disable it, use a normal Wi-Fi router instead.
+- **Bridging over Wi-Fi:** some Wi-Fi adapters resist bridging and the VM gets no
+  IP. Set Promiscuous Mode = Allow All (step 3); if it still fails, connect the
+  PCs to a router by **Ethernet** and bridge to the wired adapter.
+- **DHCP IPs change on reboot:** re-check IPs and update `/etc/hosts` each session,
+  or reserve static IPs on the phone/router.
+- All hosts are x86_64 → all VMs x86_64 → **same architecture ✓** (don't try to add
+  an Apple-Silicon Mac to this cluster — see §0).
+
+---
+
 ## 2. Install the toolchain on EVERY machine
 
 **Ubuntu / WSL2 / Linux VM:**
