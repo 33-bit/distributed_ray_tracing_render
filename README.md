@@ -62,4 +62,6 @@ python3 tools/compare_frames.py frames_seq frames_mpi      # expect MSE = 0
 | C | MPI + OpenMP scheduling & communication (hybrid, prefetch) | [member-c](docs/members/member-c-mpi-scheduling.md) |
 | D | Scene, renderer, benchmark, animation, video | [member-d](docs/members/member-d-integration-benchmark.md) |
 
+Per-member work breakdown + difficulty: [`docs/CONTRIBUTIONS.md`](docs/CONTRIBUTIONS.md).
+
 _Build/run details and experiment results are expanded in `docs/PROJECT.md`._
