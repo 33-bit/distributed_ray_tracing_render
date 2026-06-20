@@ -10,6 +10,18 @@ MPICXX   ?= mpic++
 CXXFLAGS ?= -std=c++17 -Wall -Wextra -O2 -Isrc
 LDFLAGS  ?=
 
+# --- OpenMP (for the MPI+OpenMP hybrid build) ---
+# Apple clang needs libomp + -Xpreprocessor; Linux/gcc takes plain -fopenmp.
+UNAME := $(shell uname)
+ifeq ($(UNAME),Darwin)
+  LIBOMP  := $(shell brew --prefix libomp 2>/dev/null)
+  OMP_CXX := -Xpreprocessor -fopenmp -I$(LIBOMP)/include
+  OMP_LD  := -L$(LIBOMP)/lib -lomp
+else
+  OMP_CXX := -fopenmp
+  OMP_LD  := -fopenmp
+endif
+
 MAIN := src/main.cpp
 BUILD := build
 
@@ -20,9 +32,10 @@ all: seq mpi
 seq: $(MAIN) $(wildcard src/**/*.hpp)
 	$(CXX) $(CXXFLAGS) $(MAIN) -o raytracer_seq $(LDFLAGS)
 
-# Distributed build. USE_MPI pulls in everything under src/mpi/.
+# Distributed build. USE_MPI pulls in src/mpi/; OpenMP threads each worker
+# across its cores (the MPI+OpenMP hybrid).
 mpi: $(MAIN) $(wildcard src/**/*.hpp)
-	$(MPICXX) $(CXXFLAGS) -DUSE_MPI $(MAIN) -o raytracer_mpi $(LDFLAGS)
+	$(MPICXX) $(CXXFLAGS) -DUSE_MPI $(OMP_CXX) $(MAIN) -o raytracer_mpi $(LDFLAGS) $(OMP_LD)
 
 # Core unit tests grow as Members A and B land their modules.
 test: src/test_core.cpp $(wildcard src/**/*.hpp)

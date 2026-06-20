@@ -11,14 +11,15 @@
 
 struct CsvLogger {
     static void write(const std::string& path, const std::string& schedule,
-                      const RenderParams& p, int nprocs, const std::vector<BenchLog>& logs) {
+                      const RenderParams& p, int nprocs, int threads,
+                      const std::vector<BenchLog>& logs) {
         bool exists = std::ifstream(path).good();
         std::ofstream out(path, std::ios::app);
         if (!exists)
-            out << "nprocs,schedule,width,height,spp,depth,shadow_samples,frames,tile,"
+            out << "nprocs,threads,schedule,width,height,spp,depth,shadow_samples,frames,tile,"
                    "rank,role,comp_s,comm_s,idle_s,tiles,total_s\n";
         for (const BenchLog& b : logs) {
-            out << nprocs << ',' << schedule << ','
+            out << nprocs << ',' << threads << ',' << schedule << ','
                 << p.width << ',' << p.height << ',' << p.spp << ',' << p.max_depth << ','
                 << p.shadow_samples << ',' << p.total_frames << ',' << p.tile_size << ','
                 << b.rank << ',' << (b.role ? "worker" : "master") << ','

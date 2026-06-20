@@ -25,6 +25,10 @@
 #include "benchmark/csv_logger.hpp"
 #endif
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 namespace fs = std::filesystem;
 
 struct Options {
@@ -32,6 +36,7 @@ struct Options {
     std::string out_dir = "frames";
     std::string schedule = "dynamic";   // dynamic | static (MPI build)
     std::string bench_csv;              // if set, append per-rank timing here
+    int         threads = 1;            // OpenMP threads per process (hybrid)
 };
 
 static Options parse_args(int argc, char** argv) {
@@ -49,6 +54,7 @@ static Options parse_args(int argc, char** argv) {
         else if (a == "--out")            o.out_dir               = val();
         else if (a == "--schedule")       o.schedule              = val();
         else if (a == "--bench")          o.bench_csv             = val();
+        else if (a == "--threads")        o.threads               = std::atoi(val());
         else { std::fprintf(stderr, "unknown arg: %s\n", a.c_str()); }
     }
     return o;
@@ -91,12 +97,15 @@ int main(int argc, char** argv) {
     MPI_Bcast(pbuf, 8, MPI_INT, 0, MPI_COMM_WORLD);
     RenderParams params = (rank == 0) ? o.params : mpi_proto::decode_params(pbuf);
     Schedule mode = (o.schedule == "static") ? Schedule::Static : Schedule::Dynamic;
+#ifdef _OPENMP
+    omp_set_num_threads(o.threads > 0 ? o.threads : 1);   // hybrid: threads per worker
+#endif
 
     BenchLog log;
     if (rank == 0) {
         fs::create_directories(o.out_dir);
-        std::printf("[mpi] %d proc(s)  %s  %dx%d spp=%d depth=%d shadow=%d frames=%d tile=%d -> %s/\n",
-                    size, o.schedule.c_str(), params.width, params.height, params.spp,
+        std::printf("[mpi] %d proc x %d thr  %s  %dx%d spp=%d depth=%d shadow=%d frames=%d tile=%d -> %s/\n",
+                    size, o.threads, o.schedule.c_str(), params.width, params.height, params.spp,
                     params.max_depth, params.shadow_samples, params.total_frames,
                     params.tile_size, o.out_dir.c_str());
         run_master(params, o.out_dir, mode, log);
@@ -120,7 +129,7 @@ int main(int argc, char** argv) {
                         comp_max > 0 ? 100.0 * (comp_max - comp_min) / comp_max : 0.0);
         std::printf("\n");
         if (!o.bench_csv.empty()) {
-            CsvLogger::write(o.bench_csv, o.schedule, params, size, all);
+            CsvLogger::write(o.bench_csv, o.schedule, params, size, o.threads, all);
             std::printf("[mpi] benchmark appended -> %s\n", o.bench_csv.c_str());
         }
     }

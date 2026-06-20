@@ -29,6 +29,12 @@ struct Renderer {
         const double inv_w = 1.0 / p.width;
         const double inv_h = 1.0 / p.height;
 
+        // Hybrid layer: thread the tile's rows across the worker's cores. Every
+        // pixel writes a distinct location and seeds its own RNG, so the output
+        // is identical for any thread count — no races, still bit-deterministic.
+#ifdef _OPENMP
+        #pragma omp parallel for schedule(dynamic, 1)
+#endif
         for (int py = t.y0; py < t.y1; ++py) {
             for (int px = t.x0; px < t.x1; ++px) {
                 Color sum(0, 0, 0);
