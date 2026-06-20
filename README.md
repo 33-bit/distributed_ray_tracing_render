@@ -15,9 +15,11 @@ communication cost, granularity, speedup, and the process/thread split.
 from OpenMP** within one worker; dynamic scheduling holds worker imbalance to
 **3 %** where static drifts to **27 %**.
 
-> Full write-up: [`docs/PROJECT.md`](docs/PROJECT.md) · Multi-machine cluster
-> setup + demo guide: [`docs/CLUSTER_SETUP.md`](docs/CLUSTER_SETUP.md) · Design
-> spec: [`docs/superpowers/specs/2026-06-19-mpi-ray-tracer-design.md`](docs/superpowers/specs/2026-06-19-mpi-ray-tracer-design.md)
+> Full write-up (incl. **math & concepts background** in Appendix A):
+> [`docs/PROJECT.md`](docs/PROJECT.md) · Cluster setup + demo guide:
+> [`docs/CLUSTER_SETUP.md`](docs/CLUSTER_SETUP.md) · **Viva Q&A cheat-sheet:**
+> [`docs/VIVA_QA.md`](docs/VIVA_QA.md) · Design spec:
+> [`docs/superpowers/specs/2026-06-19-mpi-ray-tracer-design.md`](docs/superpowers/specs/2026-06-19-mpi-ray-tracer-design.md)
 
 ## Quick start
 
