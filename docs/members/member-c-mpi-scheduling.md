@@ -123,3 +123,53 @@ compute spread = **3.5 %** vs static **7.3 %**, and dynamic gave the slow worker
 *fewer* tiles (250 vs 265) to compensate while static forced 260 each. The
 balanced demo scene keeps the gap modest; coarser tiles widen it (granularity
 experiment, Task 8).
+
+### 2026-06-20 — MPI + OpenMP hybrid
+
+**Idea.** Single-node MPI ignores the obvious second axis of parallelism: each
+worker owns many cores. Add a shared-memory layer so the system is genuinely
+two-level — distributed across processes, threaded within each.
+
+**What I did.** `#pragma omp parallel for` over the tile's rows in `render_tile`,
+a `--threads N` flag (`omp_set_num_threads`), and OS-detected OpenMP in the
+Makefile (libomp + `-Xpreprocessor` on macOS, plain `-fopenmp` on Linux). Threads
+recorded in the CSV.
+
+**Why this, not the alternative.**
+- *Thread the pixel rows, not whole tiles per thread.* Rows are the natural
+  independent unit inside `render_tile`; each pixel writes a distinct location and
+  seeds its own RNG, so the output is bit-identical for any thread count — no
+  locks, determinism preserved (re-verified MSE=0).
+- *`schedule(dynamic,1)`* because per-row cost varies (glass/mirror rows are
+  heavier), so dynamic keeps threads balanced.
+- *Gotcha:* `mpirun --bind-to none` is required, else Open MPI pins each process
+  to one core and OpenMP cannot expand.
+
+**Result.** One worker scales **8.48 s → 1.74 s over 1→7 threads (4.86×)**. The
+hybrid (e.g. 2 procs × 7 threads) is competitive with flat MPI (8 procs × 1) and
+is the canonical pattern for a cluster of multi-core nodes.
+
+### 2026-06-20 — Non-blocking prefetch
+
+**Idea.** In the blocking loop a worker stalls after sending a result until the
+master replies with the next task. Hide that round-trip by always keeping the
+next tile in flight.
+
+**What I did.** A `--prefetch` mode: the master runs **depth-2 dispatch** (a
+per-rank FIFO of in-flight tasks); the worker **double-buffers** — posts
+`MPI_Irecv` for the next tile and `MPI_Isend` for the previous result, both
+overlapping the current render, then `MPI_Wait`s on the prefetched task. The
+blocking path (lookahead=1) is untouched as the baseline.
+
+**Why this, not the alternative.**
+- *Generalized the master to depth-N* rather than writing a second master —
+  depth 1 reproduces the old behaviour exactly, depth 2 enables prefetch, and
+  results still arrive in per-rank FIFO order so tracking stays a simple deque.
+- *Wait on the previous `Isend` before repacking the send buffer* — the one
+  correctness subtlety of reusing a single buffer; cheap because the master
+  consumes promptly.
+
+**Result.** Correct (MSE=0, no deadlock). The gain is small on one node
+(0.79→0.78 s; 0.625→0.617 s at fine tiles) because shared-memory MPI latency is
+tiny — the benefit grows with real network latency. That communication is *not*
+the bottleneck here is itself a useful finding.

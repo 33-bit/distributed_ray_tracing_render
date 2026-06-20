@@ -134,11 +134,35 @@ def sched_chart(path, out):
     print("wrote", out)
 
 
+def hybrid_chart(path, out):
+    """Makespan for each MPI-process × OpenMP-thread split (same total cores)."""
+    groups = collections.OrderedDict()
+    for r in load(path):
+        groups.setdefault((r['nprocs'], int(r['threads'])), []).append(r)
+    labels, makespan = [], []
+    for key in sorted(groups, key=lambda k: -k[0]):     # flat (8p×1t) leftmost
+        m, _ = best_trial(groups[key])
+        labels.append(f"{key[0]}p×{key[1]}t")
+        makespan.append(m['total_s'])
+    x = np.arange(len(labels))
+    fig, ax = plt.subplots(figsize=(8, 5))
+    bars = ax.bar(x, makespan, color='tab:purple')
+    ax.bar_label(bars, fmt='%.2fs')
+    ax.set_xticks(x); ax.set_xticklabels(labels)
+    ax.set(xlabel='MPI processes × OpenMP threads per process',
+           ylabel='makespan (s)',
+           title='Hybrid MPI+OpenMP: makespan vs split (same total cores)')
+    ax.grid(alpha=.3, axis='y')
+    fig.tight_layout(); fig.savefig(out, dpi=120); plt.close(fig)
+    print("wrote", out)
+
+
 def main():
     d = sys.argv[1] if len(sys.argv) > 1 else 'output'
     jobs = [('speedup.csv', speedup_chart, 'chart_speedup.png'),
             ('granularity.csv', granularity_chart, 'chart_granularity.png'),
-            ('sched.csv', sched_chart, 'chart_schedule.png')]
+            ('sched.csv', sched_chart, 'chart_schedule.png'),
+            ('hybrid.csv', hybrid_chart, 'chart_hybrid.png')]
     made = 0
     for name, fn, out in jobs:
         p = os.path.join(d, name)

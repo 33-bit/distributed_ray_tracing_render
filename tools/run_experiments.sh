@@ -54,5 +54,27 @@ for sch in dynamic static; do
     done
 done
 
-echo "wrote: $GCSV  $SCSV  $DCSV"
+# --- Hybrid: fixed workload, vary the MPI-process x OpenMP-thread split ---
+# --bind-to none so Open MPI doesn't pin a process to one core (OpenMP needs room).
+HCSV="$OUTDIR/hybrid.csv"; rm -f "$HCSV"
+echo "## hybrid MPI x OpenMP (tile 32)"
+for combo in "8 1" "4 2" "2 4" "2 7"; do
+    set -- $combo; p=$1; thr=$2
+    for trial in $(seq 1 "$TRIALS"); do
+        mpirun --bind-to none -np "$p" $BIN $COMMON --tile 32 --threads "$thr" \
+            --schedule dynamic --out "$FRAMESDIR" --bench "$HCSV" | sed "s/^/   ${p}px${thr}t /"
+    done
+done
+
+# --- Non-blocking prefetch vs blocking (fine tiles = more round-trips) ---
+echo "## prefetch vs blocking (P=$MAXP, tile 16)"
+for pf in "" "--prefetch"; do
+    lbl=$([ -z "$pf" ] && echo blocking || echo prefetch)
+    for trial in $(seq 1 "$TRIALS"); do
+        mpirun -np "$MAXP" $BIN $COMMON --tile 16 $pf --schedule dynamic \
+            --out "$FRAMESDIR" 2>/dev/null | grep makespan | sed "s/^/   $lbl /"
+    done
+done
+
+echo "wrote: $GCSV  $SCSV  $DCSV  $HCSV"
 echo "now run: python3 tools/make_charts.py $OUTDIR"

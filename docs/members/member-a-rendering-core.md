@@ -93,3 +93,22 @@ single dot-product solve with a parallel-ray guard. Camera builds an orthonormal
 **Tests (`make test`): 18 checks, 0 failures** — dot/cross/normalize/reflect,
 RNG determinism, sphere hit `t=4` with camera-facing normal, plane hit `t=1`,
 camera center ray ≈ `(0,0,-1)`.
+
+### 2026-06-20 — Triangle primitive (`triangle.hpp`)
+
+**Idea.** Add a third intersectable so the renderer isn't limited to spheres and
+planes, and to give the geometry layer the building block for triangle meshes.
+
+**What I did.** `Triangle : Hittable` via the Möller–Trumbore algorithm — solve
+the ray/triangle test directly in barycentric coordinates `(u,v)` with no
+precomputed plane. Double-sided. Wired a 4-triangle pyramid into the demo scene.
+
+**Why this, not the alternative.**
+- *Möller–Trumbore, not plane-hit-then-inside-test.* It is the standard,
+  branch-light formulation and yields the barycentric coords for free (useful
+  later for interpolated normals / texture coords).
+- *Double-sided (no back-face cull)* so a lone triangle is visible from either
+  side — fewer surprises in a hand-built scene.
+
+**Tests: +4** (hit at `t=2` with a camera-facing normal; miss outside the
+triangle). Member A main code now ~273 LOC.

@@ -156,3 +156,30 @@ filler — and it visibly improved both the render and the experiments.
 glass, refracted ray stays unit-length, and grazing glass→air is total internal
 reflection.
 
+### 2026-06-20 — Spotlight, distance attenuation, Beer-Lambert glass
+
+**Idea.** Round out the lighting/material model with the three effects that most
+change how a scene reads: a focused spotlight, plausible distance falloff, and
+colored (absorbing) glass.
+
+**What I did.**
+- `Light` gained a spotlight cone (smooth `smoothstep` edge between `cos_inner`
+  and `cos_outer`) and optional `1/(1+k·d²)` distance attenuation, plus named
+  factories (`point` / `area` / `spot`, `with_attenuation`).
+- `Material` gained an `absorption` colour + `colored_glass()`; the dielectric
+  path now applies Beer-Lambert `exp(-absorption · path)` to light traversing the
+  glass.
+- Demo: a cool cyan spotlight casts a tinted pool of light on the floor.
+
+**Why this, not the alternative.**
+- *One `Light` struct with flags, not a class hierarchy* — keeps it a POD that
+  Member C can still ship as a flat block of numbers.
+- *`smoothstep` cone edge, not a hard cutoff* — avoids an aliased rim on the spot.
+- *Beer-Lambert keyed on the back-face hit distance (`rec.t`)* — that is exactly
+  how far the ray travelled inside the glass; clear glass (absorption 0) is
+  unaffected, so the seq-vs-MPI determinism baseline is untouched.
+
+**Tests: +6** (smoothstep ramp; spotlight lights under-but-not-aside; Beer
+falloff). Shading stays deterministic → seq vs MPI MSE=0. Member B main code now
+~251 LOC.
+
