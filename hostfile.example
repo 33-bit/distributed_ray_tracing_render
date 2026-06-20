@@ -1,0 +1,13 @@
+# MPI hostfile — copy to "hostfile" and edit with your real machines.
+#
+# Each line: <name> slots=<cores>
+#   - <name> must resolve (add it to /etc/hosts on EVERY node) and be reachable
+#     by passwordless SSH from the machine you run mpirun on.
+#   - slots = number of CPU cores on that machine (check with: nproc).
+#
+# See docs/CLUSTER_SETUP.md for the full walkthrough.
+
+master slots=4
+node1  slots=4
+node2  slots=4
+node3  slots=4
