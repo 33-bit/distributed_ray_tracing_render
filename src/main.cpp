@@ -37,6 +37,7 @@ struct Options {
     std::string schedule = "dynamic";   // dynamic | static (MPI build)
     std::string bench_csv;              // if set, append per-rank timing here
     int         threads = 1;            // OpenMP threads per process (hybrid)
+    bool        prefetch = false;       // non-blocking double-buffered worker
 };
 
 static Options parse_args(int argc, char** argv) {
@@ -55,6 +56,7 @@ static Options parse_args(int argc, char** argv) {
         else if (a == "--schedule")       o.schedule              = val();
         else if (a == "--bench")          o.bench_csv             = val();
         else if (a == "--threads")        o.threads               = std::atoi(val());
+        else if (a == "--prefetch")       o.prefetch              = true;
         else { std::fprintf(stderr, "unknown arg: %s\n", a.c_str()); }
     }
     return o;
@@ -104,13 +106,13 @@ int main(int argc, char** argv) {
     BenchLog log;
     if (rank == 0) {
         fs::create_directories(o.out_dir);
-        std::printf("[mpi] %d proc x %d thr  %s  %dx%d spp=%d depth=%d shadow=%d frames=%d tile=%d -> %s/\n",
-                    size, o.threads, o.schedule.c_str(), params.width, params.height, params.spp,
-                    params.max_depth, params.shadow_samples, params.total_frames,
-                    params.tile_size, o.out_dir.c_str());
-        run_master(params, o.out_dir, mode, log);
+        std::printf("[mpi] %d proc x %d thr  %s  %s  %dx%d spp=%d depth=%d shadow=%d frames=%d tile=%d -> %s/\n",
+                    size, o.threads, o.schedule.c_str(), o.prefetch ? "prefetch" : "blocking",
+                    params.width, params.height, params.spp, params.max_depth,
+                    params.shadow_samples, params.total_frames, params.tile_size, o.out_dir.c_str());
+        run_master(params, o.out_dir, mode, log, o.prefetch ? 2 : 1);
     } else {
-        run_worker(params, log);
+        run_worker(params, log, o.prefetch);
     }
 
     std::vector<BenchLog> all = gather_logs(log, rank, size);

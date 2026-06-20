@@ -16,6 +16,7 @@
 
 #include <mpi.h>
 #include <vector>
+#include <deque>
 #include <map>
 #include <string>
 #include <cstdio>
@@ -28,7 +29,7 @@
 #include "benchmark/benchmark.hpp"
 
 inline void run_master(const RenderParams& base, const std::string& out_dir,
-                       Schedule mode, BenchLog& log) {
+                       Schedule mode, BenchLog& log, int lookahead = 1) {
     int size;
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     const int nworkers = size - 1;
@@ -88,7 +89,7 @@ inline void run_master(const RenderParams& base, const std::string& out_dir,
     std::vector<std::vector<int>> wq(nworkers);
     for (int i = 0; i < T; ++i) wq[i % nworkers].push_back(i);
     std::vector<size_t> wcursor(nworkers, 0);
-    std::vector<int> pending(size, -1);   // pending[rank] = task index in flight
+    std::vector<std::deque<int>> inflight(size);   // per-rank FIFO of in-flight task indices
 
     auto next_task_for = [&](int rank) -> int {
         if (mode == Schedule::Dynamic)
@@ -102,7 +103,7 @@ inline void run_master(const RenderParams& base, const std::string& out_dir,
         t.start();
         MPI_Send(buf, 5, MPI_INT, rank, TAG_TASK, MPI_COMM_WORLD);
         log.comm_s += t.elapsed_s();
-        pending[rank] = ti;
+        inflight[rank].push_back(ti);
     };
     auto send_stop = [&](int rank) {
         int z[5] = { 0, 0, 0, 0, 0 };
@@ -111,10 +112,15 @@ inline void run_master(const RenderParams& base, const std::string& out_dir,
         log.comm_s += t.elapsed_s();
     };
 
-    // Seed each worker with one task (or stop it if there is nothing for it).
+    // Seed each worker with up to `lookahead` tasks (lookahead=2 keeps a worker's
+    // next tile already in flight, which is what the prefetch worker overlaps).
     for (int r = 1; r <= nworkers; ++r) {
-        int ti = next_task_for(r);
-        if (ti >= 0) send_task(r, ti); else send_stop(r);
+        for (int d = 0; d < lookahead; ++d) {
+            int ti = next_task_for(r);
+            if (ti < 0) break;
+            send_task(r, ti);
+        }
+        if (inflight[r].empty()) send_stop(r);
     }
 
     // Collect results; on each, place the tile, then refill or stop that worker.
@@ -132,13 +138,15 @@ inline void run_master(const RenderParams& base, const std::string& out_dir,
         MPI_Recv(buf.data(), count, MPI_UNSIGNED_CHAR, src, TAG_RESULT, MPI_COMM_WORLD, &st);
         log.comm_s += t.elapsed_s();           // receiving the tile bytes
 
-        const Task& tk = tasks[pending[src]];
+        const Task& tk = tasks[inflight[src].front()];   // results return in FIFO order per rank
+        inflight[src].pop_front();
         mpi_proto::unpack_tile(frame_buffer(tk.frame), tk.tile, buf.data());
         ++completed;
         if (--remaining[tk.frame] == 0) finish_frame(tk.frame);
 
         int nt = next_task_for(src);
-        if (nt >= 0) send_task(src, nt); else send_stop(src);
+        if (nt >= 0) send_task(src, nt);
+        else if (inflight[src].empty()) send_stop(src);   // worker drained -> stop its pending recv
     }
     log.total_s = wall.elapsed_s();
 }
