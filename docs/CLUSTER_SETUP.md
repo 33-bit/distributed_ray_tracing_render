@@ -193,6 +193,41 @@ clusters; more setup. (Search "Ubuntu NFS server" — out of scope here.)
 > you build on each node, so this is automatic. With NFS + mixed arch, it breaks —
 > keep the cluster homogeneous (see §0).
 
+### Usernames — same on all nodes? (recommended yes)
+
+Not strictly required, but the **same username on every node** makes two things
+line up automatically:
+
+1. **SSH login** — `mpirun` SSHes into each node *as the username it runs as on the
+   master*. If master is `alice` and a node is `bob`, it tries `ssh alice@node` →
+   fails. Same username → `ssh node` just works.
+2. **Binary path** — Open MPI runs the executable at the *same path* on every node
+   (under your home dir). Same username → same `/home/<user>/raytracer` everywhere.
+
+So the simplest setup is: **create the same username on all VMs/machines** and use
+Option A above (`git clone … ~/raytracer`).
+
+**If usernames must differ**, do both of these:
+
+- Per-host `User` in `~/.ssh/config` on the **master**:
+  ```
+  Host node1
+      HostName 192.168.x.11
+      User bob
+  Host node2
+      HostName 192.168.x.12
+      User charlie
+  ```
+  (`mpirun` uses ssh, which reads this — so `ssh node1` becomes `ssh bob@node1`.)
+- Put the code at a **username-independent path** on every node and launch with an
+  absolute path + `--wdir`, so it doesn't depend on differing home dirs:
+  ```bash
+  sudo mkdir -p /opt/raytracer && sudo chown $USER /opt/raytracer
+  git clone <repo> /opt/raytracer && cd /opt/raytracer && make mpi
+  # then run with:
+  mpirun --hostfile hostfile --wdir /opt/raytracer -np N /opt/raytracer/raytracer_mpi ...
+  ```
+
 Create the **hostfile** in the project dir on the **master** (`slots` = CPU cores
 on that machine; check with `nproc`):
 ```
