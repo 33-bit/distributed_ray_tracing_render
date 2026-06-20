@@ -65,10 +65,15 @@ inline void run_master(const RenderParams& base, const std::string& out_dir,
 
     // np == 1: no workers, render everything locally (the speedup baseline T1).
     if (nworkers <= 0) {
+        int cached_frame = 0;
+        Scene sc = build_demo_scene(aspect, 0, base.total_frames);
         for (const Task& tk : tasks) {
             RenderParams p = base; p.frame = tk.frame;
             t.start();
-            Scene sc = build_demo_scene(aspect, tk.frame, base.total_frames);
+            if (tk.frame != cached_frame) {
+                sc = build_demo_scene(aspect, tk.frame, base.total_frames);
+                cached_frame = tk.frame;
+            }
             Renderer::render_tile(sc, p, tk.tile, frame_buffer(tk.frame));
             log.comp_s += t.elapsed_s();
             ++log.tiles;

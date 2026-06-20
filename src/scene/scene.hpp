@@ -85,7 +85,9 @@ inline Scene build_demo_scene(double aspect, int frame, int total_frames) {
     double light_radius = 5.0;
     s.lights_.push_back(Light{
         Vec3(light_radius * std::sin(light_angle), 6.0, light_radius * std::cos(light_angle)),
-        Color(1.0, 0.95, 0.9), 0.0 });
+        Color(1.0, 0.95, 0.9),
+        0.6 });   // area light: radius 0.6 -> soft shadows when --shadow-samples > 1
+                  // (with shadow-samples=1 it degenerates to a hard point light)
 
     return s;
 }

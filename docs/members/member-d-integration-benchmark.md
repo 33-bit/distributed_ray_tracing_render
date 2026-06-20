@@ -143,3 +143,50 @@ determinism design end to end.
 > renderer was never wrong (`cmp` had already shown the files identical) — the
 > bug was in the checker. Fixed the dtype.
 
+### 2026-06-20 — Video, experiment runner, charts (+ scene tuning)
+
+**Idea.** Produce the final artifacts: the rendered video, the experiment CSVs,
+and the report charts (speedup, granularity, load balance).
+
+**What I did.**
+- `assemble_video.sh` — ffmpeg PPM→H.264 mp4 (even-dimension scale filter).
+- `run_experiments.sh` — sweeps tile size {16,32,64,128} and P {1,2,4,8},
+  best-of-N trials, dumps CSVs.
+- `make_charts.py` — speedup+efficiency, granularity stacked bar, static-vs-
+  dynamic load balance.
+- Tuning that came out of the first noisy run (see below): made the demo light
+  an **area light** so `--shadow-samples` produces real soft shadows, and made
+  the worker/master **cache the scene per frame** instead of rebuilding it per
+  tile.
+
+**Why this, not the alternative.**
+- *H.264/mp4 via ffmpeg, even-dim scale filter.* yuv420p (needed for broad
+  playback) requires even width/height; the `scale=trunc(iw/2)*2:...` filter
+  guarantees it without me constraining render resolutions.
+- *Best-of-N trials, keep the fastest.* My first single-trial sweep had a
+  wandering outlier (one config would randomly spike 2–3×) because the laptop
+  was doing other work. Min-of-N is the standard way to estimate compute time
+  under contention; `make_charts.py` chunks each config's rows into trials and
+  keeps the fastest. This turned a noisy granularity plot into the clean
+  comm-grows-with-finer-tiles result.
+- *Area light + soft shadows for the benchmark workload.* The first speedup runs
+  were overhead-bound (per-tile compute too small next to MPI traffic). Soft
+  shadows add real, content-dependent compute per tile, which (a) makes the
+  speedup curve meaningful, (b) makes the load-balance experiment matter, and
+  (c) demonstrates a feature we promised. Determinism still holds — the
+  soft-shadow samples are pixel-seeded — so seq vs MPI stays MSE=0 (re-verified
+  with `--shadow-samples 4`).
+- *Scene cached per frame.* Rebuilding the scene for every tile was redundant
+  work that unfairly inflated worker time vs the sequential baseline (which
+  builds once per frame). Caching makes the comparison apples-to-apples.
+
+**Results (480×360, spp 16, depth 6, soft shadows ×4, 8 frames, best-of-3):**
+- **Speedup**: T1 = 4.58 s; P=2 → 4.71 s (1 worker ≈ 1 core, dedicated master);
+  P=4 → 1.60 s (2.9×); P=8 → 0.91 s (**5.0×**, ~72 % efficiency vs the 7 workers).
+- **Granularity**: communication share is largest at 16×16 and shrinks as tiles
+  grow; makespan drifts down 0.95 s → 0.87 s (16→128). Coarser = less master
+  traffic.
+- **Load balance**: dynamic **1.6 %** worker-compute spread vs static **5.8 %**.
+- **Correctness**: MSE = 0 (byte-identical) with hard and soft shadows.
+- **Video**: 480×360 H.264, 48 frames, orbiting camera + soft moving shadows.
+

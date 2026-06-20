@@ -24,6 +24,11 @@ inline void run_worker(const RenderParams& base, BenchLog& log) {
     Image img(base.width, base.height);   // reused scratch buffer
     int task_buf[5];
 
+    // Cache the scene and rebuild only when the frame changes — tasks tend to
+    // arrive frame-grouped, so this avoids rebuilding the scene for every tile.
+    int   cached_frame = 0;
+    Scene scene = build_demo_scene(aspect, 0, base.total_frames);
+
     Timer wall; wall.start();
     Timer t;
     for (;;) {
@@ -39,7 +44,10 @@ inline void run_worker(const RenderParams& base, BenchLog& log) {
         p.frame = task.frame;
 
         t.start();
-        Scene scene = build_demo_scene(aspect, task.frame, base.total_frames);
+        if (task.frame != cached_frame) {
+            scene = build_demo_scene(aspect, task.frame, base.total_frames);
+            cached_frame = task.frame;
+        }
         Renderer::render_tile(scene, p, task.tile, img);
         log.comp_s += t.elapsed_s();          // rendering this tile
 
