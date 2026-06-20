@@ -190,3 +190,23 @@ and the report charts (speedup, granularity, load balance).
 - **Correctness**: MSE = 0 (byte-identical) with hard and soft shadows.
 - **Video**: 480×360 H.264, 48 frames, orbiting camera + soft moving shadows.
 
+### 2026-06-20 — Re-run after the glass sphere landed (final numbers)
+
+When Member B added the refractive glass sphere I re-ran the whole suite, because
+glass adds heavy, content-dependent per-tile cost. The headline numbers in
+`docs/PROJECT.md` §6 are this final run:
+- **Speedup**: T1 = 7.15 s → P=4 2.9×, **P=8 5.3×**.
+- **Granularity**: communication share 4.0 % (16×16) → 0.4 % (128×128).
+- **Load balance**: dynamic **1.3 %** vs static **31.6 %** — far more dramatic
+  than before, because the glass/mirror tiles are now genuinely expensive, so a
+  static cyclic split strands the unlucky worker. This is the clearest possible
+  argument for dynamic scheduling, and it came for free from a graphics feature.
+- **Correctness** still MSE = 0 with all features on.
+
+Retrospective: keeping the renderer a pure, deterministic function of
+(scene, params) was the decision that paid off most — it made the parallel build
+*provably* correct (`cmp`-clean), turned debugging into a non-event, and let
+every experiment be re-run without fear. The one thing I'd change: let rank 0
+render when idle, to reclaim the dedicated-master core and lift the speedup
+ceiling from P−1 toward P.
+
