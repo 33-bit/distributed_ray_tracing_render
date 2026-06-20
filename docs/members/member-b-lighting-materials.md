@@ -29,6 +29,44 @@ Color shade(const ISceneQuery& scene, const Ray& r, int depth, int max_depth,
 Color gamma_correct(Color c, double gamma = 2.2);
 ```
 
+## Theory I should know (my part)
+
+> Full version: `docs/PROJECT.md` Appendix A.1. My job: given a ray–surface hit
+> (from Member A), compute its colour.
+
+**Phong lighting** — colour = ambient + Σ over lights of (diffuse + specular):
+- **Ambient** `ka·albedo` — a small constant so shadows aren't pure black.
+- **Diffuse (Lambert)** `albedo · I · max(0, N·L)`. `N·L` is a cosine: a surface
+  is brightest when it faces the light (`L` = direction to light), dark when edge-on.
+- **Specular (Phong)** `ks · I · max(0, R·V)^shininess` — the shiny highlight.
+  `R` is `L` mirrored about `N`, `V` points to the camera; the power tightens it.
+
+**Shadows.** For each light, shoot a **shadow ray** from the hit toward the light;
+if it hits something first, that light is blocked here. A **point light** → one
+ray → hard edge. An **area light** → sample `S` points on it and average
+visibility → soft **penumbra**. Averaging random samples is **Monte Carlo**
+integration: more samples, smoother, slower.
+
+**Reflection (mirror).** Bounce the ray about the normal, `R = D − 2(D·N)N`, trace
+it recursively, blend it in by the material's reflectivity; a depth cap stops
+infinite mirror-in-mirror recursion.
+
+**Refraction (glass).** Light bends by **Snell's law** `n₁sinθ₁ = n₂sinθ₂`
+(air n≈1, glass n≈1.5). If it's too steep to exit, that's **total internal
+reflection**. How much reflects vs refracts is **Fresnel**, approximated by
+**Schlick** `R0 + (1−R0)(1−cosθ)⁵` — more reflection at grazing angles, which is
+why a glass rim looks bright. **Beer–Lambert** `e^(−σd)` darkens light by how far
+`d` it travelled through coloured glass.
+
+**Display fixes (applied by the renderer, but my helpers).** **Gamma** encodes
+`c^(1/2.2)` because monitors are non-linear — so all the math above stays in
+*linear* light and is corrected once at the end. **Reinhard tone mapping**
+`c/(1+c)` squashes over-bright highlights into `[0,1)` instead of clipping.
+
+**Why this matters for the parallel side:** all of the above is deterministic
+(the soft-shadow randomness is seeded per pixel-sample by Member A), so my shader
+gives identical output no matter which MPI rank runs it → MSE = 0.
+
 ## Log
 <!-- Entries appended as code lands. Format: Idea / What I did / Why this, not the alternative. -->
 

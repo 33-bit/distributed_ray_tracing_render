@@ -30,6 +30,42 @@ struct Timer { void start(); double elapsed_s() const; };
 struct BenchLog { double comp_s, comm_s, idle_s; long tiles; }; // per rank, gathered to CSV
 ```
 
+## Theory I should know (my part)
+
+> Full version: `docs/PROJECT.md` Appendix A. My job: wire A+B into a renderer,
+> animate it, and *measure* the parallel system.
+
+**The render loop (per pixel).** I call Member A's camera to make rays and Member
+B's `shade` to colour them, then:
+- **Anti-aliasing (supersampling):** shoot `spp` rays through jittered sub-pixel
+  spots and average — `colour = (1/spp) Σ shade(rayᵢ)` — smoothing jagged edges.
+- **Tone map then gamma:** `c/(1+c)` to tame bright highlights, then `c^(1/2.2)`
+  for the monitor — applied once, at write time, so reflection/refraction stay in
+  linear light.
+- **PPM output:** a dead-simple image format (`P6` header + raw RGB bytes), so
+  there are zero image-library dependencies and ffmpeg ingests it directly.
+
+**Animation = pure function of the frame index.** `build_demo_scene(aspect,frame,
+total)` places the camera on a circle (`angle = 2π·frame/total`, **linear
+interpolation** of position) and sweeps the light the other way. No mutable
+state between frames → any machine can render any frame independently. This is the
+scene-level twin of A's per-pixel determinism, and it's *why* the whole thing is
+embarrassingly parallel across both tiles and frames.
+
+**Benchmarking — the formulas I chart (see also Member C):**
+- **Speedup** `S(P)=T(1)/T(P)`; **Efficiency** `E(P)=S(P)/P`.
+- **Amdahl** caps speedup at `1/f` for a serial fraction `f`; **Gustafson**
+  `S=P−f(P−1)` explains why scaling improves when the problem grows with `P`.
+- **Granularity tradeoff** (tile size): fine tiles balance better but add
+  communication; coarse tiles do the opposite.
+- I split each rank's time into **compute / communication / idle** so the charts
+  show *where* the time goes, not just the total.
+
+**Correctness — MSE.** `MSE = (1/N) Σ (aᵢ − bᵢ)²` over every pixel byte (plus the
+max absolute difference). `0` = byte-identical. My `compare_frames.py` reports it;
+getting `0` is the proof that parallelizing changed *who* computes a pixel, never
+*what* it computes.
+
 ## Log
 <!-- Entries appended as code lands. Format: Idea / What I did / Why this, not the alternative. -->
 

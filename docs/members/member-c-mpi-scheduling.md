@@ -26,6 +26,54 @@ void run_worker(BenchLog& log);
 I depend on D's `Scene`, `RenderParams`, `render_tile()`, and `Image`; I do not
 touch shading or geometry internals.
 
+## Theory I should know (my part)
+
+> Full version: `docs/PROJECT.md` Appendix A.2–A.3. My job: take the (already
+> correct) renderer and make many machines/cores run it together.
+
+**Why it parallelizes at all.** Every pixel is computed independently — no pixel
+needs another's result. That's **data parallelism**, the *embarrassingly
+parallel* best case. I split each frame into 2-D **tiles** (decomposition) and
+hand tiles out to processors (**mapping**).
+
+**Two kinds of parallel memory:**
+- **Distributed memory (MPI):** many **processes**, each with its *own* memory,
+  possibly on different machines, cooperating by **sending messages**. Each has a
+  **rank** in a **communicator** (`MPI_COMM_WORLD`).
+- **Shared memory (OpenMP):** many **threads** on one machine sharing the *same*
+  memory, via compiler pragmas. We use **both** (hybrid).
+
+**MPI calls I use:**
+- Point-to-point: `MPI_Send`/`MPI_Recv` (*blocking* — wait till done),
+  `MPI_Isend`/`MPI_Irecv` (*non-blocking* — start now, `MPI_Wait` later).
+- Collectives: `MPI_Bcast` (one→all, the config), `MPI_Gather` (all→one, the
+  timings).
+- `MPI_ANY_SOURCE` — receive from whichever worker finishes first (enables
+  dynamic load balancing).
+
+**Master–worker.** Rank 0 (**master**) generates tiles and assembles frames; ranks
+1…P−1 (**workers**) loop: ask → render → return. **Dynamic** scheduling = a free
+worker immediately pulls the next tile, so uneven tile costs even out. **Static**
+(`tile mod nworkers`) fixes the split up front and can strand a slow worker — my
+load-balance experiment shows dynamic 3 % imbalance vs static 27 %.
+
+**OpenMP (hybrid).** `#pragma omp parallel for` splits a loop's iterations across
+a node's cores (**fork–join**: spawn threads, run, rejoin). I thread each worker's
+tile rows, so the system is two-level: MPI across nodes, OpenMP within a node.
+
+**Non-blocking / overlap.** A blocking worker idles while waiting for its next
+task. With `Isend`/`Irecv` it *starts* the transfer and keeps rendering, then
+waits — **hiding communication latency behind computation** (my `--prefetch`).
+
+**How we judge it (the numbers I report):**
+- **Speedup** `S(P)=T(1)/T(P)`, **Efficiency** `E(P)=S(P)/P` (ideal = 1).
+- **Amdahl's law** `S(P)=1/(f+(1−f)/P)`: a serial fraction `f` caps speedup at
+  `1/f` — why it saturates.
+- **Granularity** = compute ÷ communication per task: too fine → message overhead;
+  too coarse → imbalance.
+- **Communication cost** ≈ `latency + size/bandwidth` — tiny on one node, large
+  over a network (why prefetch helps more on a real cluster).
+
 ## Log
 <!-- Entries appended as code lands. Format: Idea / What I did / Why this, not the alternative. -->
 

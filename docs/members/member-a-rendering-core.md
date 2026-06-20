@@ -26,6 +26,48 @@ struct Sphere : Hittable { Sphere(Vec3 center, double radius, int material_id); 
 struct Plane  : Hittable { Plane(Vec3 point, Vec3 normal, int material_id); };
 ```
 
+## Theory I should know (my part)
+
+> Full version with diagrams: `docs/PROJECT.md` Appendix A.1–A.2. Here is the
+> minimum to explain my subsystem at the viva.
+
+**Vectors are the alphabet.** Everything is 3-D vectors. Two operations carry the
+whole project:
+- **Dot product** `a·b = ax·bx + ay·by + az·bz = |a||b|cosθ`. It measures
+  *alignment* — I use it for "how much does this surface face the light?" and to
+  project one vector onto another.
+- **Cross product** `a×b` gives a vector **perpendicular** to both — I use it to
+  build the camera's axes and a triangle's normal.
+- `normalize(v) = v/|v|` makes a unit-length direction.
+
+**A ray** is `P(t) = O + t·D` (origin + t·direction, `t ≥ 0`). Rendering a pixel =
+find the smallest `t > 0` where the ray meets a surface.
+
+**Ray–sphere** is a quadratic. Substituting the ray into `|X−C|² = r²` gives
+`a t² + b t + c = 0`; the **discriminant** `b²−4ac` decides miss (`<0`) vs hit,
+and the smaller positive root is the nearest surface. (I use the "half-b" form to
+drop the 4s.)
+
+**Ray–plane** is one division: `t = ((Q−O)·N)/(D·N)`; if `D·N≈0` the ray is
+parallel and misses.
+
+**Ray–triangle** (Möller–Trumbore) writes the hit point in **barycentric**
+coordinates `(1−u−v)V0 + uV1 + vV2`; `u,v ≥ 0` and `u+v ≤ 1` means "inside". It
+returns `t,u,v` from one 3×3 solve — no separate plane test.
+
+**The normal `N`** is the unit perpendicular at the hit; it's what the lighting
+(Member B) reads. Sphere: `(P−C)/r`. Triangle: `normalize(e1×e2)`.
+
+**The camera** is a pinhole: from eye/look-at/up I build an orthonormal basis and
+a virtual "viewport" rectangle; `get_ray(u,v)` shoots a ray from the eye through
+screen position `(u,v)∈[0,1]²`.
+
+**The RNG and determinism.** A pseudo-random generator turns a **seed** into a
+repeatable number stream. The crucial design choice (`seed_for(frame,x,y,sample)`)
+is to seed by *where and when* a sample is — never by which process computes it —
+so the renderer is a **pure function** and the MPI result equals the sequential
+one bit-for-bit. This is the foundation Member C's correctness proof stands on.
+
 ## Log
 <!-- Entries appended as code lands. Format: Idea / What I did / Why this, not the alternative. -->
 

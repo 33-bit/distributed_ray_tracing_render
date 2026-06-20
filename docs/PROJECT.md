@@ -18,6 +18,12 @@ It is positioned as a **distributed rendering *system***, not a graphics demo:
 the priority is a working MPI pipeline with measurable, explainable parallel
 performance and a provable correctness guarantee against a sequential baseline.
 
+> **New to ray tracing or MPI?** Start with **[Appendix A — Background: the math
+> & concepts](#appendix-a--background-the-math--concepts-you-need)** at the bottom
+> of this file. It explains every equation and parallel-computing term used here
+> from scratch. Each member's journal in `docs/members/` also opens with the
+> theory for that member's part.
+
 ![Sample frame](results/sample_frame.png)
 
 *Demo scene: checker floor, a diffuse sphere, a mirror sphere, a refractive glass
@@ -323,3 +329,185 @@ hybrid).
 **Deferred (per proposal §13):** BVH, textures, triangle *meshes* (the triangle
 primitive exists; mesh loading does not). Non-blocking MPI and the hybrid, listed
 as optional sophistication, are **implemented**.
+
+---
+
+# Appendix A — Background: the math & concepts you need
+
+New to ray tracing or MPI? Read this once and the rest of the project (and the
+viva questions) will make sense. Two halves: **the graphics math** (how a pixel
+becomes a colour) and **the parallel-computing concepts** (how we make it fast).
+Vectors are written `a`, dot product `a·b`, cross product `a×b`, `|a|` is length.
+
+## A.1 The graphics math
+
+### The ray
+A ray is a half-line: a point `P` along it is
+```
+P(t) = O + t·D ,    t ≥ 0
+```
+`O` = origin (the camera, or a hit point), `D` = direction (we keep it unit
+length). Ray tracing = "for each pixel, find the first surface the ray hits and
+work out its colour."
+
+### Ray–sphere intersection (a quadratic)
+A sphere is all points at distance `r` from centre `C`: `|X − C|² = r²`. Put the
+ray into it (`X = O + tD`, let `oc = O − C`):
+```
+(D·D) t² + 2(oc·D) t + (oc·oc − r²) = 0
+```
+That's `a t² + b t + c = 0`. The **discriminant** `Δ = b² − 4ac` tells us:
+`Δ < 0` → miss; `Δ ≥ 0` → hit at `t = (−b ∓ √Δ)/(2a)` (take the smaller positive
+`t` — the nearest surface). Code uses the tidy "half-b" form (`b/2 = oc·D`).
+
+### Ray–plane intersection (one division)
+Plane = point `Q` + normal `N`: `(X − Q)·N = 0`. Solve:
+```
+t = ((Q − O)·N) / (D·N)
+```
+If `D·N ≈ 0` the ray is parallel to the plane (no hit).
+
+### Ray–triangle (Möller–Trumbore, barycentric)
+Any point in a triangle is `(1−u−v)·V0 + u·V1 + v·V2` with `u,v ≥ 0`,
+`u+v ≤ 1` (the **barycentric** weights). Setting that equal to `O + tD` and
+solving the 3×3 system (with edges `e1=V1−V0`, `e2=V2−V0`) gives `t, u, v`
+directly — the inside test is just the sign of `u, v, u+v`.
+
+### Surface normal
+The **normal** `N` is the unit vector perpendicular to the surface at the hit
+point — it drives all the lighting. Sphere: `N = (P − C)/r`. Plane: `N` is given.
+Triangle: `N = normalize(e1 × e2)`.
+
+### Local lighting — the Phong model
+Colour at a hit = ambient + a sum over lights of diffuse + specular:
+```
+ambient  = ka · albedo                       (a little base light so shadows aren't pure black)
+diffuse  = albedo · I_light · max(0, N·L)    (Lambert: brightest when the surface faces the light)
+specular = ks · I_light · max(0, R·V)^shininess   (Phong highlight)
+```
+`L` = unit direction to the light, `V` = unit direction to the camera, `R` =
+`L` reflected about `N`. `N·L` is a cosine — it falls off as the surface turns
+away from the light. The `^shininess` power makes the specular dot tight/shiny.
+
+### Shadows
+Before adding a light's contribution, shoot a **shadow ray** from the hit point
+toward the light. If it hits anything *before* reaching the light, that point is
+in shadow for that light (skip it).
+
+**Soft shadows** = a light with area, not a point. Sample `S` random points on the
+light and average the visibility; partial blocking gives a smooth **penumbra**.
+This is **Monte Carlo integration**: `E[f] ≈ (1/S) Σ f(xᵢ)` — more samples, less
+noise.
+
+### Reflection (mirrors)
+A mirror ray is the incoming direction bounced about the normal:
+```
+R = D − 2 (D·N) N
+```
+We trace it recursively and mix the result in; a recursion **depth** cap stops
+infinite bouncing between mirrors.
+
+### Refraction (glass) — Snell + Fresnel
+Light bends entering a denser medium. **Snell's law:** `n₁ sin θ₁ = n₂ sin θ₂`
+(`n` = index of refraction; air ≈ 1, glass ≈ 1.5). Vector form with `η = n₁/n₂`,
+`c = −D·N`:
+```
+T = η D + (η c − √(1 − η²(1 − c²))) N
+```
+If the square root's argument is negative there is **total internal reflection**
+(no exit ray — all light reflects). How much reflects vs refracts is the
+**Fresnel** term, approximated by **Schlick**:
+```
+R(θ) = R0 + (1 − R0)(1 − cos θ)⁵ ,   R0 = ((n₁ − n₂)/(n₁ + n₂))²
+```
+(more reflection at grazing angles — why glass rims look bright).
+
+**Beer–Lambert** absorption tints thick glass: light surviving a path of length
+`d` is `I = I₀ · e^(−σ d)` per colour channel (`σ` = absorption).
+
+### Finishing a pixel
+- **Anti-aliasing (supersampling):** shoot `spp` rays through jittered sub-pixel
+  positions and average — `colour = (1/spp) Σ shade(rayᵢ)` — to smooth jagged
+  edges.
+- **Tone mapping (Reinhard):** squash unbounded brightness into `[0,1)` with
+  `c' = c/(1+c)` so highlights don't clip to flat white.
+- **Gamma correction:** monitors are non-linear, so we encode `c^(1/2.2)` at the
+  very end (rendering math stays *linear* until then).
+
+## A.2 The parallel-computing concepts
+
+### Why ray tracing parallelizes perfectly
+Every pixel is computed **independently** — no pixel needs another pixel's
+result. That's **data parallelism**: the same operation (trace a ray) on
+different data (each pixel). Problems like this are called *embarrassingly
+parallel* and are the easiest, best case for speedup.
+
+### Decomposition and mapping
+- **Decomposition** = split the work into pieces. We cut each frame into 2-D
+  **tiles** (data decomposition); each tile is also an independent **task** (task
+  decomposition) — hence "hybrid decomposition".
+- **Mapping** = assign pieces to processors. We use a **master–worker** map: one
+  process hands out tiles, the rest render them.
+
+### MPI — distributed memory
+**MPI (Message Passing Interface)** is the standard for **distributed-memory**
+parallelism: several **processes** (each with its *own* memory, possibly on
+different machines) cooperate by **sending messages**. Each process has a number
+(**rank**) within a group (**communicator**, `MPI_COMM_WORLD`).
+- **Point-to-point:** `MPI_Send` / `MPI_Recv` (one rank to one rank, *blocking* =
+  wait until done); `MPI_Isend` / `MPI_Irecv` (*non-blocking* = start now, finish
+  later with `MPI_Wait`).
+- **Collectives:** `MPI_Bcast` (one → all, e.g. broadcast the config),
+  `MPI_Gather` (all → one, e.g. collect timings), `MPI_Reduce` (all → one, combined
+  with an operation like sum).
+- `MPI_ANY_SOURCE` lets the master receive from *whichever* worker finishes first
+  — the key to dynamic load balancing.
+
+### Master–worker & load balancing
+Rank 0 (**master**) generates tasks and assembles results; ranks 1…P−1
+(**workers**) repeatedly ask for a tile, render it, return it. **Dynamic**
+scheduling (a worker pulls the next tile the instant it's free) keeps everyone
+busy even when tiles cost different amounts; the **static** alternative fixes the
+assignment up front and can leave fast workers idle.
+
+### OpenMP — shared memory (the hybrid's second level)
+**OpenMP** parallelizes within *one* machine using **threads** that **share
+memory**, via compiler hints. `#pragma omp parallel for` splits a loop's
+iterations across the cores (a **fork–join**: spawn threads, run, rejoin). We use
+it so each MPI worker also threads across *its* cores → two-level
+**MPI + OpenMP hybrid** (distributed across nodes, threaded within a node).
+
+### Overlapping communication with computation
+A blocking worker stalls while waiting for the next task. **Non-blocking**
+calls (`Isend`/`Irecv`) let it *start* the transfer and keep computing, then
+`Wait` later — hiding the message latency behind useful work (our `--prefetch`).
+
+## A.3 How we measure it (performance math)
+
+- **Speedup:** `S(P) = T(1) / T(P)` — how many times faster on `P` processors.
+- **Efficiency:** `E(P) = S(P) / P` — speedup per processor (ideal = 1 = 100 %).
+- **Amdahl's law** (fixed problem size): if a fraction `f` of the work is
+  inherently serial, `S(P) = 1 / (f + (1−f)/P)`, which can never exceed `1/f`. It
+  explains why speedup *saturates*. (In our renderer the serial part is mostly the
+  master's coordination + frame writing.)
+- **Gustafson's law** (grow the problem with `P`): `S(P) = P − f(P−1)` — bigger
+  problems keep scaling; this is why we'd raise the resolution/frames on a real
+  cluster.
+- **Granularity** = compute-per-task ÷ communication-per-task. **Too fine** (tiny
+  tiles) → message/scheduling overhead dominates; **too coarse** (huge tiles) →
+  load imbalance. The granularity experiment (§6.2) finds the sweet spot.
+- **Load imbalance** = `(max − min) / max` of per-worker compute time. Lower is
+  better; it's the headline difference between dynamic and static (§6.3).
+- **Communication cost** ≈ `latency + message_size / bandwidth`. On one node
+  latency is tiny (shared memory); across a network it's much larger — which is
+  why prefetch helps more on a real cluster.
+
+## A.4 How we prove it's correct
+
+We compare the parallel output to the sequential baseline with **Mean Squared
+Error**: `MSE = (1/N) Σ (aᵢ − bᵢ)²` over all pixel bytes (plus the maximum
+absolute difference). `MSE = 0` with max-diff `0` means the images are
+**byte-for-byte identical**. We achieve this because the renderer is a
+**deterministic pure function** of (scene, parameters): every random sample is
+seeded by *where/when* it is (`seed_for(frame,x,y,sample)`), never by *which*
+process draws it — so the answer cannot depend on how the work was split.
