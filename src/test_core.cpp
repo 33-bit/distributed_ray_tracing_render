@@ -17,6 +17,7 @@
 #include "scene/object.hpp"
 #include "scene/sphere.hpp"
 #include "scene/plane.hpp"
+#include "scene/triangle.hpp"
 #include "scene/camera.hpp"
 // modules under test (Member B — shading)
 #include <vector>
@@ -104,6 +105,14 @@ int main() {
         Camera cam(Vec3(0, 0, 0), Vec3(0, 0, -1), Vec3(0, 1, 0), 60.0, 1.0);
         Ray center = cam.get_ray(0.5, 0.5);
         CHECK(approx(center.dir.x, 0, 1e-6) && approx(center.dir.z, -1, 1e-6));
+
+        // -- ray/triangle (Möller–Trumbore): a triangle facing the camera at z=-2 --
+        Triangle tri(Vec3(-1, -1, -2), Vec3(1, -1, -2), Vec3(0, 1, -2), 0);
+        HitRecord trec;
+        CHECK(tri.hit(Ray(Vec3(0, 0, 0), Vec3(0, 0, -1)), 1e-4, INF, trec));
+        CHECK(approx(trec.t, 2.0));                                   // hits the face at z=-2
+        CHECK(approx(trec.normal.z, 1.0, 1e-9));                      // normal faces the camera
+        CHECK(!tri.hit(Ray(Vec3(5, 5, 0), Vec3(0, 0, -1)), 1e-4, INF, trec));  // misses outside
     }
     // === Member B (shading) tests ===
     {
@@ -179,6 +188,27 @@ int main() {
         // total internal reflection: glass -> air at a grazing angle has no exit ray
         Vec3 dummy;
         CHECK(!refract(normalized(Vec3(1, -0.1, 0)), Vec3(0, 1, 0), 1.5, dummy));
+
+        // spotlight cone (smoothstep): full inside, zero outside, soft between
+        CHECK(approx(smoothstep(0.90, 0.95, 0.99), 1.0));
+        CHECK(approx(smoothstep(0.90, 0.95, 0.50), 0.0));
+        double edge = smoothstep(0.90, 0.95, 0.925);
+        CHECK(edge > 0.0 && edge < 1.0);
+
+        // a downward spotlight lights the floor under it, not far to the side
+        Plane fl(Vec3(0, 0, 0), Vec3(0, 1, 0), 0);
+        MockScene sp;
+        sp.objs = { &fl };
+        sp.mats = { Material::diffuse(Color(0.8, 0.8, 0.8)) };
+        sp.lts  = { Light::spot(Vec3(0, 5, 0), Color(1, 1, 1), Vec3(0, -1, 0), 12, 22) };
+        Color under = shade(sp, Ray(Vec3(0, 3, 0),     Vec3(0, -1, 0)), 0, 4, 1, rng);
+        Color aside = shade(sp, Ray(Vec3(9, 3, 0.001), Vec3(0, -1, 0)), 0, 4, 1, rng);
+        CHECK(under.x > aside.x + 0.1);
+
+        // Beer-Lambert: a longer path through tinted glass absorbs more
+        Material cg = Material::colored_glass(1.5, Color(0.0, 0.4, 0.4));
+        CHECK(cg.type == MatType::Dielectric && cg.absorption.y > 0.0);
+        CHECK(std::exp(-cg.absorption.y * 4.0) < std::exp(-cg.absorption.y * 0.5));
     }
 
     std::printf("%d checks, %d failures\n", g_checks, g_failures);

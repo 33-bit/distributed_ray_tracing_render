@@ -14,6 +14,7 @@ struct Material {
     double  reflectivity = 0.0;                  // mirror fraction in [0,1]
     Color   emission    = Color(0, 0, 0);        // self-emitted light
     double  ior         = 1.5;                   // index of refraction (Dielectric)
+    Color   absorption  = Color(0, 0, 0);        // Beer-Lambert absorption/unit length (tinted glass)
 
     // Procedural checkerboard: when set, the diffuse albedo alternates between
     // `albedo` and `albedo2` in world-space cells of size 1/checker_scale.
@@ -45,5 +46,9 @@ struct Material {
     static Material dielectric(double index_of_refraction, const Color& tint = Color(1, 1, 1)) {
         Material m; m.type = MatType::Dielectric; m.albedo = tint;
         m.ior = index_of_refraction; return m;
+    }
+    static Material colored_glass(double index_of_refraction, const Color& absorption) {
+        Material m; m.type = MatType::Dielectric; m.ior = index_of_refraction;
+        m.absorption = absorption; return m;   // Beer-Lambert tint by path length
     }
 };

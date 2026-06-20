@@ -64,6 +64,13 @@ inline bool refract(const Vec3& v, const Vec3& n, double eta_ratio, Vec3& out) {
     return true;
 }
 
+// Smooth 0->1 ramp between edge0 and edge1 (Hermite). Used for the soft edge of
+// a spotlight cone.
+inline double smoothstep(double edge0, double edge1, double x) {
+    double t = clampd((x - edge0) / (edge1 - edge0 + 1e-12), 0.0, 1.0);
+    return t * t * (3.0 - 2.0 * t);
+}
+
 // Resolve the diffuse albedo at a point, applying the procedural checker if set.
 inline Color effective_albedo(const Material& m, const Vec3& p) {
     if (!m.checker) return m.albedo;
@@ -103,15 +110,24 @@ inline Color shade(const ISceneQuery& scene, const Ray& r,
         double cos_i = std::min(dot(-unit, nn), 1.0);
         double fres  = fresnel_schlick(cos_i, schlick_r0(m.ior));
 
+        // Beer-Lambert: a ray that travelled `rec.t` *inside* the glass (i.e. it
+        // is now exiting, back face) is attenuated by exp(-absorption · distance),
+        // which tints thick glass. Clear glass (absorption 0) is unaffected.
+        Color absorb(1, 1, 1);
+        if (!rec.front_face)
+            absorb = Color(std::exp(-m.absorption.x * rec.t),
+                           std::exp(-m.absorption.y * rec.t),
+                           std::exp(-m.absorption.z * rec.t));
+
         Color reflected = shade(scene, Ray(rec.p + nn * 1e-4, reflect(unit, nn)),
                                 depth + 1, max_depth, shadow_samples, rng);
         Vec3 refr;
         if (refract(unit, nn, eta, refr)) {
             Color transmitted = shade(scene, Ray(rec.p - nn * 1e-4, normalized(refr)),
                                       depth + 1, max_depth, shadow_samples, rng);
-            return m.albedo * lerp(transmitted, reflected, fres);
+            return absorb * m.albedo * lerp(transmitted, reflected, fres);
         }
-        return m.albedo * reflected;   // total internal reflection -> all reflected
+        return absorb * m.albedo * reflected;   // total internal reflection -> all reflected
     }
 
     const Vec3 n    = rec.normal;
@@ -134,17 +150,27 @@ inline Color shade(const ISceneQuery& scene, const Ray& r,
             if (occluded(scene, rec.p, lp))
                 continue;  // this sample is in shadow -> contributes nothing
 
-            Vec3   ldir = normalized(lp - rec.p);
+            Vec3   to   = lp - rec.p;
+            double dist = to.length();
+            Vec3   ldir = to / dist;
             double ndl  = std::max(0.0, dot(n, ldir));
 
+            // Spotlight cone and distance attenuation scale this light's power.
+            double factor = 1.0;
+            if (L.is_spot)
+                factor *= smoothstep(L.cos_outer, L.cos_inner, dot(-ldir, L.spot_dir));
+            if (L.attenuate)
+                factor *= 1.0 / (1.0 + L.atten_k * dist * dist);
+            if (factor <= 0.0) continue;
+
             // Lambertian diffuse
-            contribution += alb * L.intensity * ndl;
+            contribution += alb * L.intensity * (ndl * factor);
 
             // Phong specular
             if (m.specular > 0.0 && ndl > 0.0) {
                 Vec3   refl = reflect(-ldir, n);
                 double rv   = std::max(0.0, dot(refl, view));
-                contribution += L.intensity * (m.specular * std::pow(rv, m.shininess));
+                contribution += L.intensity * (m.specular * std::pow(rv, m.shininess) * factor);
             }
         }
         result += contribution * (1.0 / samples);  // average -> penumbra from partial visibility

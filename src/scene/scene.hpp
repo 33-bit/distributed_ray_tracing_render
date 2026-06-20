@@ -14,6 +14,7 @@
 #include "scene/camera.hpp"
 #include "scene/sphere.hpp"
 #include "scene/plane.hpp"
+#include "scene/triangle.hpp"
 #include "scene/material.hpp"
 #include "scene/light.hpp"
 #include "render/shading.hpp"   // ISceneQuery
@@ -29,6 +30,7 @@ struct Scene : ISceneQuery {
     int add_material(const Material& m) { materials.push_back(m); return static_cast<int>(materials.size()) - 1; }
     void add_sphere(const Vec3& c, double r, int mat) { objects.push_back(std::make_unique<Sphere>(c, r, mat)); }
     void add_plane(const Vec3& p, const Vec3& n, int mat) { objects.push_back(std::make_unique<Plane>(p, n, mat)); }
+    void add_triangle(const Vec3& a, const Vec3& b, const Vec3& c, int mat) { objects.push_back(std::make_unique<Triangle>(a, b, c, mat)); }
 
     // --- ISceneQuery ---
     bool hit(const Ray& r, double tmin, double tmax, HitRecord& rec) const override {
@@ -67,6 +69,15 @@ inline Scene build_demo_scene(double aspect, int frame, int total_frames) {
     s.add_sphere(Vec3( 1.6, 1.0, 0.0), 1.0, m_glass);   // refractive glass
     s.add_sphere(Vec3( 0.0, 0.5, 2.0), 0.5, m_gold);    // glossy gold
 
+    // A small triangle pyramid (4 triangles) to the left, showing the Triangle
+    // primitive alongside the spheres.
+    int m_pyr = s.add_material(Material::diffuse(Color(0.65, 0.25, 0.8)));   // purple
+    Vec3 pa(-3.7, 0.0, 0.7), pb(-2.5, 0.0, 1.0), pc(-3.1, 0.0, -0.6), apex(-3.1, 1.6, 0.35);
+    s.add_triangle(pa, pb, apex, m_pyr);
+    s.add_triangle(pb, pc, apex, m_pyr);
+    s.add_triangle(pc, pa, apex, m_pyr);
+    s.add_triangle(pa, pc, pb, m_pyr);   // base
+
     // Normalized time in [0,1) over the whole sequence (0 for a single frame).
     double t = (total_frames > 1) ? static_cast<double>(frame) / total_frames : 0.0;
 
@@ -88,6 +99,11 @@ inline Scene build_demo_scene(double aspect, int frame, int total_frames) {
         Color(1.0, 0.95, 0.9),
         0.6 });   // area light: radius 0.6 -> soft shadows when --shadow-samples > 1
                   // (with shadow-samples=1 it degenerates to a hard point light)
+
+    // A cool cyan spotlight from above-front, aimed at the scene, to show the
+    // cone falloff as a tinted pool of light on the floor.
+    s.lights_.push_back(Light::spot(Vec3(0.0, 7.0, 2.0), Color(0.20, 0.45, 0.65),
+                                    Vec3(0.0, -1.0, -0.25), 16.0, 30.0));
 
     return s;
 }
