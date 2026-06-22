@@ -1,0 +1,95 @@
+{
+  "background": {
+    "top": [0.05, 0.03, 0.12],
+    "bottom": [0.10, 0.06, 0.18]
+  },
+  "camera": {
+    "lookat": [0, 1.8, 0],
+    "up": [0, 1, 0],
+    "vfov": 45,
+    "orbit": {
+      "center": [0, 1.8, 0],
+      "radius": 10,
+      "height": 4,
+      "speed": 0.6,
+      "phase": 0.3
+    }
+  },
+  "materials": {
+    "obsidian":     { "type": "glossy", "albedo": [0.06, 0.04, 0.10], "specular": 0.7, "shininess": 64 },
+    "diamond_top":  { "type": "mirror", "albedo": [0.35, 0.80, 0.85], "reflectivity": 0.6 },
+    "bookshelf":    { "type": "diffuse", "albedo": [0.50, 0.30, 0.12] },
+    "book_red":     { "type": "diffuse", "albedo": [0.70, 0.12, 0.10] },
+    "book_green":   { "type": "diffuse", "albedo": [0.10, 0.50, 0.15] },
+    "book_blue":    { "type": "diffuse", "albedo": [0.12, 0.15, 0.60] },
+    "enchant_glow": { "type": "emissive", "emission": [0.30, 0.15, 0.60] },
+    "particle":     { "type": "emissive", "emission": [0.50, 0.20, 0.80] },
+    "candle":       { "type": "emissive", "emission": [0.90, 0.70, 0.30] },
+    "stone_floor":  { "type": "checkerboard", "albedo": [0.25, 0.25, 0.28], "albedo2": [0.20, 0.20, 0.22], "scale": 1.0 },
+    "lapis":        { "type": "glossy", "albedo": [0.10, 0.15, 0.60], "specular": 0.4, "shininess": 32 },
+    "float_book":   { "type": "diffuse", "albedo": [0.55, 0.35, 0.18] }
+  },
+  "objects": [
+    { "type": "plane", "point": [0, 0, 0], "normal": [0, 1, 0], "material": "stone_floor" },
+
+    { "type": "sphere", "center": [0, 0.5, 0], "radius": 0.5, "material": "obsidian" },
+    { "type": "sphere", "center": [0, 0.95, 0], "radius": 0.25, "material": "diamond_top" },
+    { "type": "sphere", "center": [0, 1.3, 0], "radius": 0.15, "material": "enchant_glow" },
+
+    { "type": "sphere", "center": [0, 2.2, 0], "radius": 0.25, "material": "float_book" },
+    { "type": "triangle", "v0": [-0.2, 2.2, -0.15], "v1": [0.2, 2.2, -0.15], "v2": [0, 2.2, 0.2], "material": "float_book" },
+
+    { "type": "sphere", "center": [-3, 0.8, -3], "radius": 0.8, "material": "bookshelf" },
+    { "type": "sphere", "center": [-3, 1.8, -3], "radius": 0.8, "material": "bookshelf" },
+    { "type": "sphere", "center": [-3, 1.3, -3.5], "radius": 0.15, "material": "book_red" },
+    { "type": "sphere", "center": [-3, 0.8, -3.5], "radius": 0.15, "material": "book_green" },
+
+    { "type": "sphere", "center": [3, 0.8, -3], "radius": 0.8, "material": "bookshelf" },
+    { "type": "sphere", "center": [3, 1.8, -3], "radius": 0.8, "material": "bookshelf" },
+    { "type": "sphere", "center": [3, 1.3, -3.5], "radius": 0.15, "material": "book_blue" },
+
+    { "type": "sphere", "center": [-3, 0.8, 3], "radius": 0.8, "material": "bookshelf" },
+    { "type": "sphere", "center": [-3, 1.8, 3], "radius": 0.8, "material": "bookshelf" },
+    { "type": "sphere", "center": [3, 0.8, 3], "radius": 0.8, "material": "bookshelf" },
+    { "type": "sphere", "center": [3, 1.8, 3], "radius": 0.8, "material": "bookshelf" },
+    { "type": "sphere", "center": [3, 1.3, 3.5], "radius": 0.15, "material": "book_red" },
+
+    { "type": "sphere", "center": [0, 0.8, -3], "radius": 0.8, "material": "bookshelf" },
+    { "type": "sphere", "center": [0, 1.8, -3], "radius": 0.8, "material": "bookshelf" },
+
+    { "type": "sphere", "center": [1.2, 2.8, 0.5], "radius": 0.06, "material": "particle" },
+    { "type": "sphere", "center": [-0.8, 3.0, -0.3], "radius": 0.05, "material": "particle" },
+    { "type": "sphere", "center": [0.4, 2.5, -0.7], "radius": 0.07, "material": "particle" },
+    { "type": "sphere", "center": [-0.5, 2.7, 0.8], "radius": 0.05, "material": "particle" },
+    { "type": "sphere", "center": [0.9, 3.2, -0.2], "radius": 0.04, "material": "particle" },
+    { "type": "sphere", "center": [-1.0, 2.9, 0.1], "radius": 0.06, "material": "particle" },
+
+    { "type": "sphere", "center": [2, 1.0, 0], "radius": 0.08, "material": "candle" },
+    { "type": "sphere", "center": [-2, 1.0, 0], "radius": 0.08, "material": "candle" },
+
+    { "type": "sphere", "center": [0.5, 0.15, 0.5], "radius": 0.15, "material": "lapis" }
+  ],
+  "lights": [
+    {
+      "type": "spot",
+      "position": [0, 5, 0],
+      "direction": [0, -1, 0],
+      "intensity": [0.35, 0.18, 0.65],
+      "angle": 30,
+      "falloff": 2
+    },
+    {
+      "type": "area",
+      "position": [3, 4, 3],
+      "intensity": [0.30, 0.15, 0.50],
+      "radius": 0.5,
+      "orbit": { "center": [0, 0, 0], "radius": 4, "height": 4, "speed": 0.9, "phase": 0.0 }
+    },
+    {
+      "type": "area",
+      "position": [-2, 3, -2],
+      "intensity": [0.25, 0.20, 0.40],
+      "radius": 0.4
+    }
+  ]
+}

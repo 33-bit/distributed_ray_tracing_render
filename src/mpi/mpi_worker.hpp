@@ -21,19 +21,23 @@
 #include "scene/scene.hpp"
 #include "core/timer.hpp"
 #include "benchmark/benchmark.hpp"
+#include "scene/scene_parser.hpp"
 
-inline void run_worker(const RenderParams& base, BenchLog& log, bool prefetch = false) {
+inline void run_worker(const RenderParams& base, BenchLog& log, bool prefetch = false,
+                       const SceneConfig* cfg = nullptr) {
     int rank; MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     log.rank = rank; log.role = 1;
 
     const double aspect = static_cast<double>(base.width) / base.height;
     Image img(base.width, base.height);   // reused scratch buffer
     int   cached_frame = 0;
-    Scene scene = build_demo_scene(aspect, 0, base.total_frames);
+    Scene scene = cfg ? build_scene_from_config(*cfg, aspect, 0, base.total_frames)
+                      : build_demo_scene(aspect, 0, base.total_frames);
 
     auto render = [&](const Task& task) {
         if (task.frame != cached_frame) {
-            scene = build_demo_scene(aspect, task.frame, base.total_frames);
+            scene = cfg ? build_scene_from_config(*cfg, aspect, task.frame, base.total_frames)
+                        : build_demo_scene(aspect, task.frame, base.total_frames);
             cached_frame = task.frame;
         }
         RenderParams p = base; p.frame = task.frame;

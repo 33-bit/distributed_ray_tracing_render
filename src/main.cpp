@@ -14,6 +14,7 @@
 #include "render/renderer.hpp"
 #include "render/tile.hpp"
 #include "scene/scene.hpp"
+#include "scene/scene_parser.hpp"
 
 #ifdef USE_MPI
 #include <mpi.h>
@@ -38,6 +39,7 @@ struct Options {
     std::string bench_csv;              // if set, append per-rank timing here
     int         threads = 1;            // OpenMP threads per process (hybrid)
     bool        prefetch = false;       // non-blocking double-buffered worker
+    std::string scene_file;            // if set, load scene from JSON config
 };
 
 static Options parse_args(int argc, char** argv) {
@@ -57,17 +59,21 @@ static Options parse_args(int argc, char** argv) {
         else if (a == "--bench")          o.bench_csv             = val();
         else if (a == "--threads")        o.threads               = std::atoi(val());
         else if (a == "--prefetch")       o.prefetch              = true;
+        else if (a == "--scene")          o.scene_file            = val();
         else { std::fprintf(stderr, "unknown arg: %s\n", a.c_str()); }
     }
     return o;
 }
 
 // Render one frame on a single core. Returns seconds spent in render_tile.
-double render_frame_sequential(const RenderParams& base, int frame, const std::string& out_dir) {
+double render_frame_sequential(const RenderParams& base, int frame,
+                               const std::string& out_dir,
+                               const SceneConfig* cfg = nullptr) {
     RenderParams p = base;
     p.frame = frame;
     double aspect = static_cast<double>(p.width) / p.height;
-    Scene scene = build_demo_scene(aspect, frame, p.total_frames);
+    Scene scene = cfg ? build_scene_from_config(*cfg, aspect, frame, p.total_frames)
+                      : build_demo_scene(aspect, frame, p.total_frames);
     Image img(p.width, p.height);
     std::vector<Tile> tiles = make_tiles(p.width, p.height, p.tile_size);
 
@@ -99,6 +105,25 @@ int main(int argc, char** argv) {
     MPI_Bcast(pbuf, 8, MPI_INT, 0, MPI_COMM_WORLD);
     RenderParams params = (rank == 0) ? o.params : mpi_proto::decode_params(pbuf);
     Schedule mode = (o.schedule == "static") ? Schedule::Static : Schedule::Dynamic;
+
+    // Broadcast scene config JSON (if any) so all ranks parse identically.
+    std::string scene_text;
+    const SceneConfig* scene_cfg_ptr = nullptr;
+    SceneConfig scene_cfg;
+    {
+        int len = 0;
+        if (rank == 0 && !o.scene_file.empty()) {
+            scene_text = read_file_to_string(o.scene_file);
+            len = static_cast<int>(scene_text.size());
+        }
+        MPI_Bcast(&len, 1, MPI_INT, 0, MPI_COMM_WORLD);
+        if (len > 0) {
+            if (rank != 0) scene_text.resize(len);
+            MPI_Bcast(&scene_text[0], len, MPI_CHAR, 0, MPI_COMM_WORLD);
+            scene_cfg = parse_scene_config(scene_text);
+            scene_cfg_ptr = &scene_cfg;
+        }
+    }
 #ifdef _OPENMP
     omp_set_num_threads(o.threads > 0 ? o.threads : 1);   // hybrid: threads per worker
 #endif
@@ -110,9 +135,9 @@ int main(int argc, char** argv) {
                     size, o.threads, o.schedule.c_str(), o.prefetch ? "prefetch" : "blocking",
                     params.width, params.height, params.spp, params.max_depth,
                     params.shadow_samples, params.total_frames, params.tile_size, o.out_dir.c_str());
-        run_master(params, o.out_dir, mode, log, o.prefetch ? 2 : 1);
+        run_master(params, o.out_dir, mode, log, o.prefetch ? 2 : 1, scene_cfg_ptr);
     } else {
-        run_worker(params, log, o.prefetch);
+        run_worker(params, log, o.prefetch, scene_cfg_ptr);
     }
 
     std::vector<BenchLog> all = gather_logs(log, rank, size);
@@ -138,6 +163,15 @@ int main(int argc, char** argv) {
     MPI_Finalize();
     return 0;
 #else
+    // Parse scene config if --scene was given.
+    const SceneConfig* scene_cfg_ptr = nullptr;
+    SceneConfig scene_cfg;
+    if (!o.scene_file.empty()) {
+        std::string text = read_file_to_string(o.scene_file);
+        scene_cfg = parse_scene_config(text);
+        scene_cfg_ptr = &scene_cfg;
+    }
+
     fs::create_directories(o.out_dir);
     std::printf("[seq] %dx%d  spp=%d  depth=%d  shadow=%d  frames=%d  tile=%d  -> %s/\n",
                 o.params.width, o.params.height, o.params.spp, o.params.max_depth,
@@ -146,7 +180,7 @@ int main(int argc, char** argv) {
 
     Timer total; total.start();
     for (int f = 0; f < o.params.total_frames; ++f) {
-        double secs = render_frame_sequential(o.params, f, o.out_dir);
+        double secs = render_frame_sequential(o.params, f, o.out_dir, scene_cfg_ptr);
         std::printf("[seq] frame %4d/%d  %.3fs\n", f + 1, o.params.total_frames, secs);
     }
     std::printf("[seq] done in %.3fs\n", total.elapsed_s());

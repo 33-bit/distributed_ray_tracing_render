@@ -27,9 +27,11 @@
 #include "scene/scene.hpp"
 #include "core/timer.hpp"
 #include "benchmark/benchmark.hpp"
+#include "scene/scene_parser.hpp"
 
 inline void run_master(const RenderParams& base, const std::string& out_dir,
-                       Schedule mode, BenchLog& log, int lookahead = 1) {
+                       Schedule mode, BenchLog& log, int lookahead = 1,
+                       const SceneConfig* cfg = nullptr) {
     int size;
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     const int nworkers = size - 1;
@@ -67,12 +69,14 @@ inline void run_master(const RenderParams& base, const std::string& out_dir,
     // np == 1: no workers, render everything locally (the speedup baseline T1).
     if (nworkers <= 0) {
         int cached_frame = 0;
-        Scene sc = build_demo_scene(aspect, 0, base.total_frames);
+        Scene sc = cfg ? build_scene_from_config(*cfg, aspect, 0, base.total_frames)
+                       : build_demo_scene(aspect, 0, base.total_frames);
         for (const Task& tk : tasks) {
             RenderParams p = base; p.frame = tk.frame;
             t.start();
             if (tk.frame != cached_frame) {
-                sc = build_demo_scene(aspect, tk.frame, base.total_frames);
+                sc = cfg ? build_scene_from_config(*cfg, aspect, tk.frame, base.total_frames)
+                         : build_demo_scene(aspect, tk.frame, base.total_frames);
                 cached_frame = tk.frame;
             }
             Renderer::render_tile(sc, p, tk.tile, frame_buffer(tk.frame));

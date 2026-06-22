@@ -1,0 +1,44 @@
+{
+  "background": {
+    "top": [0.3, 0.5, 0.9],
+    "bottom": [0.85, 0.85, 0.95]
+  },
+  "camera": {
+    "eye": [0, 3, 10],
+    "lookat": [0, 1, 0],
+    "up": [0, 1, 0],
+    "vfov": 38
+  },
+  "materials": {
+    "checker": { "type": "checkerboard", "albedo": [0.95, 0.95, 0.95], "albedo2": [0.1, 0.1, 0.15], "scale": 0.8 },
+    "glass1":  { "type": "dielectric", "ior": 1.5 },
+    "glass2":  { "type": "dielectric", "ior": 1.8, "albedo": [0.95, 0.9, 0.85] },
+    "mirror1": { "type": "mirror", "albedo": [0.9, 0.95, 1.0], "reflectivity": 0.95 },
+    "mirror2": { "type": "mirror", "albedo": [1.0, 0.85, 0.85], "reflectivity": 0.8 },
+    "blue":    { "type": "diffuse", "albedo": [0.15, 0.25, 0.75] },
+    "gold":    { "type": "glossy", "albedo": [0.85, 0.65, 0.15], "specular": 0.7, "shininess": 64 }
+  },
+  "objects": [
+    { "type": "plane",  "point": [0, 0, 0], "normal": [0, 1, 0], "material": "checker" },
+    { "type": "sphere", "center": [-3, 1.2, 0],  "radius": 1.2, "material": "glass1" },
+    { "type": "sphere", "center": [0, 1.0, 0],   "radius": 1.0, "material": "mirror1" },
+    { "type": "sphere", "center": [3, 1.2, 0],   "radius": 1.2, "material": "glass2" },
+    { "type": "sphere", "center": [-1.5, 0.5, 2.5], "radius": 0.5, "material": "blue" },
+    { "type": "sphere", "center": [1.5, 0.5, 2.5],  "radius": 0.5, "material": "gold" },
+    { "type": "sphere", "center": [0, 0.4, 3.5],    "radius": 0.4, "material": "mirror2" }
+  ],
+  "lights": [
+    {
+      "type": "area",
+      "position": [4, 8, 5],
+      "intensity": [1.0, 0.95, 0.85],
+      "radius": 0.8
+    },
+    {
+      "type": "area",
+      "position": [-5, 6, -3],
+      "intensity": [0.6, 0.7, 1.0],
+      "radius": 0.5
+    }
+  ]
+}
