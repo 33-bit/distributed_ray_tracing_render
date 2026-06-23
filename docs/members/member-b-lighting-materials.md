@@ -1,8 +1,11 @@
 # Member B — Lighting, Materials & Shading · Dev Journal
 
 **Subsystem:** surface materials, light sources, and the `shade()` function that
-turns a ray–surface hit into a color — Phong diffuse+specular, hard and soft
-shadow rays, recursive reflection, gamma. The "how it looks" layer.
+turns a ray–surface hit into a color — **path-traced global illumination** (indirect
+diffuse bounce with cosine-weighted importance sampling + Russian Roulette), Phong
+diffuse+specular, hard and soft shadow rays, recursive reflection with **rough
+reflections** for glossy materials, **ACES filmic tone mapping**, gamma. The "how it
+looks" layer.
 
 **Files I own:** `src/scene/material.hpp`, `src/scene/light.hpp`,
 `src/render/shading.hpp`.
@@ -10,9 +13,10 @@ shadow rays, recursive reflection, gamma. The "how it looks" layer.
 ## Interface contract (what C, D rely on)
 
 ```cpp
-enum class MatType { Diffuse, Specular, Reflective, Emissive };
+enum class MatType { Diffuse, Specular, Reflective, Emissive, Dielectric };
 struct Material { MatType type; Color albedo; double specular; double shininess;
-                  double reflectivity; Color emission; };
+                  double reflectivity; double roughness; Color emission;
+                  double ior; Color absorption; };
 struct Light    { Vec3 position; Color intensity; double radius; }; // radius 0 = point, >0 = area (soft)
 
 // I depend on A's geometry but NOT on D's concrete Scene — only this query view:
@@ -25,8 +29,10 @@ struct ISceneQuery {
 };
 
 Color shade(const ISceneQuery& scene, const Ray& r, int depth, int max_depth,
-            int shadow_samples, RNG& rng);
+            int shadow_samples, RNG& rng);  // path tracer: direct + indirect GI + reflection
 Color gamma_correct(Color c, double gamma = 2.2);
+Color tone_map_aces(const Color& c);       // ACES filmic (replaces Reinhard as default)
+Color tone_map_reinhard(const Color& c);   // still available for comparison
 ```
 
 ## Theory I should know (my part)

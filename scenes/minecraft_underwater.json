@@ -1,14 +1,34 @@
 {
   "background": {
-    "top": [0.02, 0.08, 0.18],
-    "bottom": [0.05, 0.25, 0.35]
+    "top": [
+      0.02,
+      0.08,
+      0.18
+    ],
+    "bottom": [
+      0.05,
+      0.25,
+      0.35
+    ]
   },
   "camera": {
-    "lookat": [0, 2, 0],
-    "up": [0, 1, 0],
+    "lookat": [
+      0,
+      2,
+      0
+    ],
+    "up": [
+      0,
+      1,
+      0
+    ],
     "vfov": 50,
     "orbit": {
-      "center": [0, 2, 0],
+      "center": [
+        0,
+        2,
+        0
+      ],
       "radius": 14,
       "height": 4,
       "speed": 0.8,
@@ -16,80 +36,590 @@
     }
   },
   "materials": {
-    "sand":          { "type": "checkerboard", "albedo": [0.76, 0.70, 0.42], "albedo2": [0.68, 0.62, 0.36], "scale": 1.5 },
-    "prismarine":    { "type": "glossy", "albedo": [0.25, 0.60, 0.55], "specular": 0.35, "shininess": 24 },
-    "dark_prismarine": { "type": "glossy", "albedo": [0.12, 0.35, 0.32], "specular": 0.3, "shininess": 20 },
-    "sea_lantern":   { "type": "emissive", "emission": [0.7, 0.85, 0.9] },
-    "water_glass":   { "type": "dielectric", "ior": 1.33, "albedo": [0.5, 0.7, 0.85] },
-    "guardian_body":  { "type": "glossy", "albedo": [0.35, 0.55, 0.50], "specular": 0.2, "shininess": 16 },
-    "guardian_eye":   { "type": "emissive", "emission": [0.9, 0.3, 0.1] },
-    "guardian_spike": { "type": "diffuse", "albedo": [0.30, 0.50, 0.45] },
-    "coral_pink":    { "type": "diffuse", "albedo": [0.85, 0.35, 0.50] },
-    "coral_blue":    { "type": "diffuse", "albedo": [0.20, 0.40, 0.80] },
-    "kelp":          { "type": "diffuse", "albedo": [0.10, 0.40, 0.15] },
-    "gold_block":    { "type": "glossy", "albedo": [0.85, 0.70, 0.15], "specular": 0.5, "shininess": 40 }
+    "sand": {
+      "type": "checkerboard",
+      "albedo": [
+        0.76,
+        0.7,
+        0.42
+      ],
+      "albedo2": [
+        0.68,
+        0.62,
+        0.36
+      ],
+      "scale": 1.5
+    },
+    "prismarine": {
+      "type": "glossy",
+      "albedo": [
+        0.25,
+        0.6,
+        0.55
+      ],
+      "specular": 0.35,
+      "shininess": 24
+    },
+    "dark_prismarine": {
+      "type": "glossy",
+      "albedo": [
+        0.12,
+        0.35,
+        0.32
+      ],
+      "specular": 0.3,
+      "shininess": 20
+    },
+    "sea_lantern": {
+      "type": "emissive",
+      "emission": [
+        0.7,
+        0.85,
+        0.9
+      ]
+    },
+    "water_glass": {
+      "type": "dielectric",
+      "ior": 1.33,
+      "albedo": [
+        0.5,
+        0.7,
+        0.85
+      ]
+    },
+    "guardian_body": {
+      "type": "glossy",
+      "albedo": [
+        0.35,
+        0.55,
+        0.5
+      ],
+      "specular": 0.2,
+      "shininess": 16
+    },
+    "guardian_eye": {
+      "type": "emissive",
+      "emission": [
+        0.9,
+        0.3,
+        0.1
+      ]
+    },
+    "guardian_spike": {
+      "type": "diffuse",
+      "albedo": [
+        0.3,
+        0.5,
+        0.45
+      ]
+    },
+    "coral_pink": {
+      "type": "diffuse",
+      "albedo": [
+        0.85,
+        0.35,
+        0.5
+      ]
+    },
+    "coral_blue": {
+      "type": "diffuse",
+      "albedo": [
+        0.2,
+        0.4,
+        0.8
+      ]
+    },
+    "kelp": {
+      "type": "diffuse",
+      "albedo": [
+        0.1,
+        0.4,
+        0.15
+      ]
+    },
+    "gold_block": {
+      "type": "glossy",
+      "albedo": [
+        0.85,
+        0.7,
+        0.15
+      ],
+      "specular": 0.5,
+      "shininess": 40
+    }
   },
   "objects": [
-    { "type": "plane", "point": [0, 0, 0], "normal": [0, 1, 0], "material": "sand" },
-
-    { "type": "sphere", "center": [0, 1.0, 0], "radius": 1.0, "material": "prismarine" },
-    { "type": "sphere", "center": [0, 2.8, 0], "radius": 0.9, "material": "dark_prismarine" },
-    { "type": "sphere", "center": [0, 4.4, 0], "radius": 0.8, "material": "prismarine" },
-    { "type": "sphere", "center": [0, 5.8, 0], "radius": 0.7, "material": "dark_prismarine" },
-
-    { "type": "sphere", "center": [-2.5, 1.0, -2.5], "radius": 1.0, "material": "prismarine" },
-    { "type": "sphere", "center": [2.5, 1.0, -2.5], "radius": 1.0, "material": "prismarine" },
-    { "type": "sphere", "center": [-2.5, 1.0, 2.5], "radius": 1.0, "material": "prismarine" },
-    { "type": "sphere", "center": [2.5, 1.0, 2.5], "radius": 1.0, "material": "prismarine" },
-
-    { "type": "sphere", "center": [-2.5, 2.8, -2.5], "radius": 0.9, "material": "dark_prismarine" },
-    { "type": "sphere", "center": [2.5, 2.8, -2.5], "radius": 0.9, "material": "dark_prismarine" },
-    { "type": "sphere", "center": [-2.5, 2.8, 2.5], "radius": 0.9, "material": "dark_prismarine" },
-    { "type": "sphere", "center": [2.5, 2.8, 2.5], "radius": 0.9, "material": "dark_prismarine" },
-
-    { "type": "sphere", "center": [0, 3.5, -2.5], "radius": 0.5, "material": "sea_lantern" },
-    { "type": "sphere", "center": [0, 3.5, 2.5], "radius": 0.5, "material": "sea_lantern" },
-    { "type": "sphere", "center": [-2.5, 3.5, 0], "radius": 0.5, "material": "sea_lantern" },
-    { "type": "sphere", "center": [2.5, 3.5, 0], "radius": 0.5, "material": "sea_lantern" },
-
-    { "type": "sphere", "center": [6, 2.0, 3], "radius": 1.2, "material": "guardian_body" },
-    { "type": "sphere", "center": [6, 2.0, 3], "radius": 0.3, "material": "guardian_eye" },
-    { "type": "triangle", "v0": [6, 3.2, 3], "v1": [6.6, 3.8, 3.3], "v2": [5.4, 3.8, 2.7], "material": "guardian_spike" },
-    { "type": "triangle", "v0": [6, 0.8, 3], "v1": [6.5, 0.2, 3.2], "v2": [5.5, 0.2, 2.8], "material": "guardian_spike" },
-    { "type": "triangle", "v0": [7.2, 2.0, 3], "v1": [7.8, 2.5, 3.3], "v2": [7.8, 1.5, 2.7], "material": "guardian_spike" },
-
-    { "type": "sphere", "center": [-5, 0.4, 4], "radius": 0.4, "material": "coral_pink" },
-    { "type": "sphere", "center": [-5.3, 0.8, 4.2], "radius": 0.3, "material": "coral_pink" },
-    { "type": "sphere", "center": [-4.7, 0.6, 3.7], "radius": 0.35, "material": "coral_blue" },
-
-    { "type": "sphere", "center": [4, 0.5, -4], "radius": 0.15, "material": "kelp" },
-    { "type": "sphere", "center": [4, 1.0, -4], "radius": 0.15, "material": "kelp" },
-    { "type": "sphere", "center": [4, 1.5, -4], "radius": 0.15, "material": "kelp" },
-    { "type": "sphere", "center": [4, 2.0, -4], "radius": 0.18, "material": "kelp" },
-
-    { "type": "sphere", "center": [0, 0.6, -5], "radius": 0.6, "material": "gold_block" },
-
-    { "type": "sphere", "center": [-6, 1.5, -1], "radius": 0.8, "material": "water_glass" }
+    {
+      "type": "plane",
+      "point": [
+        0,
+        0,
+        0
+      ],
+      "normal": [
+        0,
+        1,
+        0
+      ],
+      "material": "sand"
+    },
+    {
+      "type": "box",
+      "center": [
+        0,
+        1.0,
+        0
+      ],
+      "material": "prismarine",
+      "size": [
+        2.0,
+        2.0,
+        2.0
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        0,
+        2.8,
+        0
+      ],
+      "material": "dark_prismarine",
+      "size": [
+        1.8,
+        1.8,
+        1.8
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        0,
+        4.4,
+        0
+      ],
+      "material": "prismarine",
+      "size": [
+        1.6,
+        1.6,
+        1.6
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        0,
+        5.8,
+        0
+      ],
+      "material": "dark_prismarine",
+      "size": [
+        1.4,
+        1.4,
+        1.4
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -2.5,
+        1.0,
+        -2.5
+      ],
+      "material": "prismarine",
+      "size": [
+        2.0,
+        2.0,
+        2.0
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        2.5,
+        1.0,
+        -2.5
+      ],
+      "material": "prismarine",
+      "size": [
+        2.0,
+        2.0,
+        2.0
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -2.5,
+        1.0,
+        2.5
+      ],
+      "material": "prismarine",
+      "size": [
+        2.0,
+        2.0,
+        2.0
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        2.5,
+        1.0,
+        2.5
+      ],
+      "material": "prismarine",
+      "size": [
+        2.0,
+        2.0,
+        2.0
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -2.5,
+        2.8,
+        -2.5
+      ],
+      "material": "dark_prismarine",
+      "size": [
+        1.8,
+        1.8,
+        1.8
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        2.5,
+        2.8,
+        -2.5
+      ],
+      "material": "dark_prismarine",
+      "size": [
+        1.8,
+        1.8,
+        1.8
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -2.5,
+        2.8,
+        2.5
+      ],
+      "material": "dark_prismarine",
+      "size": [
+        1.8,
+        1.8,
+        1.8
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        2.5,
+        2.8,
+        2.5
+      ],
+      "material": "dark_prismarine",
+      "size": [
+        1.8,
+        1.8,
+        1.8
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        0,
+        3.5,
+        -2.5
+      ],
+      "material": "sea_lantern",
+      "size": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        0,
+        3.5,
+        2.5
+      ],
+      "material": "sea_lantern",
+      "size": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -2.5,
+        3.5,
+        0
+      ],
+      "material": "sea_lantern",
+      "size": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        2.5,
+        3.5,
+        0
+      ],
+      "material": "sea_lantern",
+      "size": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "type": "sphere",
+      "center": [
+        6,
+        2.0,
+        3
+      ],
+      "radius": 1.2,
+      "material": "guardian_body"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        6,
+        2.0,
+        3
+      ],
+      "radius": 0.3,
+      "material": "guardian_eye"
+    },
+    {
+      "type": "triangle",
+      "v0": [
+        6,
+        3.2,
+        3
+      ],
+      "v1": [
+        6.6,
+        3.8,
+        3.3
+      ],
+      "v2": [
+        5.4,
+        3.8,
+        2.7
+      ],
+      "material": "guardian_spike"
+    },
+    {
+      "type": "triangle",
+      "v0": [
+        6,
+        0.8,
+        3
+      ],
+      "v1": [
+        6.5,
+        0.2,
+        3.2
+      ],
+      "v2": [
+        5.5,
+        0.2,
+        2.8
+      ],
+      "material": "guardian_spike"
+    },
+    {
+      "type": "triangle",
+      "v0": [
+        7.2,
+        2.0,
+        3
+      ],
+      "v1": [
+        7.8,
+        2.5,
+        3.3
+      ],
+      "v2": [
+        7.8,
+        1.5,
+        2.7
+      ],
+      "material": "guardian_spike"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        -5,
+        0.4,
+        4
+      ],
+      "radius": 0.4,
+      "material": "coral_pink"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        -5.3,
+        0.8,
+        4.2
+      ],
+      "radius": 0.3,
+      "material": "coral_pink"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        -4.7,
+        0.6,
+        3.7
+      ],
+      "radius": 0.35,
+      "material": "coral_blue"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        4,
+        0.5,
+        -4
+      ],
+      "radius": 0.15,
+      "material": "kelp"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        4,
+        1.0,
+        -4
+      ],
+      "radius": 0.15,
+      "material": "kelp"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        4,
+        1.5,
+        -4
+      ],
+      "radius": 0.15,
+      "material": "kelp"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        4,
+        2.0,
+        -4
+      ],
+      "radius": 0.18,
+      "material": "kelp"
+    },
+    {
+      "type": "box",
+      "center": [
+        0,
+        0.6,
+        -5
+      ],
+      "material": "gold_block",
+      "size": [
+        1.2,
+        1.2,
+        1.2
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -6,
+        1.5,
+        -1
+      ],
+      "material": "water_glass",
+      "size": [
+        1.6,
+        1.6,
+        1.6
+      ]
+    }
   ],
   "lights": [
     {
       "type": "area",
-      "position": [0, 12, 0],
-      "intensity": [0.25, 0.40, 0.50],
+      "position": [
+        0,
+        12,
+        0
+      ],
+      "intensity": [
+        0.25,
+        0.4,
+        0.5
+      ],
       "radius": 3.0,
-      "orbit": { "center": [0, 0, 0], "radius": 6, "height": 12, "speed": -0.3, "phase": 0 }
+      "orbit": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "radius": 6,
+        "height": 12,
+        "speed": -0.3,
+        "phase": 0
+      }
     },
     {
       "type": "area",
-      "position": [0, 3.5, -2.5],
-      "intensity": [0.5, 0.65, 0.7],
+      "position": [
+        0,
+        3.5,
+        -2.5
+      ],
+      "intensity": [
+        0.5,
+        0.65,
+        0.7
+      ],
       "radius": 0.5
     },
     {
       "type": "spot",
-      "position": [6, 5, 3],
-      "direction": [0, -1, 0],
-      "intensity": [0.4, 0.2, 0.15],
+      "position": [
+        6,
+        5,
+        3
+      ],
+      "direction": [
+        0,
+        -1,
+        0
+      ],
+      "intensity": [
+        0.4,
+        0.2,
+        0.15
+      ],
       "angle": 35,
       "radius": 0.3
     }

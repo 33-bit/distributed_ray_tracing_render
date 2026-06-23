@@ -155,11 +155,38 @@ e.g. higher resolution on a real cluster.)
 **Q. How does ray tracing work, in one breath?**
 For each pixel, shoot a ray from the camera; find the nearest surface it hits;
 compute the colour there from the lights, shadows, and any reflected/refracted
-rays; write the pixel.
+rays; bounce the ray for indirect illumination (global illumination); write the
+pixel.
+
+**Q. What is global illumination / path tracing?**
+Instead of a flat ambient term, we bounce a random ray off each surface to
+collect indirect light from the environment. This creates **color bleeding**
+(a red wall tints nearby objects), soft indirect shadows, and realistic ambient
+lighting. We use cosine-weighted importance sampling (PDF = cos(θ)/π) so the
+Monte Carlo estimate simplifies to `albedo × incoming_light`. Russian Roulette
+probabilistically terminates paths when energy is low, avoiding wasted computation.
+
+**Q. What is ACES tone mapping?**
+A filmic curve (Narkowicz 2015 approximation) that compresses HDR values into
+display range with better contrast, color saturation, and highlight rolloff than
+the simpler Reinhard operator. It's the industry standard for cinematic rendering.
+
+**Q. What is depth of field?**
+A thin-lens camera model: rays are jittered on a virtual lens disk, creating
+bokeh blur for objects not at the focus distance. Objects at `focus_dist` are
+sharp; others blur proportionally to `aperture`. Controlled via JSON scene config.
 
 **Q. How do you intersect a ray and a sphere?**
 Substitute the ray `O+tD` into `|X−C|²=r²` → a quadratic `at²+bt+c=0`. The
 discriminant says hit or miss; the smaller positive root is the nearest surface.
+
+**Q. How do you intersect a ray and a box (AABB)?**
+The **Kay-Kajiya slab method**: for each of the 3 axes, compute the entry and exit
+`t` values where the ray crosses the two slab planes. The overall entry is the max
+of the three entries; the overall exit is the min of the three exits. If
+entry < exit and the interval overlaps `[tmin, tmax]`, it's a hit. The outward
+normal comes from whichever axis produced the entry `t`. Used for Minecraft-style
+blocks.
 
 **Q. What's the normal and why do you need it?**
 The unit vector perpendicular to the surface at the hit. Lighting depends on it —
@@ -209,20 +236,25 @@ cluster). Showing comm is *not* the bottleneck is itself a valid result.
 
 **Q. What would you improve with more time?**
 Let the master render when idle (recover the core); add a BVH so large scenes
-scale; run a true multi-node weak-scaling study.
+scale; run a true multi-node weak-scaling study; add a denoiser (e.g. OIDN) for
+clean low-spp renders; volumetric fog/atmosphere; procedural textures (noise,
+marble, wood grain).
 
 ---
 
 ## 9. "Explain your part in 30 seconds" (per member)
 
 **Member A — rendering core & math.** "I own the geometry and math: vectors, the
-ray, ray–sphere/plane/triangle intersection, the camera, and the deterministic
-pixel-seeded RNG. That RNG is what makes the whole renderer reproducible, which
+ray, ray–sphere/plane/triangle/box intersection, the pinhole and thin-lens (DOF)
+camera, the deterministic pixel-seeded RNG, and cosine-weighted hemisphere sampling
+for path tracing. That RNG is what makes the whole renderer reproducible, which
 the correctness proof relies on."
 
 **Member B — lighting, materials, shading.** "I turn a ray–surface hit into a
-colour: Phong diffuse+specular, hard and soft shadows, recursive reflection with
-Fresnel, refractive glass with Snell + Beer–Lambert, a spotlight, and gamma. It's
+colour using a path tracer: direct lighting (Phong diffuse+specular, hard and soft
+shadows), indirect global illumination (cosine-weighted bounce + Russian Roulette),
+recursive reflection with Fresnel, rough reflections for glossy, refractive glass
+with Snell + Beer–Lambert, a spotlight, ACES filmic tone mapping, and gamma. It's
 all behind an abstract scene interface so it never depends on how the scene is
 stored or distributed."
 

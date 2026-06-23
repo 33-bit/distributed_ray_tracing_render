@@ -18,6 +18,7 @@
 #include "scene/sphere.hpp"
 #include "scene/plane.hpp"
 #include "scene/triangle.hpp"
+#include "scene/box.hpp"
 #include "scene/camera.hpp"
 // modules under test (Member B — shading)
 #include <vector>
@@ -113,6 +114,22 @@ int main() {
         CHECK(approx(trec.t, 2.0));                                   // hits the face at z=-2
         CHECK(approx(trec.normal.z, 1.0, 1e-9));                      // normal faces the camera
         CHECK(!tri.hit(Ray(Vec3(5, 5, 0), Vec3(0, 0, -1)), 1e-4, INF, trec));  // misses outside
+
+        // -- ray/box (AABB slab method): box centered at (0,0,-5), size 2x2x2 --
+        Box bx(Vec3(0, 0, -5), Vec3(2, 2, 2), 0);
+        HitRecord brec;
+        CHECK(bx.hit(Ray(Vec3(0, 0, 0), Vec3(0, 0, -1)), 1e-4, INF, brec));
+        CHECK(approx(brec.t, 4.0));                                       // front face at z=-4
+        CHECK(brec.front_face && approx(brec.normal.z, 1.0));             // normal faces camera
+        CHECK(!bx.hit(Ray(Vec3(5, 5, 0), Vec3(0, 0, -1)), 1e-4, INF, brec));  // miss
+        // hit from inside
+        CHECK(bx.hit(Ray(Vec3(0, 0, -5), Vec3(0, 0, -1)), 1e-4, INF, brec));
+        CHECK(approx(brec.t, 1.0));                                       // exit face at z=-6
+        CHECK(!brec.front_face);
+        // side face hit
+        CHECK(bx.hit(Ray(Vec3(5, 0, -5), Vec3(-1, 0, 0)), 1e-4, INF, brec));
+        CHECK(approx(brec.t, 4.0));                                       // +x face at x=1
+        CHECK(approx(brec.normal.x, 1.0));
     }
     // === Member B (shading) tests ===
     {
@@ -140,13 +157,13 @@ int main() {
         Color shadow = shade(scs, Ray(Vec3(0, 3, 0), Vec3(0, -1, 0)), 0, 4, 1, rng);
 
         CHECK(lit.x > shadow.x + 0.05);   // clearly brighter when lit
-        CHECK(shadow.x < 0.1);            // shadowed point -> ~ambient only
+        CHECK(shadow.x < 0.35);           // shadowed, but GI adds indirect sky light
 
-        // reflectivity == 0 => recursion depth must not change the result
+        // GI: deeper recursion adds indirect light from background bounces
         RNG r1(1), r2(1);
         Color d0 = shade(sc, Ray(Vec3(0, 3, 0), Vec3(0, -1, 0)), 0, 0, 1, r1);
         Color d4 = shade(sc, Ray(Vec3(0, 3, 0), Vec3(0, -1, 0)), 0, 4, 1, r2);
-        CHECK(approx(d0.x, d4.x) && approx(d0.y, d4.y));
+        CHECK(d4.x >= d0.x - 0.01);      // deeper path tracing adds energy
 
         // emissive material returns its emission directly
         Sphere es(Vec3(0, 0, -3), 1.0, 0);
@@ -177,6 +194,12 @@ int main() {
         // Reinhard tone map compresses HDR into [0,1)
         Color tm = tone_map_reinhard(Color(10, 10, 10));
         CHECK(tm.x < 1.0 && tm.x > 0.9);
+
+        // ACES filmic tone map: darker midtones but richer contrast
+        Color ta = tone_map_aces(Color(1, 1, 1));
+        CHECK(ta.x < 1.0 && ta.x > 0.7);
+        Color ta2 = tone_map_aces(Color(0, 0, 0));
+        CHECK(approx(ta2.x, 0.0, 0.01));
 
         // refraction (Snell): entering a denser medium bends the ray toward the
         // normal, so its horizontal component shrinks

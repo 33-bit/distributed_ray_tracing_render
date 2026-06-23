@@ -1,14 +1,34 @@
 {
   "background": {
-    "top": [0.30, 0.50, 0.95],
-    "bottom": [0.85, 0.90, 1.0]
+    "top": [
+      0.3,
+      0.5,
+      0.95
+    ],
+    "bottom": [
+      0.85,
+      0.9,
+      1.0
+    ]
   },
   "camera": {
-    "lookat": [0, 3, 0],
-    "up": [0, 1, 0],
+    "lookat": [
+      0,
+      3,
+      0
+    ],
+    "up": [
+      0,
+      1,
+      0
+    ],
     "vfov": 52,
     "orbit": {
-      "center": [0, 3, 0],
+      "center": [
+        0,
+        3,
+        0
+      ],
       "radius": 18,
       "height": 6,
       "speed": 0.6,
@@ -16,75 +36,492 @@
     }
   },
   "materials": {
-    "grass_top":   { "type": "diffuse", "albedo": [0.20, 0.55, 0.12] },
-    "dirt":        { "type": "diffuse", "albedo": [0.50, 0.32, 0.14] },
-    "stone":       { "type": "glossy", "albedo": [0.48, 0.48, 0.48], "specular": 0.12, "shininess": 8 },
-    "oak_log":     { "type": "diffuse", "albedo": [0.42, 0.28, 0.10] },
-    "leaves":      { "type": "diffuse", "albedo": [0.12, 0.48, 0.08] },
-    "waterfall":   { "type": "dielectric", "ior": 1.33, "albedo": [0.55, 0.75, 0.98] },
-    "bridge_wood": { "type": "diffuse", "albedo": [0.58, 0.42, 0.18] },
-    "cloud":       { "type": "glossy", "albedo": [0.95, 0.95, 0.98], "specular": 0.05, "shininess": 4 },
-    "flower_red":  { "type": "diffuse", "albedo": [0.85, 0.15, 0.12] },
-    "flower_yel":  { "type": "diffuse", "albedo": [0.90, 0.82, 0.15] }
+    "grass_top": {
+      "type": "diffuse",
+      "albedo": [
+        0.2,
+        0.55,
+        0.12
+      ]
+    },
+    "dirt": {
+      "type": "diffuse",
+      "albedo": [
+        0.5,
+        0.32,
+        0.14
+      ]
+    },
+    "stone": {
+      "type": "glossy",
+      "albedo": [
+        0.48,
+        0.48,
+        0.48
+      ],
+      "specular": 0.12,
+      "shininess": 8
+    },
+    "oak_log": {
+      "type": "diffuse",
+      "albedo": [
+        0.42,
+        0.28,
+        0.1
+      ]
+    },
+    "leaves": {
+      "type": "diffuse",
+      "albedo": [
+        0.12,
+        0.48,
+        0.08
+      ]
+    },
+    "waterfall": {
+      "type": "dielectric",
+      "ior": 1.33,
+      "albedo": [
+        0.55,
+        0.75,
+        0.98
+      ]
+    },
+    "bridge_wood": {
+      "type": "diffuse",
+      "albedo": [
+        0.58,
+        0.42,
+        0.18
+      ]
+    },
+    "cloud": {
+      "type": "glossy",
+      "albedo": [
+        0.95,
+        0.95,
+        0.98
+      ],
+      "specular": 0.05,
+      "shininess": 4
+    },
+    "flower_red": {
+      "type": "diffuse",
+      "albedo": [
+        0.85,
+        0.15,
+        0.12
+      ]
+    },
+    "flower_yel": {
+      "type": "diffuse",
+      "albedo": [
+        0.9,
+        0.82,
+        0.15
+      ]
+    }
   },
   "objects": [
-    { "type": "sphere", "center": [0, 1.5, 0], "radius": 2.5, "material": "dirt" },
-    { "type": "sphere", "center": [0, 3.5, 0], "radius": 1.8, "material": "grass_top" },
-
-    { "type": "sphere", "center": [0, 5.0, 0], "radius": 0.35, "material": "oak_log" },
-    { "type": "sphere", "center": [0, 5.8, 0], "radius": 0.30, "material": "oak_log" },
-    { "type": "sphere", "center": [0, 6.6, 0], "radius": 0.80, "material": "leaves" },
-    { "type": "sphere", "center": [0.5, 6.3, 0.4], "radius": 0.55, "material": "leaves" },
-    { "type": "sphere", "center": [-0.4, 6.3, -0.3], "radius": 0.55, "material": "leaves" },
-
-    { "type": "sphere", "center": [-6, 3.0, 4], "radius": 2.0, "material": "stone" },
-    { "type": "sphere", "center": [-6, 4.5, 4], "radius": 1.5, "material": "grass_top" },
-
-    { "type": "sphere", "center": [-6, 5.5, 4], "radius": 0.25, "material": "oak_log" },
-    { "type": "sphere", "center": [-6, 6.2, 4], "radius": 0.60, "material": "leaves" },
-    { "type": "sphere", "center": [-5.5, 5.9, 4.3], "radius": 0.45, "material": "leaves" },
-
-    { "type": "sphere", "center": [6, 2.0, -3], "radius": 1.8, "material": "dirt" },
-    { "type": "sphere", "center": [6, 3.5, -3], "radius": 1.3, "material": "grass_top" },
-    { "type": "sphere", "center": [6.3, 4.2, -3], "radius": 0.15, "material": "flower_red" },
-    { "type": "sphere", "center": [5.7, 4.1, -2.6], "radius": 0.12, "material": "flower_yel" },
-
-    { "type": "sphere", "center": [-6, 2.5, 4.8], "radius": 0.18, "material": "waterfall" },
-    { "type": "sphere", "center": [-6, 2.0, 4.9], "radius": 0.18, "material": "waterfall" },
-    { "type": "sphere", "center": [-6, 1.5, 5.0], "radius": 0.20, "material": "waterfall" },
-    { "type": "sphere", "center": [-6, 1.0, 5.1], "radius": 0.22, "material": "waterfall" },
-    { "type": "sphere", "center": [-6, 0.5, 5.2], "radius": 0.25, "material": "waterfall" },
-    { "type": "sphere", "center": [-6, 0.0, 5.3], "radius": 0.28, "material": "waterfall" },
-
-    { "type": "triangle", "v0": [-3, 4.0, 2], "v1": [-1, 3.8, 0.5], "v2": [-2, 4.1, 1.2], "material": "bridge_wood" },
-    { "type": "triangle", "v0": [-1, 3.8, 0.5], "v1": [1, 3.6, 0.2], "v2": [0, 3.9, 0.3], "material": "bridge_wood" },
-
-    { "type": "triangle", "v0": [2.5, 3.5, -1], "v1": [4.5, 3.3, -2], "v2": [3.5, 3.6, -1.5], "material": "bridge_wood" },
-
-    { "type": "sphere", "center": [3, 8, 5], "radius": 1.5, "material": "cloud" },
-    { "type": "sphere", "center": [4.2, 8.2, 5.5], "radius": 1.0, "material": "cloud" },
-    { "type": "sphere", "center": [-5, 9, -3], "radius": 1.2, "material": "cloud" },
-    { "type": "sphere", "center": [-3.8, 9.1, -2.5], "radius": 0.9, "material": "cloud" }
+    {
+      "type": "box",
+      "center": [
+        0,
+        1.5,
+        0
+      ],
+      "material": "dirt",
+      "size": [
+        5.0,
+        5.0,
+        5.0
+      ]
+    },
+    {
+      "type": "sphere",
+      "center": [
+        0,
+        3.5,
+        0
+      ],
+      "radius": 1.8,
+      "material": "grass_top"
+    },
+    {
+      "type": "box",
+      "center": [
+        0,
+        5.0,
+        0
+      ],
+      "material": "oak_log",
+      "size": [
+        0.7,
+        0.7,
+        0.7
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        0,
+        5.8,
+        0
+      ],
+      "material": "oak_log",
+      "size": [
+        0.6,
+        0.6,
+        0.6
+      ]
+    },
+    {
+      "type": "sphere",
+      "center": [
+        0,
+        6.6,
+        0
+      ],
+      "radius": 0.8,
+      "material": "leaves"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        0.5,
+        6.3,
+        0.4
+      ],
+      "radius": 0.55,
+      "material": "leaves"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        -0.4,
+        6.3,
+        -0.3
+      ],
+      "radius": 0.55,
+      "material": "leaves"
+    },
+    {
+      "type": "box",
+      "center": [
+        -6,
+        3.0,
+        4
+      ],
+      "material": "stone",
+      "size": [
+        4.0,
+        4.0,
+        4.0
+      ]
+    },
+    {
+      "type": "sphere",
+      "center": [
+        -6,
+        4.5,
+        4
+      ],
+      "radius": 1.5,
+      "material": "grass_top"
+    },
+    {
+      "type": "box",
+      "center": [
+        -6,
+        5.5,
+        4
+      ],
+      "material": "oak_log",
+      "size": [
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "type": "sphere",
+      "center": [
+        -6,
+        6.2,
+        4
+      ],
+      "radius": 0.6,
+      "material": "leaves"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        -5.5,
+        5.9,
+        4.3
+      ],
+      "radius": 0.45,
+      "material": "leaves"
+    },
+    {
+      "type": "box",
+      "center": [
+        6,
+        2.0,
+        -3
+      ],
+      "material": "dirt",
+      "size": [
+        3.6,
+        3.6,
+        3.6
+      ]
+    },
+    {
+      "type": "sphere",
+      "center": [
+        6,
+        3.5,
+        -3
+      ],
+      "radius": 1.3,
+      "material": "grass_top"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        6.3,
+        4.2,
+        -3
+      ],
+      "radius": 0.15,
+      "material": "flower_red"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        5.7,
+        4.1,
+        -2.6
+      ],
+      "radius": 0.12,
+      "material": "flower_yel"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        -6,
+        2.5,
+        4.8
+      ],
+      "radius": 0.18,
+      "material": "waterfall"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        -6,
+        2.0,
+        4.9
+      ],
+      "radius": 0.18,
+      "material": "waterfall"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        -6,
+        1.5,
+        5.0
+      ],
+      "radius": 0.2,
+      "material": "waterfall"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        -6,
+        1.0,
+        5.1
+      ],
+      "radius": 0.22,
+      "material": "waterfall"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        -6,
+        0.5,
+        5.2
+      ],
+      "radius": 0.25,
+      "material": "waterfall"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        -6,
+        0.0,
+        5.3
+      ],
+      "radius": 0.28,
+      "material": "waterfall"
+    },
+    {
+      "type": "triangle",
+      "v0": [
+        -3,
+        4.0,
+        2
+      ],
+      "v1": [
+        -1,
+        3.8,
+        0.5
+      ],
+      "v2": [
+        -2,
+        4.1,
+        1.2
+      ],
+      "material": "bridge_wood"
+    },
+    {
+      "type": "triangle",
+      "v0": [
+        -1,
+        3.8,
+        0.5
+      ],
+      "v1": [
+        1,
+        3.6,
+        0.2
+      ],
+      "v2": [
+        0,
+        3.9,
+        0.3
+      ],
+      "material": "bridge_wood"
+    },
+    {
+      "type": "triangle",
+      "v0": [
+        2.5,
+        3.5,
+        -1
+      ],
+      "v1": [
+        4.5,
+        3.3,
+        -2
+      ],
+      "v2": [
+        3.5,
+        3.6,
+        -1.5
+      ],
+      "material": "bridge_wood"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        3,
+        8,
+        5
+      ],
+      "radius": 1.5,
+      "material": "cloud"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        4.2,
+        8.2,
+        5.5
+      ],
+      "radius": 1.0,
+      "material": "cloud"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        -5,
+        9,
+        -3
+      ],
+      "radius": 1.2,
+      "material": "cloud"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        -3.8,
+        9.1,
+        -2.5
+      ],
+      "radius": 0.9,
+      "material": "cloud"
+    }
   ],
   "lights": [
     {
       "type": "area",
-      "position": [8, 12, 6],
-      "intensity": [1.0, 0.95, 0.82],
+      "position": [
+        8,
+        12,
+        6
+      ],
+      "intensity": [
+        1.0,
+        0.95,
+        0.82
+      ],
       "radius": 1.5,
-      "orbit": { "center": [0, 0, 0], "radius": 10, "height": 12, "speed": -0.3, "phase": 0.1 }
+      "orbit": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "radius": 10,
+        "height": 12,
+        "speed": -0.3,
+        "phase": 0.1
+      }
     },
     {
       "type": "area",
-      "position": [-6, 8, -5],
-      "intensity": [0.35, 0.40, 0.60],
+      "position": [
+        -6,
+        8,
+        -5
+      ],
+      "intensity": [
+        0.35,
+        0.4,
+        0.6
+      ],
       "radius": 0.6
     },
     {
       "type": "spot",
-      "position": [0, 10, 0],
-      "direction": [0, -1, 0],
-      "intensity": [0.4, 0.4, 0.5],
+      "position": [
+        0,
+        10,
+        0
+      ],
+      "direction": [
+        0,
+        -1,
+        0
+      ],
+      "intensity": [
+        0.4,
+        0.4,
+        0.5
+      ],
       "angle": 40,
       "falloff": 2
     }

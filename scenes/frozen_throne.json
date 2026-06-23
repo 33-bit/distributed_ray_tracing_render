@@ -1,0 +1,85 @@
+{
+  "background": { "top": [0.05, 0.08, 0.2], "bottom": [0.15, 0.2, 0.35] },
+  "camera": {
+    "eye": [0, 4, 14],
+    "lookat": [0, 4, 0],
+    "up": [0, 1, 0],
+    "vfov": 50,
+    "aperture": 0.06,
+    "focus_dist": 14
+  },
+  "materials": {
+    "ice_floor":     { "type": "checkerboard", "albedo": [0.6, 0.7, 0.85], "albedo2": [0.35, 0.45, 0.6], "scale": 1.5 },
+    "packed_ice":    { "type": "glossy", "albedo": [0.55, 0.65, 0.8], "specular": 0.3, "shininess": 24 },
+    "blue_ice":      { "type": "glossy", "albedo": [0.3, 0.5, 0.85], "specular": 0.5, "shininess": 48 },
+    "clear_ice":     { "type": "dielectric", "ior": 1.31, "albedo": [0.88, 0.92, 1.0] },
+    "obsidian":      { "type": "glossy", "albedo": [0.06, 0.04, 0.08], "specular": 0.6, "shininess": 80 },
+    "netherite":     { "type": "glossy", "albedo": [0.2, 0.18, 0.2], "specular": 0.4, "shininess": 40 },
+    "soul_fire":     { "type": "emissive", "emission": [0.3, 0.8, 1.2] },
+    "ender_glow":    { "type": "emissive", "emission": [0.5, 0.2, 1.5] },
+    "beacon_beam":   { "type": "emissive", "emission": [0.4, 0.6, 2.0] },
+    "diamond_block": { "type": "dielectric", "ior": 2.42, "albedo": [0.7, 0.92, 0.95] },
+    "gold_crown":    { "type": "glossy", "albedo": [0.92, 0.78, 0.15], "specular": 0.8, "shininess": 80 },
+    "snow":          { "type": "diffuse", "albedo": [0.92, 0.93, 0.96] },
+    "frost":         { "type": "diffuse", "albedo": [0.7, 0.78, 0.9] },
+    "nether_star":   { "type": "emissive", "emission": [2.0, 2.0, 2.5] }
+  },
+  "objects": [
+    { "type": "plane", "point": [0, 0, 0], "normal": [0, 1, 0], "material": "ice_floor" },
+
+    { "type": "box", "center": [0, 1.5, 0],  "size": [5, 3, 5],   "material": "obsidian" },
+    { "type": "box", "center": [0, 3.5, 0],  "size": [4, 1, 4],   "material": "netherite" },
+    { "type": "box", "center": [0, 4.5, 0],  "size": [3, 1, 3],   "material": "obsidian" },
+    { "type": "box", "center": [0, 5.5, 0],  "size": [2.5, 1, 2.5], "material": "blue_ice" },
+    { "type": "box", "center": [0, 6.3, 0],  "size": [1.8, 0.6, 1.8], "material": "netherite" },
+    { "type": "box", "center": [0, 7.5, 0],  "size": [0.6, 1.8, 0.3], "material": "obsidian" },
+
+    { "type": "sphere", "center": [0, 8.8, 0], "radius": 0.4, "material": "nether_star" },
+
+    { "type": "box", "center": [-3, 5, 0], "size": [0.4, 4, 0.4], "material": "packed_ice" },
+    { "type": "box", "center": [3, 5, 0],  "size": [0.4, 4, 0.4], "material": "packed_ice" },
+    { "type": "box", "center": [0, 5, -3], "size": [0.4, 4, 0.4], "material": "packed_ice" },
+    { "type": "box", "center": [0, 5, 3],  "size": [0.4, 4, 0.4], "material": "packed_ice" },
+
+    { "type": "sphere", "center": [-3, 7.2, 0], "radius": 0.3, "material": "soul_fire" },
+    { "type": "sphere", "center": [3, 7.2, 0],  "radius": 0.3, "material": "soul_fire" },
+    { "type": "sphere", "center": [0, 7.2, -3], "radius": 0.3, "material": "soul_fire" },
+    { "type": "sphere", "center": [0, 7.2, 3],  "radius": 0.3, "material": "soul_fire" },
+
+    { "type": "box", "center": [-6, 3.5, -6], "size": [1.5, 7, 1.5], "material": "packed_ice" },
+    { "type": "box", "center": [6, 3.5, -6],  "size": [1.5, 7, 1.5], "material": "packed_ice" },
+    { "type": "box", "center": [-6, 3.5, 6],  "size": [1.5, 7, 1.5], "material": "blue_ice" },
+    { "type": "box", "center": [6, 3.5, 6],   "size": [1.5, 7, 1.5], "material": "blue_ice" },
+
+    { "type": "sphere", "center": [-6, 7.5, -6], "radius": 0.5, "material": "clear_ice" },
+    { "type": "sphere", "center": [6, 7.5, -6],  "radius": 0.5, "material": "clear_ice" },
+    { "type": "sphere", "center": [-6, 7.5, 6],  "radius": 0.5, "material": "clear_ice" },
+    { "type": "sphere", "center": [6, 7.5, 6],   "radius": 0.5, "material": "clear_ice" },
+
+    { "type": "sphere", "center": [-6, 8.2, -6], "radius": 0.15, "material": "ender_glow" },
+    { "type": "sphere", "center": [6, 8.2, -6],  "radius": 0.15, "material": "ender_glow" },
+    { "type": "sphere", "center": [-6, 8.2, 6],  "radius": 0.15, "material": "ender_glow" },
+    { "type": "sphere", "center": [6, 8.2, 6],   "radius": 0.15, "material": "ender_glow" },
+
+    { "type": "box", "center": [-3.5, 0.4, 5],  "size": [2.0, 0.8, 2.0], "material": "snow" },
+    { "type": "box", "center": [4, 0.3, 7],     "size": [1.5, 0.6, 1.5], "material": "snow" },
+    { "type": "box", "center": [-5, 0.25, -3],  "size": [1.2, 0.5, 1.8], "material": "frost" },
+    { "type": "box", "center": [5, 0.35, 3],    "size": [1.8, 0.7, 1.2], "material": "snow" },
+
+    { "type": "sphere", "center": [-2, 1.0, 6],  "radius": 0.6, "material": "diamond_block" },
+    { "type": "sphere", "center": [2.5, 0.8, 7],  "radius": 0.5, "material": "clear_ice" },
+    { "type": "sphere", "center": [0, 7.0, 0],    "radius": 0.25, "material": "gold_crown" },
+
+    { "type": "sphere", "center": [0, 0.5, 8],   "radius": 0.12, "material": "beacon_beam" },
+    { "type": "sphere", "center": [0, 1.5, 8],   "radius": 0.12, "material": "beacon_beam" },
+    { "type": "sphere", "center": [0, 2.5, 8],   "radius": 0.12, "material": "beacon_beam" },
+    { "type": "sphere", "center": [0, 3.5, 8],   "radius": 0.12, "material": "beacon_beam" }
+  ],
+  "lights": [
+    { "type": "area", "position": [0, 9.5, 0],  "intensity": [0.8, 0.85, 1.2], "radius": 0.8 },
+    { "type": "area", "position": [0, 5, 8],    "intensity": [0.15, 0.25, 0.6], "radius": 0.5 },
+    { "type": "spot", "position": [0, 12, 0], "intensity": [0.3, 0.35, 0.6], "direction": [0, -1, 0], "inner_deg": 12, "outer_deg": 30 },
+    { "type": "area", "position": [-8, 4, 0],  "intensity": [0.08, 0.15, 0.3], "radius": 0.5 },
+    { "type": "area", "position": [8, 4, 0],   "intensity": [0.08, 0.15, 0.3], "radius": 0.5 }
+  ]
+}

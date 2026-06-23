@@ -1,14 +1,34 @@
 {
   "background": {
-    "top": [0.35, 0.55, 0.92],
-    "bottom": [0.75, 0.85, 0.98]
+    "top": [
+      0.35,
+      0.55,
+      0.92
+    ],
+    "bottom": [
+      0.75,
+      0.85,
+      0.98
+    ]
   },
   "camera": {
-    "lookat": [0, 1.5, 0],
-    "up": [0, 1, 0],
+    "lookat": [
+      0,
+      1.5,
+      0
+    ],
+    "up": [
+      0,
+      1,
+      0
+    ],
     "vfov": 50,
     "orbit": {
-      "center": [0, 1.5, 0],
+      "center": [
+        0,
+        1.5,
+        0
+      ],
       "radius": 12,
       "height": 5,
       "speed": 1,
@@ -16,59 +36,413 @@
     }
   },
   "materials": {
-    "grass":     { "type": "checkerboard", "albedo": [0.22, 0.55, 0.12], "albedo2": [0.18, 0.45, 0.10], "scale": 2.0 },
-    "dirt":      { "type": "diffuse", "albedo": [0.55, 0.35, 0.18] },
-    "stone":     { "type": "glossy", "albedo": [0.5, 0.5, 0.5], "specular": 0.15, "shininess": 8 },
-    "oak_log":   { "type": "diffuse", "albedo": [0.45, 0.30, 0.12] },
-    "oak_plank": { "type": "diffuse", "albedo": [0.65, 0.48, 0.22] },
-    "leaves":    { "type": "diffuse", "albedo": [0.15, 0.50, 0.08] },
-    "glass_pane": { "type": "dielectric", "ior": 1.3, "albedo": [0.85, 0.92, 1.0] },
-    "water":     { "type": "dielectric", "ior": 1.33, "albedo": [0.6, 0.75, 0.95] },
-    "red_wool":  { "type": "diffuse", "albedo": [0.75, 0.12, 0.10] },
-    "cobble":    { "type": "glossy", "albedo": [0.42, 0.42, 0.42], "specular": 0.1, "shininess": 6 },
-    "gold_block": { "type": "glossy", "albedo": [0.9, 0.75, 0.2], "specular": 0.6, "shininess": 48 },
-    "diamond":   { "type": "mirror", "albedo": [0.4, 0.85, 0.9], "reflectivity": 0.7 }
+    "grass": {
+      "type": "checkerboard",
+      "albedo": [
+        0.22,
+        0.55,
+        0.12
+      ],
+      "albedo2": [
+        0.18,
+        0.45,
+        0.1
+      ],
+      "scale": 2.0
+    },
+    "dirt": {
+      "type": "diffuse",
+      "albedo": [
+        0.55,
+        0.35,
+        0.18
+      ]
+    },
+    "stone": {
+      "type": "glossy",
+      "albedo": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "specular": 0.15,
+      "shininess": 8
+    },
+    "oak_log": {
+      "type": "diffuse",
+      "albedo": [
+        0.45,
+        0.3,
+        0.12
+      ]
+    },
+    "oak_plank": {
+      "type": "diffuse",
+      "albedo": [
+        0.65,
+        0.48,
+        0.22
+      ]
+    },
+    "leaves": {
+      "type": "diffuse",
+      "albedo": [
+        0.15,
+        0.5,
+        0.08
+      ]
+    },
+    "glass_pane": {
+      "type": "dielectric",
+      "ior": 1.3,
+      "albedo": [
+        0.85,
+        0.92,
+        1.0
+      ]
+    },
+    "water": {
+      "type": "dielectric",
+      "ior": 1.33,
+      "albedo": [
+        0.6,
+        0.75,
+        0.95
+      ]
+    },
+    "red_wool": {
+      "type": "diffuse",
+      "albedo": [
+        0.75,
+        0.12,
+        0.1
+      ]
+    },
+    "cobble": {
+      "type": "glossy",
+      "albedo": [
+        0.42,
+        0.42,
+        0.42
+      ],
+      "specular": 0.1,
+      "shininess": 6
+    },
+    "gold_block": {
+      "type": "glossy",
+      "albedo": [
+        0.9,
+        0.75,
+        0.2
+      ],
+      "specular": 0.6,
+      "shininess": 48
+    },
+    "diamond": {
+      "type": "mirror",
+      "albedo": [
+        0.4,
+        0.85,
+        0.9
+      ],
+      "reflectivity": 0.7
+    }
   },
   "objects": [
-    { "type": "plane", "point": [0, 0, 0], "normal": [0, 1, 0], "material": "grass" },
-
-    { "type": "sphere", "center": [-3, 0.8, 0], "radius": 0.8, "material": "cobble" },
-    { "type": "sphere", "center": [-3, 2.2, 0], "radius": 0.7, "material": "oak_plank" },
-    { "type": "sphere", "center": [-3, 3.4, 0], "radius": 0.6, "material": "red_wool" },
-
-    { "type": "sphere", "center": [-1, 0.8, -1], "radius": 0.8, "material": "cobble" },
-    { "type": "sphere", "center": [-1, 2.2, -1], "radius": 0.7, "material": "oak_plank" },
-    { "type": "sphere", "center": [-1, 3.2, -1], "radius": 0.5, "material": "oak_plank" },
-
-    { "type": "sphere", "center": [-2, 1.5, -0.5], "radius": 0.4, "material": "glass_pane" },
-
-    { "type": "sphere", "center": [2.5, 1.2, 1], "radius": 1.2, "material": "oak_log" },
-    { "type": "sphere", "center": [2.5, 3.0, 1], "radius": 0.9, "material": "leaves" },
-    { "type": "sphere", "center": [2.5, 4.2, 1], "radius": 0.7, "material": "leaves" },
-    { "type": "sphere", "center": [1.8, 3.3, 0.5], "radius": 0.6, "material": "leaves" },
-    { "type": "sphere", "center": [3.2, 3.3, 1.5], "radius": 0.6, "material": "leaves" },
-
-    { "type": "sphere", "center": [5, 0.5, -2], "radius": 0.5, "material": "gold_block" },
-    { "type": "sphere", "center": [5, 1.3, -2], "radius": 0.4, "material": "diamond" },
-
-    { "type": "sphere", "center": [0, 0.3, 4], "radius": 0.3, "material": "dirt" },
-    { "type": "sphere", "center": [0.7, 0.25, 3.8], "radius": 0.25, "material": "stone" },
-    { "type": "sphere", "center": [-0.5, 0.2, 3.5], "radius": 0.2, "material": "cobble" },
-
-    { "type": "triangle", "v0": [-4, 0, 3], "v1": [-2, 0, 3], "v2": [-3, 0.1, 5], "material": "water" }
+    {
+      "type": "plane",
+      "point": [
+        0,
+        0,
+        0
+      ],
+      "normal": [
+        0,
+        1,
+        0
+      ],
+      "material": "grass"
+    },
+    {
+      "type": "box",
+      "center": [
+        -3,
+        0.8,
+        0
+      ],
+      "material": "cobble",
+      "size": [
+        1.6,
+        1.6,
+        1.6
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -3,
+        2.2,
+        0
+      ],
+      "material": "oak_plank",
+      "size": [
+        1.4,
+        1.4,
+        1.4
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -3,
+        3.4,
+        0
+      ],
+      "material": "red_wool",
+      "size": [
+        1.2,
+        1.2,
+        1.2
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -1,
+        0.8,
+        -1
+      ],
+      "material": "cobble",
+      "size": [
+        1.6,
+        1.6,
+        1.6
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -1,
+        2.2,
+        -1
+      ],
+      "material": "oak_plank",
+      "size": [
+        1.4,
+        1.4,
+        1.4
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -1,
+        3.2,
+        -1
+      ],
+      "material": "oak_plank",
+      "size": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -2,
+        1.5,
+        -0.5
+      ],
+      "material": "glass_pane",
+      "size": [
+        0.8,
+        0.8,
+        0.8
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        2.5,
+        1.2,
+        1
+      ],
+      "material": "oak_log",
+      "size": [
+        2.4,
+        2.4,
+        2.4
+      ]
+    },
+    {
+      "type": "sphere",
+      "center": [
+        2.5,
+        3.0,
+        1
+      ],
+      "radius": 0.9,
+      "material": "leaves"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        2.5,
+        4.2,
+        1
+      ],
+      "radius": 0.7,
+      "material": "leaves"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        1.8,
+        3.3,
+        0.5
+      ],
+      "radius": 0.6,
+      "material": "leaves"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        3.2,
+        3.3,
+        1.5
+      ],
+      "radius": 0.6,
+      "material": "leaves"
+    },
+    {
+      "type": "box",
+      "center": [
+        5,
+        0.5,
+        -2
+      ],
+      "material": "gold_block",
+      "size": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        5,
+        1.3,
+        -2
+      ],
+      "material": "diamond",
+      "size": [
+        0.8,
+        0.8,
+        0.8
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        0,
+        0.3,
+        4
+      ],
+      "material": "dirt",
+      "size": [
+        0.6,
+        0.6,
+        0.6
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        0.7,
+        0.25,
+        3.8
+      ],
+      "material": "stone",
+      "size": [
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -0.5,
+        0.2,
+        3.5
+      ],
+      "material": "cobble",
+      "size": [
+        0.4,
+        0.4,
+        0.4
+      ]
+    },
+    {
+      "type": "triangle",
+      "v0": [
+        -4,
+        0,
+        3
+      ],
+      "v1": [
+        -2,
+        0,
+        3
+      ],
+      "v2": [
+        -3,
+        0.1,
+        5
+      ],
+      "material": "water"
+    }
   ],
   "lights": [
     {
       "type": "area",
-      "position": [6, 10, 4],
-      "intensity": [1.0, 0.95, 0.85],
+      "position": [
+        6,
+        10,
+        4
+      ],
+      "intensity": [
+        1.0,
+        0.95,
+        0.85
+      ],
       "radius": 1.0,
-      "orbit": { "center": [0, 0, 0], "radius": 8, "height": 10, "speed": -0.5, "phase": 0.5 }
+      "orbit": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "radius": 8,
+        "height": 10,
+        "speed": -0.5,
+        "phase": 0.5
+      }
     },
     {
       "type": "area",
-      "position": [-4, 6, -3],
-      "intensity": [0.3, 0.35, 0.5],
+      "position": [
+        -4,
+        6,
+        -3
+      ],
+      "intensity": [
+        0.3,
+        0.35,
+        0.5
+      ],
       "radius": 0.4
     }
   ]

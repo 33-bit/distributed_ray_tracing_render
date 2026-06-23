@@ -6,9 +6,10 @@ the animation (orbiting camera + moving light), the CLI/`main`, per-rank timing
 and CSV benchmarking, and the ffmpeg/chart/correctness tooling. The "tie it all
 together and measure it" layer.
 
-**Files I own:** `src/scene/scene.hpp`, `src/render/renderer.hpp`, `tile.hpp`,
-`image.hpp`, `src/core/timer.hpp`, `src/benchmark/benchmark.hpp`,
-`csv_logger.hpp`, `src/main.cpp`, `tools/*`.
+**Files I own:** `src/scene/scene.hpp`, `src/scene/scene_parser.hpp`,
+`src/scene/json_parser.hpp`, `src/render/renderer.hpp`, `tile.hpp`, `image.hpp`,
+`src/core/timer.hpp`, `src/benchmark/benchmark.hpp`, `csv_logger.hpp`,
+`src/main.cpp`, `tools/*`, `scenes/*.json` (30 scene configs).
 
 ## Interface contract (what A, B, C rely on)
 
@@ -20,8 +21,10 @@ struct RenderParams { int width, height, spp, max_depth, shadow_samples,
 struct Image { int w, h; /* RGB */ Image(int,int); void set(int x,int y,Color);
                void write_ppm(const std::string& path) const; };
 
-struct Scene : ISceneQuery { Camera camera; /* objects, materials, lights, bg */ };
-Scene build_demo_scene(double aspect, int frame, int total_frames); // animation here
+struct Scene : ISceneQuery { Camera camera; /* objects, materials, lights, bg */
+  void add_sphere(...); void add_plane(...); void add_triangle(...); void add_box(...); };
+Scene build_demo_scene(double aspect, int frame, int total_frames);
+Scene build_scene_from_config(const SceneConfig& cfg, ...);  // JSON scene loading
 
 struct Renderer { static void render_tile(const Scene&, const RenderParams&,
                                           const Tile&, Image& out); };

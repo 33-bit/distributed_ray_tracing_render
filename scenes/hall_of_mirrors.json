@@ -1,0 +1,65 @@
+{
+  "background": { "top": [0.01, 0.01, 0.02], "bottom": [0.01, 0.01, 0.02] },
+  "camera": {
+    "eye": [0, 2.5, 6],
+    "lookat": [0, 2, -2],
+    "up": [0, 1, 0],
+    "vfov": 60
+  },
+  "materials": {
+    "marble_floor":   { "type": "checkerboard", "albedo": [0.85, 0.82, 0.78], "albedo2": [0.15, 0.12, 0.1], "scale": 1.0 },
+    "mirror_wall":    { "type": "mirror", "albedo": [0.95, 0.95, 0.98], "reflectivity": 0.95 },
+    "gold_frame":     { "type": "glossy", "albedo": [0.85, 0.65, 0.1], "specular": 0.7, "shininess": 64 },
+    "chrome":         { "type": "mirror", "albedo": [0.9, 0.9, 0.92], "reflectivity": 0.9 },
+    "ruby":           { "type": "colored_glass", "ior": 1.77, "absorption": [0.2, 4.0, 4.0] },
+    "sapphire":       { "type": "colored_glass", "ior": 1.77, "absorption": [4.0, 2.5, 0.3] },
+    "emerald":        { "type": "colored_glass", "ior": 1.6, "absorption": [3.5, 0.2, 3.0] },
+    "diamond":        { "type": "dielectric", "ior": 2.42, "albedo": [1.0, 1.0, 1.0] },
+    "crystal":        { "type": "dielectric", "ior": 1.55, "albedo": [0.98, 0.98, 1.0] },
+    "velvet_red":     { "type": "diffuse", "albedo": [0.5, 0.04, 0.04] },
+    "obsidian":       { "type": "glossy", "albedo": [0.08, 0.06, 0.1], "specular": 0.5, "shininess": 80 },
+    "candle":         { "type": "emissive", "emission": [2.0, 1.4, 0.6] },
+    "chandelier":     { "type": "emissive", "emission": [2.5, 2.0, 1.2] }
+  },
+  "objects": [
+    { "type": "plane", "point": [0, 0, 0], "normal": [0, 1, 0], "material": "marble_floor" },
+    { "type": "plane", "point": [0, 7, 0], "normal": [0, -1, 0], "material": "obsidian" },
+
+    { "type": "box", "center": [-5, 3.5, 0], "size": [0.3, 7, 16], "material": "mirror_wall" },
+    { "type": "box", "center": [5, 3.5, 0],  "size": [0.3, 7, 16], "material": "mirror_wall" },
+    { "type": "box", "center": [0, 3.5, -8], "size": [10, 7, 0.3], "material": "mirror_wall" },
+
+    { "type": "box", "center": [-4.7, 3.5, 3],  "size": [0.15, 5.0, 0.15], "material": "gold_frame" },
+    { "type": "box", "center": [-4.7, 3.5, -3], "size": [0.15, 5.0, 0.15], "material": "gold_frame" },
+    { "type": "box", "center": [4.7, 3.5, 3],   "size": [0.15, 5.0, 0.15], "material": "gold_frame" },
+    { "type": "box", "center": [4.7, 3.5, -3],  "size": [0.15, 5.0, 0.15], "material": "gold_frame" },
+
+    { "type": "box", "center": [0, 1.0, 0], "size": [2.5, 2.0, 2.5], "material": "velvet_red" },
+    { "type": "box", "center": [0, 2.2, 0], "size": [2.0, 0.3, 2.0], "material": "obsidian" },
+
+    { "type": "sphere", "center": [0, 3.5, 0],     "radius": 0.8, "material": "diamond" },
+    { "type": "sphere", "center": [-1.5, 1.0, 2],   "radius": 0.6, "material": "ruby" },
+    { "type": "sphere", "center": [1.5, 1.0, 2],    "radius": 0.6, "material": "sapphire" },
+    { "type": "sphere", "center": [0, 1.0, -2],     "radius": 0.6, "material": "emerald" },
+    { "type": "sphere", "center": [-2.5, 0.5, -4],  "radius": 0.5, "material": "crystal" },
+    { "type": "sphere", "center": [2.5, 0.5, -4],   "radius": 0.5, "material": "crystal" },
+
+    { "type": "sphere", "center": [-3, 0.5, 0], "radius": 0.5, "material": "chrome" },
+    { "type": "sphere", "center": [3, 0.5, 0],  "radius": 0.5, "material": "chrome" },
+
+    { "type": "sphere", "center": [0, 6.5, 0], "radius": 0.25, "material": "chandelier" },
+    { "type": "sphere", "center": [0, 6.5, -4], "radius": 0.2, "material": "chandelier" },
+    { "type": "sphere", "center": [0, 6.5, 4],  "radius": 0.2, "material": "chandelier" },
+
+    { "type": "sphere", "center": [-4.5, 4.0, 0],  "radius": 0.1, "material": "candle" },
+    { "type": "sphere", "center": [4.5, 4.0, 0],   "radius": 0.1, "material": "candle" },
+    { "type": "sphere", "center": [-4.5, 4.0, -5], "radius": 0.1, "material": "candle" },
+    { "type": "sphere", "center": [4.5, 4.0, -5],  "radius": 0.1, "material": "candle" }
+  ],
+  "lights": [
+    { "type": "area", "position": [0, 6.2, 0],  "intensity": [1.0, 0.85, 0.55], "radius": 0.5 },
+    { "type": "area", "position": [0, 6.2, -4], "intensity": [0.6, 0.5, 0.3],  "radius": 0.4 },
+    { "type": "area", "position": [0, 6.2, 4],  "intensity": [0.6, 0.5, 0.3],  "radius": 0.4 },
+    { "type": "spot", "position": [0, 6.8, 0], "intensity": [0.4, 0.35, 0.25], "direction": [0, -1, 0], "inner_deg": 25, "outer_deg": 50 }
+  ]
+}

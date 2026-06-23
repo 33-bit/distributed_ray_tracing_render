@@ -1,0 +1,90 @@
+{
+  "background": { "top": [0.0, 0.0, 0.0], "bottom": [0.0, 0.0, 0.0] },
+  "camera": {
+    "eye": [0, 3, 12],
+    "lookat": [0, 4, 0],
+    "up": [0, 1, 0],
+    "vfov": 55
+  },
+  "materials": {
+    "stone_floor":    { "type": "checkerboard", "albedo": [0.35, 0.32, 0.3], "albedo2": [0.22, 0.2, 0.18], "scale": 1.5 },
+    "stone_wall":     { "type": "glossy", "albedo": [0.42, 0.4, 0.38], "specular": 0.08, "shininess": 6 },
+    "stone_pillar":   { "type": "glossy", "albedo": [0.5, 0.48, 0.45], "specular": 0.12, "shininess": 10 },
+    "dark_stone":     { "type": "diffuse", "albedo": [0.2, 0.18, 0.16] },
+    "gold_trim":      { "type": "glossy", "albedo": [0.85, 0.7, 0.15], "specular": 0.7, "shininess": 64 },
+    "altar_marble":   { "type": "glossy", "albedo": [0.88, 0.86, 0.82], "specular": 0.25, "shininess": 32 },
+    "glass_red":      { "type": "colored_glass", "ior": 1.5, "absorption": [0.2, 3.0, 3.0] },
+    "glass_blue":     { "type": "colored_glass", "ior": 1.5, "absorption": [3.0, 2.0, 0.3] },
+    "glass_gold":     { "type": "colored_glass", "ior": 1.5, "absorption": [0.3, 0.8, 3.0] },
+    "glass_green":    { "type": "colored_glass", "ior": 1.5, "absorption": [2.5, 0.3, 2.5] },
+    "glass_purple":   { "type": "colored_glass", "ior": 1.5, "absorption": [1.0, 3.0, 0.5] },
+    "candle_glow":    { "type": "emissive", "emission": [1.5, 1.0, 0.4] },
+    "cross_gold":     { "type": "mirror", "albedo": [0.9, 0.75, 0.2], "reflectivity": 0.8 },
+    "diamond_relic":  { "type": "dielectric", "ior": 2.4, "albedo": [0.95, 0.95, 1.0] },
+    "red_carpet":     { "type": "diffuse", "albedo": [0.6, 0.08, 0.06] },
+    "wood_pew":       { "type": "diffuse", "albedo": [0.35, 0.2, 0.08] }
+  },
+  "objects": [
+    { "type": "plane", "point": [0, 0, 0], "normal": [0, 1, 0], "material": "stone_floor" },
+    { "type": "plane", "point": [0, 10, 0], "normal": [0, -1, 0], "material": "dark_stone" },
+
+    { "type": "box", "center": [-6, 5, 0], "size": [0.5, 10, 20], "material": "stone_wall" },
+    { "type": "box", "center": [6, 5, 0],  "size": [0.5, 10, 20], "material": "stone_wall" },
+    { "type": "box", "center": [0, 5, -10],"size": [12, 10, 0.5], "material": "stone_wall" },
+
+    { "type": "box", "center": [-4, 5, 2],  "size": [1.0, 10, 1.0], "material": "stone_pillar" },
+    { "type": "box", "center": [4, 5, 2],   "size": [1.0, 10, 1.0], "material": "stone_pillar" },
+    { "type": "box", "center": [-4, 5, -3], "size": [1.0, 10, 1.0], "material": "stone_pillar" },
+    { "type": "box", "center": [4, 5, -3],  "size": [1.0, 10, 1.0], "material": "stone_pillar" },
+    { "type": "box", "center": [-4, 5, -7], "size": [1.0, 10, 1.0], "material": "stone_pillar" },
+    { "type": "box", "center": [4, 5, -7],  "size": [1.0, 10, 1.0], "material": "stone_pillar" },
+
+    { "type": "sphere", "center": [-5.6, 5.5, -2], "radius": 0.7, "material": "glass_red" },
+    { "type": "sphere", "center": [-5.6, 5.5, -5], "radius": 0.7, "material": "glass_blue" },
+    { "type": "sphere", "center": [-5.6, 5.5, -8], "radius": 0.7, "material": "glass_gold" },
+    { "type": "sphere", "center": [5.6, 5.5, -2],  "radius": 0.7, "material": "glass_green" },
+    { "type": "sphere", "center": [5.6, 5.5, -5],  "radius": 0.7, "material": "glass_purple" },
+    { "type": "sphere", "center": [5.6, 5.5, -8],  "radius": 0.7, "material": "glass_red" },
+
+    { "type": "sphere", "center": [-5.6, 3.5, -2], "radius": 0.5, "material": "glass_gold" },
+    { "type": "sphere", "center": [-5.6, 3.5, -5], "radius": 0.5, "material": "glass_green" },
+    { "type": "sphere", "center": [5.6, 3.5, -2],  "radius": 0.5, "material": "glass_red" },
+    { "type": "sphere", "center": [5.6, 3.5, -5],  "radius": 0.5, "material": "glass_blue" },
+
+    { "type": "box", "center": [0, 1.0, -8.5], "size": [3.0, 2.0, 1.5], "material": "altar_marble" },
+    { "type": "box", "center": [0, 2.2, -8.5], "size": [2.4, 0.3, 1.2], "material": "gold_trim" },
+    { "type": "sphere", "center": [0, 3.0, -8.5], "radius": 0.4, "material": "diamond_relic" },
+    { "type": "box", "center": [0, 5.0, -9.5], "size": [0.15, 3.0, 0.15], "material": "cross_gold" },
+    { "type": "box", "center": [0, 6.2, -9.5], "size": [1.5, 0.15, 0.15], "material": "cross_gold" },
+
+    { "type": "box", "center": [0, 0.05, 2],  "size": [1.5, 0.1, 14], "material": "red_carpet" },
+
+    { "type": "box", "center": [-2.5, 0.5, 4], "size": [2.0, 1.0, 0.5], "material": "wood_pew" },
+    { "type": "box", "center": [-2.5, 0.5, 6], "size": [2.0, 1.0, 0.5], "material": "wood_pew" },
+    { "type": "box", "center": [-2.5, 0.5, 8], "size": [2.0, 1.0, 0.5], "material": "wood_pew" },
+    { "type": "box", "center": [2.5, 0.5, 4],  "size": [2.0, 1.0, 0.5], "material": "wood_pew" },
+    { "type": "box", "center": [2.5, 0.5, 6],  "size": [2.0, 1.0, 0.5], "material": "wood_pew" },
+    { "type": "box", "center": [2.5, 0.5, 8],  "size": [2.0, 1.0, 0.5], "material": "wood_pew" },
+    { "type": "box", "center": [-2.5, 0.5, 0],  "size": [2.0, 1.0, 0.5], "material": "wood_pew" },
+    { "type": "box", "center": [2.5, 0.5, 0],   "size": [2.0, 1.0, 0.5], "material": "wood_pew" },
+    { "type": "box", "center": [-2.5, 0.5, -2],  "size": [2.0, 1.0, 0.5], "material": "wood_pew" },
+    { "type": "box", "center": [2.5, 0.5, -2],   "size": [2.0, 1.0, 0.5], "material": "wood_pew" },
+
+    { "type": "sphere", "center": [-1.0, 2.6, -8.5], "radius": 0.08, "material": "candle_glow" },
+    { "type": "sphere", "center": [1.0, 2.6, -8.5],  "radius": 0.08, "material": "candle_glow" },
+    { "type": "sphere", "center": [-0.5, 2.6, -8.5], "radius": 0.08, "material": "candle_glow" },
+    { "type": "sphere", "center": [0.5, 2.6, -8.5],  "radius": 0.08, "material": "candle_glow" },
+    { "type": "sphere", "center": [-4, 8.5, 2],  "radius": 0.1, "material": "candle_glow" },
+    { "type": "sphere", "center": [4, 8.5, 2],   "radius": 0.1, "material": "candle_glow" },
+    { "type": "sphere", "center": [-4, 8.5, -3], "radius": 0.1, "material": "candle_glow" },
+    { "type": "sphere", "center": [4, 8.5, -3],  "radius": 0.1, "material": "candle_glow" }
+  ],
+  "lights": [
+    { "type": "area", "position": [-7, 5.5, -3.5], "intensity": [0.6, 0.15, 0.1], "radius": 0.3 },
+    { "type": "area", "position": [7, 5.5, -3.5],  "intensity": [0.1, 0.4, 0.15], "radius": 0.3 },
+    { "type": "area", "position": [-7, 5.5, -7],   "intensity": [0.5, 0.4, 0.1],  "radius": 0.3 },
+    { "type": "area", "position": [7, 5.5, -7],    "intensity": [0.4, 0.1, 0.5],  "radius": 0.3 },
+    { "type": "area", "position": [0, 9, -5],      "intensity": [0.2, 0.18, 0.15], "radius": 1.0 },
+    { "type": "spot", "position": [0, 9, -8.5], "intensity": [0.6, 0.5, 0.3], "direction": [0, -1, 0], "inner_deg": 15, "outer_deg": 35 }
+  ]
+}

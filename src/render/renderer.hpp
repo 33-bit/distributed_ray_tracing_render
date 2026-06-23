@@ -46,11 +46,11 @@ struct Renderer {
                     double u = (px + jx) * inv_w;
                     // flip vertically: image row 0 is the top, camera v=0 is the bottom
                     double v = ((p.height - 1 - py) + jy) * inv_h;
-                    Ray ray = scene.camera.get_ray(u, v);
+                    Ray ray = scene.camera.get_ray(u, v, &rng);
                     sum += shade(scene, ray, 0, p.max_depth, p.shadow_samples, rng);
                 }
                 Color col = sum * (1.0 / p.spp);
-                col = tone_map_reinhard(col);   // tame HDR highlights
+                col = tone_map_aces(col);       // ACES filmic curve
                 col = gamma_correct(col);       // linear -> display
                 img.set(px, py, col);
             }

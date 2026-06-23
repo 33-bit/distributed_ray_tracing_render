@@ -4,8 +4,9 @@
 
 This project implements a distributed ray tracing renderer in **C++17 + MPI
 (+ OpenMP)**. It renders an animated 3D scene — hard & soft shadows, reflections,
-refraction (glass), spheres/planes/triangles, a spotlight, anti-aliasing, an
-orbiting camera and a moving light — as a sequence of image frames, distributes
+refraction (glass), spheres/planes/triangles/**boxes**, a spotlight, anti-aliasing,
+**path-traced global illumination**, an orbiting camera and a moving light — as a
+sequence of image frames, distributes
 the per-frame tile workload across an MPI cluster with a **dynamic master-worker
 scheduler**, assembles the frames into a video, and measures correctness,
 runtime, communication overhead, granularity, speedup and parallel efficiency.
@@ -28,7 +29,7 @@ performance and a provable correctness guarantee against a sequential baseline.
 
 *Demo scene: checker floor, a diffuse sphere, a mirror sphere, a refractive glass
 sphere, a glossy gold sphere, and a triangle pyramid, under a soft area light
-plus a cyan spotlight.*
+plus a cyan spotlight. Minecraft-themed scenes use axis-aligned boxes for blocks.*
 
 ---
 
@@ -60,6 +61,7 @@ Measured on one 8-core machine (`mpirun -np P`, 1 master + P−1 workers),
 | **Load balance** | dynamic **3 %** worker imbalance vs static **27 %** (static run ~19 % slower) |
 | **Granularity** | communication share falls **8.6 % → 0.2 %** as tiles grow 16→128 |
 | **Prefetch** | non-blocking double-buffer; MSE = 0, small single-node gain (latency-bound benefit grows on a network) |
+| **Rendering** | Path-traced **global illumination** (indirect diffuse bounce + Russian Roulette), **ACES filmic** tone mapping, rough reflections, **depth of field** |
 | **Output** | 480×360 H.264 video, orbiting camera + moving soft shadows |
 
 ## 3. Architecture
@@ -109,8 +111,8 @@ Renderer.render_tile(tile)
   for each pixel, for each sample s:
       rng = RNG( seed_for(frame, x, y, s) )          # A — deterministic
       ray = Camera.get_ray(u + jitter, v + jitter)   # A
-      color += shade(scene, ray, depth=0, ...)        # B (recurses for mirror/glass)
-  pixel = gamma( tonemap( color / spp ) )            # B helpers, D applies
+      color += shade(scene, ray, depth=0, ...)        # B (path-traces: direct + indirect GI + mirror)
+  pixel = gamma( ACES_tonemap( color / spp ) )       # B helpers, D applies
 ```
 
 ## 4. Parallel model (the report's core questions)
@@ -293,10 +295,10 @@ the launch differs. (For grading, `-np` on one node simulates the cluster.)
 ```
 src/
   core/      vec3 ray color random timer            (A, +D timer)
-  scene/     object camera sphere plane triangle    (A)
+  scene/     object camera sphere plane triangle box (A)  # box = AABB slab method
              material light                          (B)
-             scene                                   (D)
-  render/    shading                                 (B)
+             scene scene_parser json_parser           (D)  # JSON scene loading
+  render/    shading                                 (B)  # path-traced GI + ACES tonemap
              renderer image tile                     (D)  # render_tile has the OpenMP pragma
   mpi/       tags serializer master worker           (C)  # hybrid + prefetch live here
   benchmark/ benchmark csv_logger                    (D)
@@ -308,10 +310,14 @@ docs/        PROJECT.md  members/*.md  results/*  superpowers/{specs,plans}/*
 ## 10. Scope, limitations, future work
 
 **Done:** distributed tile rendering; dynamic + static scheduling; **MPI+OpenMP
-hybrid**; **non-blocking prefetch**; sphere/plane/triangle geometry; hard & soft
-shadows; reflection; refraction; spotlight; anti-aliasing; animation; video;
-byte-exact correctness; full benchmark suite (speedup, granularity, load balance,
-hybrid).
+hybrid**; **non-blocking prefetch**; sphere/plane/triangle/**box (AABB)** geometry;
+hard & soft shadows; reflection; refraction; spotlight; anti-aliasing; animation;
+video; byte-exact correctness; full benchmark suite (speedup, granularity, load
+balance, hybrid); **path-traced global illumination** (cosine-weighted importance
+sampling + Russian Roulette); **ACES filmic tone mapping**; **rough reflections**
+for glossy materials; **depth of field** (thin-lens camera); **JSON scene configs**
+(30 scenes including 22 Minecraft-themed with box blocks + cathedral, hall of
+mirrors, frozen throne).
 
 **Known limitations (honest):**
 - Rank 0 is a dedicated coordinator, so flat-MPI speedup is capped at P−1 cores.
@@ -328,7 +334,9 @@ hybrid).
 
 **Deferred (per proposal §13):** BVH, textures, triangle *meshes* (the triangle
 primitive exists; mesh loading does not). Non-blocking MPI and the hybrid, listed
-as optional sophistication, are **implemented**.
+as optional sophistication, are **implemented**. Path-traced GI, ACES tone mapping,
+box primitive, depth of field, and JSON scene configs were added post-proposal to
+bring rendering quality closer to GPU ray tracing standards.
 
 ---
 

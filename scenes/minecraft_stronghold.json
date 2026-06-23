@@ -1,14 +1,34 @@
 {
   "background": {
-    "top": [0.02, 0.02, 0.05],
-    "bottom": [0.08, 0.06, 0.10]
+    "top": [
+      0.02,
+      0.02,
+      0.05
+    ],
+    "bottom": [
+      0.08,
+      0.06,
+      0.1
+    ]
   },
   "camera": {
-    "lookat": [0, 1.5, 0],
-    "up": [0, 1, 0],
+    "lookat": [
+      0,
+      1.5,
+      0
+    ],
+    "up": [
+      0,
+      1,
+      0
+    ],
     "vfov": 45,
     "orbit": {
-      "center": [0, 1.5, 0],
+      "center": [
+        0,
+        1.5,
+        0
+      ],
       "radius": 10,
       "height": 5,
       "speed": 0.5,
@@ -16,75 +36,537 @@
     }
   },
   "materials": {
-    "stone_brick": { "type": "glossy", "albedo": [0.40, 0.40, 0.38], "specular": 0.08, "shininess": 6 },
-    "mossy_stone": { "type": "glossy", "albedo": [0.30, 0.42, 0.28], "specular": 0.10, "shininess": 8 },
-    "purpur":      { "type": "glossy", "albedo": [0.55, 0.25, 0.55], "specular": 0.3, "shininess": 24 },
-    "ender_eye":   { "type": "dielectric", "ior": 1.6, "albedo": [0.15, 0.80, 0.35] },
-    "end_portal":  { "type": "glossy", "albedo": [0.02, 0.02, 0.08], "specular": 0.9, "shininess": 128 },
-    "portal_star": { "type": "emissive", "emission": [0.1, 0.3, 0.5] },
-    "silverfish":  { "type": "glossy", "albedo": [0.55, 0.55, 0.52], "specular": 0.15, "shininess": 10 },
-    "spawner":     { "type": "glossy", "albedo": [0.15, 0.15, 0.18], "specular": 0.4, "shininess": 32 },
-    "lava_glow":   { "type": "emissive", "emission": [0.8, 0.35, 0.05] },
-    "dark_stone":  { "type": "diffuse", "albedo": [0.18, 0.18, 0.20] },
-    "iron_bar":    { "type": "mirror", "albedo": [0.60, 0.58, 0.55], "reflectivity": 0.4 }
+    "stone_brick": {
+      "type": "glossy",
+      "albedo": [
+        0.4,
+        0.4,
+        0.38
+      ],
+      "specular": 0.08,
+      "shininess": 6
+    },
+    "mossy_stone": {
+      "type": "glossy",
+      "albedo": [
+        0.3,
+        0.42,
+        0.28
+      ],
+      "specular": 0.1,
+      "shininess": 8
+    },
+    "purpur": {
+      "type": "glossy",
+      "albedo": [
+        0.55,
+        0.25,
+        0.55
+      ],
+      "specular": 0.3,
+      "shininess": 24
+    },
+    "ender_eye": {
+      "type": "dielectric",
+      "ior": 1.6,
+      "albedo": [
+        0.15,
+        0.8,
+        0.35
+      ]
+    },
+    "end_portal": {
+      "type": "glossy",
+      "albedo": [
+        0.02,
+        0.02,
+        0.08
+      ],
+      "specular": 0.9,
+      "shininess": 128
+    },
+    "portal_star": {
+      "type": "emissive",
+      "emission": [
+        0.1,
+        0.3,
+        0.5
+      ]
+    },
+    "silverfish": {
+      "type": "glossy",
+      "albedo": [
+        0.55,
+        0.55,
+        0.52
+      ],
+      "specular": 0.15,
+      "shininess": 10
+    },
+    "spawner": {
+      "type": "glossy",
+      "albedo": [
+        0.15,
+        0.15,
+        0.18
+      ],
+      "specular": 0.4,
+      "shininess": 32
+    },
+    "lava_glow": {
+      "type": "emissive",
+      "emission": [
+        0.8,
+        0.35,
+        0.05
+      ]
+    },
+    "dark_stone": {
+      "type": "diffuse",
+      "albedo": [
+        0.18,
+        0.18,
+        0.2
+      ]
+    },
+    "iron_bar": {
+      "type": "mirror",
+      "albedo": [
+        0.6,
+        0.58,
+        0.55
+      ],
+      "reflectivity": 0.4
+    }
   },
   "objects": [
-    { "type": "plane", "point": [0, 0, 0], "normal": [0, 1, 0], "material": "dark_stone" },
-
-    { "type": "sphere", "center": [2.0, 0.5, 0], "radius": 0.5, "material": "purpur" },
-    { "type": "sphere", "center": [2.0, 0.85, 0], "radius": 0.20, "material": "ender_eye" },
-    { "type": "sphere", "center": [1.4, 0.5, 1.4], "radius": 0.5, "material": "purpur" },
-    { "type": "sphere", "center": [1.4, 0.85, 1.4], "radius": 0.20, "material": "ender_eye" },
-    { "type": "sphere", "center": [0, 0.5, 2.0], "radius": 0.5, "material": "purpur" },
-    { "type": "sphere", "center": [0, 0.85, 2.0], "radius": 0.20, "material": "ender_eye" },
-    { "type": "sphere", "center": [-1.4, 0.5, 1.4], "radius": 0.5, "material": "purpur" },
-    { "type": "sphere", "center": [-1.4, 0.85, 1.4], "radius": 0.20, "material": "ender_eye" },
-    { "type": "sphere", "center": [-2.0, 0.5, 0], "radius": 0.5, "material": "purpur" },
-    { "type": "sphere", "center": [-2.0, 0.85, 0], "radius": 0.20, "material": "ender_eye" },
-    { "type": "sphere", "center": [-1.4, 0.5, -1.4], "radius": 0.5, "material": "purpur" },
-    { "type": "sphere", "center": [-1.4, 0.85, -1.4], "radius": 0.20, "material": "ender_eye" },
-    { "type": "sphere", "center": [0, 0.5, -2.0], "radius": 0.5, "material": "purpur" },
-    { "type": "sphere", "center": [0, 0.85, -2.0], "radius": 0.20, "material": "ender_eye" },
-    { "type": "sphere", "center": [1.4, 0.5, -1.4], "radius": 0.5, "material": "purpur" },
-    { "type": "sphere", "center": [1.4, 0.85, -1.4], "radius": 0.20, "material": "ender_eye" },
-
-    { "type": "sphere", "center": [0, 0.15, 0], "radius": 0.80, "material": "end_portal" },
-    { "type": "sphere", "center": [0, 0.25, 0], "radius": 0.30, "material": "portal_star" },
-
-    { "type": "sphere", "center": [-4, 1.0, -3], "radius": 1.0, "material": "stone_brick" },
-    { "type": "sphere", "center": [-4, 2.5, -3], "radius": 0.9, "material": "stone_brick" },
-    { "type": "sphere", "center": [4, 1.0, -3], "radius": 1.0, "material": "mossy_stone" },
-    { "type": "sphere", "center": [4, 2.5, -3], "radius": 0.9, "material": "stone_brick" },
-    { "type": "sphere", "center": [-4, 1.0, 3], "radius": 1.0, "material": "stone_brick" },
-    { "type": "sphere", "center": [4, 1.0, 3], "radius": 1.0, "material": "mossy_stone" },
-
-    { "type": "sphere", "center": [3, 0.35, 1], "radius": 0.35, "material": "spawner" },
-    { "type": "sphere", "center": [3.3, 0.12, 0.6], "radius": 0.12, "material": "silverfish" },
-    { "type": "sphere", "center": [2.6, 0.10, 1.3], "radius": 0.10, "material": "silverfish" },
-
-    { "type": "sphere", "center": [4, 0.15, -3], "radius": 0.15, "material": "lava_glow" },
-    { "type": "sphere", "center": [-4, 3.2, -3], "radius": 0.10, "material": "iron_bar" }
+    {
+      "type": "plane",
+      "point": [
+        0,
+        0,
+        0
+      ],
+      "normal": [
+        0,
+        1,
+        0
+      ],
+      "material": "dark_stone"
+    },
+    {
+      "type": "box",
+      "center": [
+        2.0,
+        0.5,
+        0
+      ],
+      "material": "purpur",
+      "size": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "type": "sphere",
+      "center": [
+        2.0,
+        0.85,
+        0
+      ],
+      "radius": 0.2,
+      "material": "ender_eye"
+    },
+    {
+      "type": "box",
+      "center": [
+        1.4,
+        0.5,
+        1.4
+      ],
+      "material": "purpur",
+      "size": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "type": "sphere",
+      "center": [
+        1.4,
+        0.85,
+        1.4
+      ],
+      "radius": 0.2,
+      "material": "ender_eye"
+    },
+    {
+      "type": "box",
+      "center": [
+        0,
+        0.5,
+        2.0
+      ],
+      "material": "purpur",
+      "size": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "type": "sphere",
+      "center": [
+        0,
+        0.85,
+        2.0
+      ],
+      "radius": 0.2,
+      "material": "ender_eye"
+    },
+    {
+      "type": "box",
+      "center": [
+        -1.4,
+        0.5,
+        1.4
+      ],
+      "material": "purpur",
+      "size": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "type": "sphere",
+      "center": [
+        -1.4,
+        0.85,
+        1.4
+      ],
+      "radius": 0.2,
+      "material": "ender_eye"
+    },
+    {
+      "type": "box",
+      "center": [
+        -2.0,
+        0.5,
+        0
+      ],
+      "material": "purpur",
+      "size": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "type": "sphere",
+      "center": [
+        -2.0,
+        0.85,
+        0
+      ],
+      "radius": 0.2,
+      "material": "ender_eye"
+    },
+    {
+      "type": "box",
+      "center": [
+        -1.4,
+        0.5,
+        -1.4
+      ],
+      "material": "purpur",
+      "size": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "type": "sphere",
+      "center": [
+        -1.4,
+        0.85,
+        -1.4
+      ],
+      "radius": 0.2,
+      "material": "ender_eye"
+    },
+    {
+      "type": "box",
+      "center": [
+        0,
+        0.5,
+        -2.0
+      ],
+      "material": "purpur",
+      "size": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "type": "sphere",
+      "center": [
+        0,
+        0.85,
+        -2.0
+      ],
+      "radius": 0.2,
+      "material": "ender_eye"
+    },
+    {
+      "type": "box",
+      "center": [
+        1.4,
+        0.5,
+        -1.4
+      ],
+      "material": "purpur",
+      "size": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "type": "sphere",
+      "center": [
+        1.4,
+        0.85,
+        -1.4
+      ],
+      "radius": 0.2,
+      "material": "ender_eye"
+    },
+    {
+      "type": "box",
+      "center": [
+        0,
+        0.15,
+        0
+      ],
+      "material": "end_portal",
+      "size": [
+        1.6,
+        1.6,
+        1.6
+      ]
+    },
+    {
+      "type": "sphere",
+      "center": [
+        0,
+        0.25,
+        0
+      ],
+      "radius": 0.3,
+      "material": "portal_star"
+    },
+    {
+      "type": "box",
+      "center": [
+        -4,
+        1.0,
+        -3
+      ],
+      "material": "stone_brick",
+      "size": [
+        2.0,
+        2.0,
+        2.0
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -4,
+        2.5,
+        -3
+      ],
+      "material": "stone_brick",
+      "size": [
+        1.8,
+        1.8,
+        1.8
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        4,
+        1.0,
+        -3
+      ],
+      "material": "mossy_stone",
+      "size": [
+        2.0,
+        2.0,
+        2.0
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        4,
+        2.5,
+        -3
+      ],
+      "material": "stone_brick",
+      "size": [
+        1.8,
+        1.8,
+        1.8
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -4,
+        1.0,
+        3
+      ],
+      "material": "stone_brick",
+      "size": [
+        2.0,
+        2.0,
+        2.0
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        4,
+        1.0,
+        3
+      ],
+      "material": "mossy_stone",
+      "size": [
+        2.0,
+        2.0,
+        2.0
+      ]
+    },
+    {
+      "type": "sphere",
+      "center": [
+        3,
+        0.35,
+        1
+      ],
+      "radius": 0.35,
+      "material": "spawner"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        3.3,
+        0.12,
+        0.6
+      ],
+      "radius": 0.12,
+      "material": "silverfish"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        2.6,
+        0.1,
+        1.3
+      ],
+      "radius": 0.1,
+      "material": "silverfish"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        4,
+        0.15,
+        -3
+      ],
+      "radius": 0.15,
+      "material": "lava_glow"
+    },
+    {
+      "type": "box",
+      "center": [
+        -4,
+        3.2,
+        -3
+      ],
+      "material": "iron_bar",
+      "size": [
+        0.2,
+        0.2,
+        0.2
+      ]
+    }
   ],
   "lights": [
     {
       "type": "area",
-      "position": [0, 6, 0],
-      "intensity": [0.25, 0.30, 0.50],
+      "position": [
+        0,
+        6,
+        0
+      ],
+      "intensity": [
+        0.25,
+        0.3,
+        0.5
+      ],
       "radius": 0.8,
-      "orbit": { "center": [0, 0, 0], "radius": 3, "height": 6, "speed": 0.8, "phase": 0.0 }
+      "orbit": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "radius": 3,
+        "height": 6,
+        "speed": 0.8,
+        "phase": 0.0
+      }
     },
     {
       "type": "spot",
-      "position": [0, 3, 0],
-      "direction": [0, -1, 0],
-      "intensity": [0.15, 0.40, 0.25],
+      "position": [
+        0,
+        3,
+        0
+      ],
+      "direction": [
+        0,
+        -1,
+        0
+      ],
+      "intensity": [
+        0.15,
+        0.4,
+        0.25
+      ],
       "angle": 35,
       "falloff": 2
     },
     {
       "type": "area",
-      "position": [4, 2, -3],
-      "intensity": [0.60, 0.25, 0.05],
+      "position": [
+        4,
+        2,
+        -3
+      ],
+      "intensity": [
+        0.6,
+        0.25,
+        0.05
+      ],
       "radius": 0.3
     }
   ]

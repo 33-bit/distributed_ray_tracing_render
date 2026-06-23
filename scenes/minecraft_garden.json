@@ -1,14 +1,34 @@
 {
   "background": {
-    "top": [0.45, 0.55, 0.80],
-    "bottom": [0.80, 0.82, 0.90]
+    "top": [
+      0.45,
+      0.55,
+      0.8
+    ],
+    "bottom": [
+      0.8,
+      0.82,
+      0.9
+    ]
   },
   "camera": {
-    "lookat": [0, 1.0, 0],
-    "up": [0, 1, 0],
+    "lookat": [
+      0,
+      1.0,
+      0
+    ],
+    "up": [
+      0,
+      1,
+      0
+    ],
     "vfov": 48,
     "orbit": {
-      "center": [0, 1.0, 0],
+      "center": [
+        0,
+        1.0,
+        0
+      ],
       "radius": 14,
       "height": 5,
       "speed": 0.5,
@@ -16,89 +36,723 @@
     }
   },
   "materials": {
-    "sand":         { "type": "checkerboard", "albedo": [0.85, 0.80, 0.65], "albedo2": [0.80, 0.75, 0.60], "scale": 1.5 },
-    "stepping":     { "type": "glossy", "albedo": [0.45, 0.45, 0.42], "specular": 0.12, "shininess": 8 },
-    "bamboo":       { "type": "diffuse", "albedo": [0.30, 0.60, 0.20] },
-    "bamboo_dark":  { "type": "diffuse", "albedo": [0.22, 0.48, 0.15] },
-    "cherry_trunk": { "type": "diffuse", "albedo": [0.40, 0.22, 0.12] },
-    "cherry_bloom": { "type": "diffuse", "albedo": [0.90, 0.60, 0.65] },
-    "cherry_light": { "type": "diffuse", "albedo": [0.95, 0.75, 0.78] },
-    "lantern_glow": { "type": "emissive", "emission": [0.85, 0.65, 0.30] },
-    "lantern_body": { "type": "glossy", "albedo": [0.15, 0.15, 0.15], "specular": 0.3, "shininess": 24 },
-    "pond_water":   { "type": "dielectric", "ior": 1.33, "albedo": [0.50, 0.65, 0.85] },
-    "koi_orange":   { "type": "glossy", "albedo": [0.90, 0.45, 0.10], "specular": 0.3, "shininess": 16 },
-    "koi_white":    { "type": "glossy", "albedo": [0.92, 0.90, 0.88], "specular": 0.3, "shininess": 16 },
-    "pagoda_wood":  { "type": "diffuse", "albedo": [0.50, 0.25, 0.10] },
-    "pagoda_roof":  { "type": "diffuse", "albedo": [0.30, 0.15, 0.08] },
-    "moss_rock":    { "type": "diffuse", "albedo": [0.35, 0.42, 0.28] }
+    "sand": {
+      "type": "checkerboard",
+      "albedo": [
+        0.85,
+        0.8,
+        0.65
+      ],
+      "albedo2": [
+        0.8,
+        0.75,
+        0.6
+      ],
+      "scale": 1.5
+    },
+    "stepping": {
+      "type": "glossy",
+      "albedo": [
+        0.45,
+        0.45,
+        0.42
+      ],
+      "specular": 0.12,
+      "shininess": 8
+    },
+    "bamboo": {
+      "type": "diffuse",
+      "albedo": [
+        0.3,
+        0.6,
+        0.2
+      ]
+    },
+    "bamboo_dark": {
+      "type": "diffuse",
+      "albedo": [
+        0.22,
+        0.48,
+        0.15
+      ]
+    },
+    "cherry_trunk": {
+      "type": "diffuse",
+      "albedo": [
+        0.4,
+        0.22,
+        0.12
+      ]
+    },
+    "cherry_bloom": {
+      "type": "diffuse",
+      "albedo": [
+        0.9,
+        0.6,
+        0.65
+      ]
+    },
+    "cherry_light": {
+      "type": "diffuse",
+      "albedo": [
+        0.95,
+        0.75,
+        0.78
+      ]
+    },
+    "lantern_glow": {
+      "type": "emissive",
+      "emission": [
+        0.85,
+        0.65,
+        0.3
+      ]
+    },
+    "lantern_body": {
+      "type": "glossy",
+      "albedo": [
+        0.15,
+        0.15,
+        0.15
+      ],
+      "specular": 0.3,
+      "shininess": 24
+    },
+    "pond_water": {
+      "type": "dielectric",
+      "ior": 1.33,
+      "albedo": [
+        0.5,
+        0.65,
+        0.85
+      ]
+    },
+    "koi_orange": {
+      "type": "glossy",
+      "albedo": [
+        0.9,
+        0.45,
+        0.1
+      ],
+      "specular": 0.3,
+      "shininess": 16
+    },
+    "koi_white": {
+      "type": "glossy",
+      "albedo": [
+        0.92,
+        0.9,
+        0.88
+      ],
+      "specular": 0.3,
+      "shininess": 16
+    },
+    "pagoda_wood": {
+      "type": "diffuse",
+      "albedo": [
+        0.5,
+        0.25,
+        0.1
+      ]
+    },
+    "pagoda_roof": {
+      "type": "diffuse",
+      "albedo": [
+        0.3,
+        0.15,
+        0.08
+      ]
+    },
+    "moss_rock": {
+      "type": "diffuse",
+      "albedo": [
+        0.35,
+        0.42,
+        0.28
+      ]
+    }
   },
   "objects": [
-    { "type": "plane", "point": [0, 0, 0], "normal": [0, 1, 0], "material": "sand" },
-
-    { "type": "sphere", "center": [-2, 0.10, -1], "radius": 0.35, "material": "stepping" },
-    { "type": "sphere", "center": [-1, 0.10, -0.5], "radius": 0.35, "material": "stepping" },
-    { "type": "sphere", "center": [0, 0.10, 0], "radius": 0.35, "material": "stepping" },
-    { "type": "sphere", "center": [1, 0.10, 0.3], "radius": 0.35, "material": "stepping" },
-    { "type": "sphere", "center": [2, 0.10, 0.8], "radius": 0.35, "material": "stepping" },
-
-    { "type": "sphere", "center": [-4, 0.12, 2], "radius": 0.12, "material": "bamboo" },
-    { "type": "sphere", "center": [-4, 0.36, 2], "radius": 0.12, "material": "bamboo_dark" },
-    { "type": "sphere", "center": [-4, 0.60, 2], "radius": 0.12, "material": "bamboo" },
-    { "type": "sphere", "center": [-4, 0.84, 2], "radius": 0.12, "material": "bamboo_dark" },
-    { "type": "sphere", "center": [-4, 1.08, 2], "radius": 0.12, "material": "bamboo" },
-    { "type": "sphere", "center": [-4.4, 0.12, 2.3], "radius": 0.12, "material": "bamboo" },
-    { "type": "sphere", "center": [-4.4, 0.36, 2.3], "radius": 0.12, "material": "bamboo_dark" },
-    { "type": "sphere", "center": [-4.4, 0.60, 2.3], "radius": 0.12, "material": "bamboo" },
-    { "type": "sphere", "center": [-4.4, 0.84, 2.3], "radius": 0.12, "material": "bamboo" },
-    { "type": "sphere", "center": [-3.6, 0.12, 1.7], "radius": 0.12, "material": "bamboo_dark" },
-    { "type": "sphere", "center": [-3.6, 0.36, 1.7], "radius": 0.12, "material": "bamboo" },
-    { "type": "sphere", "center": [-3.6, 0.60, 1.7], "radius": 0.12, "material": "bamboo_dark" },
-
-    { "type": "sphere", "center": [3, 0.6, -3], "radius": 0.4, "material": "cherry_trunk" },
-    { "type": "sphere", "center": [3, 1.2, -3], "radius": 0.3, "material": "cherry_trunk" },
-    { "type": "sphere", "center": [3, 2.0, -3], "radius": 0.9, "material": "cherry_bloom" },
-    { "type": "sphere", "center": [3.6, 1.8, -2.5], "radius": 0.6, "material": "cherry_light" },
-    { "type": "sphere", "center": [2.4, 1.8, -3.5], "radius": 0.6, "material": "cherry_bloom" },
-    { "type": "sphere", "center": [3.3, 2.3, -3.4], "radius": 0.5, "material": "cherry_light" },
-
-    { "type": "sphere", "center": [-2, 0.30, -3], "radius": 0.15, "material": "lantern_body" },
-    { "type": "sphere", "center": [-2, 0.50, -3], "radius": 0.10, "material": "lantern_glow" },
-    { "type": "sphere", "center": [4, 0.30, 2], "radius": 0.15, "material": "lantern_body" },
-    { "type": "sphere", "center": [4, 0.50, 2], "radius": 0.10, "material": "lantern_glow" },
-
-    { "type": "triangle", "v0": [0, 0.01, 3], "v1": [3, 0.01, 3], "v2": [0, 0.01, 5], "material": "pond_water" },
-    { "type": "triangle", "v0": [3, 0.01, 3], "v1": [3, 0.01, 5], "v2": [0, 0.01, 5], "material": "pond_water" },
-    { "type": "sphere", "center": [1.2, 0.08, 3.8], "radius": 0.10, "material": "koi_orange" },
-    { "type": "sphere", "center": [2.0, 0.08, 4.2], "radius": 0.10, "material": "koi_white" },
-    { "type": "sphere", "center": [1.6, 0.08, 4.5], "radius": 0.08, "material": "koi_orange" },
-
-    { "type": "sphere", "center": [5, 0.5, -1], "radius": 0.5, "material": "pagoda_wood" },
-    { "type": "sphere", "center": [5, 1.2, -1], "radius": 0.4, "material": "pagoda_wood" },
-    { "type": "triangle", "v0": [4, 1.4, -2], "v1": [6, 1.4, -2], "v2": [5, 1.8, -1], "material": "pagoda_roof" },
-    { "type": "triangle", "v0": [4, 1.4, 0], "v1": [6, 1.4, 0], "v2": [5, 1.8, -1], "material": "pagoda_roof" },
-
-    { "type": "sphere", "center": [-1, 0.20, 1.5], "radius": 0.30, "material": "moss_rock" },
-    { "type": "sphere", "center": [-1.5, 0.15, 1.8], "radius": 0.20, "material": "moss_rock" }
+    {
+      "type": "plane",
+      "point": [
+        0,
+        0,
+        0
+      ],
+      "normal": [
+        0,
+        1,
+        0
+      ],
+      "material": "sand"
+    },
+    {
+      "type": "box",
+      "center": [
+        -2,
+        0.1,
+        -1
+      ],
+      "material": "stepping",
+      "size": [
+        0.7,
+        0.7,
+        0.7
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -1,
+        0.1,
+        -0.5
+      ],
+      "material": "stepping",
+      "size": [
+        0.7,
+        0.7,
+        0.7
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        0,
+        0.1,
+        0
+      ],
+      "material": "stepping",
+      "size": [
+        0.7,
+        0.7,
+        0.7
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        1,
+        0.1,
+        0.3
+      ],
+      "material": "stepping",
+      "size": [
+        0.7,
+        0.7,
+        0.7
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        2,
+        0.1,
+        0.8
+      ],
+      "material": "stepping",
+      "size": [
+        0.7,
+        0.7,
+        0.7
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -4,
+        0.12,
+        2
+      ],
+      "material": "bamboo",
+      "size": [
+        0.24,
+        0.24,
+        0.24
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -4,
+        0.36,
+        2
+      ],
+      "material": "bamboo_dark",
+      "size": [
+        0.24,
+        0.24,
+        0.24
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -4,
+        0.6,
+        2
+      ],
+      "material": "bamboo",
+      "size": [
+        0.24,
+        0.24,
+        0.24
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -4,
+        0.84,
+        2
+      ],
+      "material": "bamboo_dark",
+      "size": [
+        0.24,
+        0.24,
+        0.24
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -4,
+        1.08,
+        2
+      ],
+      "material": "bamboo",
+      "size": [
+        0.24,
+        0.24,
+        0.24
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -4.4,
+        0.12,
+        2.3
+      ],
+      "material": "bamboo",
+      "size": [
+        0.24,
+        0.24,
+        0.24
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -4.4,
+        0.36,
+        2.3
+      ],
+      "material": "bamboo_dark",
+      "size": [
+        0.24,
+        0.24,
+        0.24
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -4.4,
+        0.6,
+        2.3
+      ],
+      "material": "bamboo",
+      "size": [
+        0.24,
+        0.24,
+        0.24
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -4.4,
+        0.84,
+        2.3
+      ],
+      "material": "bamboo",
+      "size": [
+        0.24,
+        0.24,
+        0.24
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -3.6,
+        0.12,
+        1.7
+      ],
+      "material": "bamboo_dark",
+      "size": [
+        0.24,
+        0.24,
+        0.24
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -3.6,
+        0.36,
+        1.7
+      ],
+      "material": "bamboo",
+      "size": [
+        0.24,
+        0.24,
+        0.24
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -3.6,
+        0.6,
+        1.7
+      ],
+      "material": "bamboo_dark",
+      "size": [
+        0.24,
+        0.24,
+        0.24
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        3,
+        0.6,
+        -3
+      ],
+      "material": "cherry_trunk",
+      "size": [
+        0.8,
+        0.8,
+        0.8
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        3,
+        1.2,
+        -3
+      ],
+      "material": "cherry_trunk",
+      "size": [
+        0.6,
+        0.6,
+        0.6
+      ]
+    },
+    {
+      "type": "sphere",
+      "center": [
+        3,
+        2.0,
+        -3
+      ],
+      "radius": 0.9,
+      "material": "cherry_bloom"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        3.6,
+        1.8,
+        -2.5
+      ],
+      "radius": 0.6,
+      "material": "cherry_light"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        2.4,
+        1.8,
+        -3.5
+      ],
+      "radius": 0.6,
+      "material": "cherry_bloom"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        3.3,
+        2.3,
+        -3.4
+      ],
+      "radius": 0.5,
+      "material": "cherry_light"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        -2,
+        0.3,
+        -3
+      ],
+      "radius": 0.15,
+      "material": "lantern_body"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        -2,
+        0.5,
+        -3
+      ],
+      "radius": 0.1,
+      "material": "lantern_glow"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        4,
+        0.3,
+        2
+      ],
+      "radius": 0.15,
+      "material": "lantern_body"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        4,
+        0.5,
+        2
+      ],
+      "radius": 0.1,
+      "material": "lantern_glow"
+    },
+    {
+      "type": "triangle",
+      "v0": [
+        0,
+        0.01,
+        3
+      ],
+      "v1": [
+        3,
+        0.01,
+        3
+      ],
+      "v2": [
+        0,
+        0.01,
+        5
+      ],
+      "material": "pond_water"
+    },
+    {
+      "type": "triangle",
+      "v0": [
+        3,
+        0.01,
+        3
+      ],
+      "v1": [
+        3,
+        0.01,
+        5
+      ],
+      "v2": [
+        0,
+        0.01,
+        5
+      ],
+      "material": "pond_water"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        1.2,
+        0.08,
+        3.8
+      ],
+      "radius": 0.1,
+      "material": "koi_orange"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        2.0,
+        0.08,
+        4.2
+      ],
+      "radius": 0.1,
+      "material": "koi_white"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        1.6,
+        0.08,
+        4.5
+      ],
+      "radius": 0.08,
+      "material": "koi_orange"
+    },
+    {
+      "type": "box",
+      "center": [
+        5,
+        0.5,
+        -1
+      ],
+      "material": "pagoda_wood",
+      "size": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        5,
+        1.2,
+        -1
+      ],
+      "material": "pagoda_wood",
+      "size": [
+        0.8,
+        0.8,
+        0.8
+      ]
+    },
+    {
+      "type": "triangle",
+      "v0": [
+        4,
+        1.4,
+        -2
+      ],
+      "v1": [
+        6,
+        1.4,
+        -2
+      ],
+      "v2": [
+        5,
+        1.8,
+        -1
+      ],
+      "material": "pagoda_roof"
+    },
+    {
+      "type": "triangle",
+      "v0": [
+        4,
+        1.4,
+        0
+      ],
+      "v1": [
+        6,
+        1.4,
+        0
+      ],
+      "v2": [
+        5,
+        1.8,
+        -1
+      ],
+      "material": "pagoda_roof"
+    },
+    {
+      "type": "box",
+      "center": [
+        -1,
+        0.2,
+        1.5
+      ],
+      "material": "moss_rock",
+      "size": [
+        0.6,
+        0.6,
+        0.6
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -1.5,
+        0.15,
+        1.8
+      ],
+      "material": "moss_rock",
+      "size": [
+        0.4,
+        0.4,
+        0.4
+      ]
+    }
   ],
   "lights": [
     {
       "type": "area",
-      "position": [6, 10, 4],
-      "intensity": [0.95, 0.90, 0.78],
+      "position": [
+        6,
+        10,
+        4
+      ],
+      "intensity": [
+        0.95,
+        0.9,
+        0.78
+      ],
       "radius": 1.2,
-      "orbit": { "center": [0, 0, 0], "radius": 8, "height": 10, "speed": -0.3, "phase": 0.5 }
+      "orbit": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "radius": 8,
+        "height": 10,
+        "speed": -0.3,
+        "phase": 0.5
+      }
     },
     {
       "type": "area",
-      "position": [-4, 5, -3],
-      "intensity": [0.30, 0.32, 0.45],
+      "position": [
+        -4,
+        5,
+        -3
+      ],
+      "intensity": [
+        0.3,
+        0.32,
+        0.45
+      ],
       "radius": 0.5
     },
     {
       "type": "spot",
-      "position": [3, 5, -3],
-      "direction": [0, -1, 0],
-      "intensity": [0.35, 0.28, 0.30],
+      "position": [
+        3,
+        5,
+        -3
+      ],
+      "direction": [
+        0,
+        -1,
+        0
+      ],
+      "intensity": [
+        0.35,
+        0.28,
+        0.3
+      ],
       "angle": 30,
       "falloff": 2
     }

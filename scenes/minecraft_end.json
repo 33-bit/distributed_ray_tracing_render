@@ -1,14 +1,34 @@
 {
   "background": {
-    "top": [0.02, 0.0, 0.08],
-    "bottom": [0.05, 0.02, 0.12]
+    "top": [
+      0.02,
+      0.0,
+      0.08
+    ],
+    "bottom": [
+      0.05,
+      0.02,
+      0.12
+    ]
   },
   "camera": {
-    "lookat": [0, 2.5, 0],
-    "up": [0, 1, 0],
+    "lookat": [
+      0,
+      2.5,
+      0
+    ],
+    "up": [
+      0,
+      1,
+      0
+    ],
     "vfov": 48,
     "orbit": {
-      "center": [0, 2.5, 0],
+      "center": [
+        0,
+        2.5,
+        0
+      ],
       "radius": 14,
       "height": 5,
       "speed": 1,
@@ -16,70 +36,430 @@
     }
   },
   "materials": {
-    "end_stone":  { "type": "checkerboard", "albedo": [0.82, 0.80, 0.65], "albedo2": [0.72, 0.70, 0.55], "scale": 2.5 },
-    "obsidian":   { "type": "mirror", "albedo": [0.1, 0.05, 0.15], "reflectivity": 0.5 },
-    "purpur":     { "type": "glossy", "albedo": [0.55, 0.30, 0.55], "specular": 0.3, "shininess": 20 },
-    "end_crystal": { "type": "dielectric", "ior": 2.0, "albedo": [0.9, 0.7, 0.95] },
-    "ender_eye":  { "type": "dielectric", "ior": 1.7, "albedo": [0.2, 0.9, 0.5] },
-    "dragon_egg": { "type": "mirror", "albedo": [0.15, 0.0, 0.2], "reflectivity": 0.85 },
-    "chorus":     { "type": "diffuse", "albedo": [0.60, 0.35, 0.60] },
-    "bedrock":    { "type": "diffuse", "albedo": [0.12, 0.12, 0.12] }
+    "end_stone": {
+      "type": "checkerboard",
+      "albedo": [
+        0.82,
+        0.8,
+        0.65
+      ],
+      "albedo2": [
+        0.72,
+        0.7,
+        0.55
+      ],
+      "scale": 2.5
+    },
+    "obsidian": {
+      "type": "mirror",
+      "albedo": [
+        0.1,
+        0.05,
+        0.15
+      ],
+      "reflectivity": 0.5
+    },
+    "purpur": {
+      "type": "glossy",
+      "albedo": [
+        0.55,
+        0.3,
+        0.55
+      ],
+      "specular": 0.3,
+      "shininess": 20
+    },
+    "end_crystal": {
+      "type": "dielectric",
+      "ior": 2.0,
+      "albedo": [
+        0.9,
+        0.7,
+        0.95
+      ]
+    },
+    "ender_eye": {
+      "type": "dielectric",
+      "ior": 1.7,
+      "albedo": [
+        0.2,
+        0.9,
+        0.5
+      ]
+    },
+    "dragon_egg": {
+      "type": "mirror",
+      "albedo": [
+        0.15,
+        0.0,
+        0.2
+      ],
+      "reflectivity": 0.85
+    },
+    "chorus": {
+      "type": "diffuse",
+      "albedo": [
+        0.6,
+        0.35,
+        0.6
+      ]
+    },
+    "bedrock": {
+      "type": "diffuse",
+      "albedo": [
+        0.12,
+        0.12,
+        0.12
+      ]
+    }
   },
   "objects": [
-    { "type": "plane", "point": [0, 0, 0], "normal": [0, 1, 0], "material": "end_stone" },
-
-    { "type": "sphere", "center": [0, 1.5, 0], "radius": 1.5, "material": "obsidian" },
-    { "type": "sphere", "center": [0, 3.5, 0], "radius": 1.2, "material": "obsidian" },
-    { "type": "sphere", "center": [0, 5.2, 0], "radius": 0.8, "material": "obsidian" },
-    { "type": "sphere", "center": [0, 6.3, 0], "radius": 0.5, "material": "dragon_egg" },
-
-    { "type": "sphere", "center": [4, 1.0, 3], "radius": 1.0, "material": "obsidian" },
-    { "type": "sphere", "center": [4, 2.6, 3], "radius": 0.7, "material": "end_crystal" },
-
-    { "type": "sphere", "center": [-4, 1.0, 3], "radius": 1.0, "material": "obsidian" },
-    { "type": "sphere", "center": [-4, 2.6, 3], "radius": 0.7, "material": "end_crystal" },
-
-    { "type": "sphere", "center": [4, 1.0, -3], "radius": 1.0, "material": "obsidian" },
-    { "type": "sphere", "center": [4, 2.6, -3], "radius": 0.7, "material": "end_crystal" },
-
-    { "type": "sphere", "center": [-4, 1.0, -3], "radius": 1.0, "material": "obsidian" },
-    { "type": "sphere", "center": [-4, 2.6, -3], "radius": 0.7, "material": "end_crystal" },
-
-    { "type": "sphere", "center": [7, 0.6, 0], "radius": 0.6, "material": "purpur" },
-    { "type": "sphere", "center": [7, 1.6, 0], "radius": 0.5, "material": "purpur" },
-    { "type": "sphere", "center": [7, 2.4, 0], "radius": 0.4, "material": "purpur" },
-
-    { "type": "sphere", "center": [-7, 0.6, 0], "radius": 0.6, "material": "purpur" },
-    { "type": "sphere", "center": [-7, 1.6, 0], "radius": 0.5, "material": "purpur" },
-    { "type": "sphere", "center": [-7, 2.4, 0], "radius": 0.4, "material": "chorus" },
-
-    { "type": "sphere", "center": [2, 0.35, 6], "radius": 0.35, "material": "ender_eye" },
-    { "type": "sphere", "center": [-2, 0.35, 6], "radius": 0.35, "material": "ender_eye" },
-
-    { "type": "triangle", "v0": [-2, 0, -7], "v1": [2, 0, -7], "v2": [0, 0, -9], "material": "bedrock" }
+    {
+      "type": "plane",
+      "point": [
+        0,
+        0,
+        0
+      ],
+      "normal": [
+        0,
+        1,
+        0
+      ],
+      "material": "end_stone"
+    },
+    {
+      "type": "box",
+      "center": [
+        0,
+        1.5,
+        0
+      ],
+      "material": "obsidian",
+      "size": [
+        3.0,
+        3.0,
+        3.0
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        0,
+        3.5,
+        0
+      ],
+      "material": "obsidian",
+      "size": [
+        2.4,
+        2.4,
+        2.4
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        0,
+        5.2,
+        0
+      ],
+      "material": "obsidian",
+      "size": [
+        1.6,
+        1.6,
+        1.6
+      ]
+    },
+    {
+      "type": "sphere",
+      "center": [
+        0,
+        6.3,
+        0
+      ],
+      "radius": 0.5,
+      "material": "dragon_egg"
+    },
+    {
+      "type": "box",
+      "center": [
+        4,
+        1.0,
+        3
+      ],
+      "material": "obsidian",
+      "size": [
+        2.0,
+        2.0,
+        2.0
+      ]
+    },
+    {
+      "type": "sphere",
+      "center": [
+        4,
+        2.6,
+        3
+      ],
+      "radius": 0.7,
+      "material": "end_crystal"
+    },
+    {
+      "type": "box",
+      "center": [
+        -4,
+        1.0,
+        3
+      ],
+      "material": "obsidian",
+      "size": [
+        2.0,
+        2.0,
+        2.0
+      ]
+    },
+    {
+      "type": "sphere",
+      "center": [
+        -4,
+        2.6,
+        3
+      ],
+      "radius": 0.7,
+      "material": "end_crystal"
+    },
+    {
+      "type": "box",
+      "center": [
+        4,
+        1.0,
+        -3
+      ],
+      "material": "obsidian",
+      "size": [
+        2.0,
+        2.0,
+        2.0
+      ]
+    },
+    {
+      "type": "sphere",
+      "center": [
+        4,
+        2.6,
+        -3
+      ],
+      "radius": 0.7,
+      "material": "end_crystal"
+    },
+    {
+      "type": "box",
+      "center": [
+        -4,
+        1.0,
+        -3
+      ],
+      "material": "obsidian",
+      "size": [
+        2.0,
+        2.0,
+        2.0
+      ]
+    },
+    {
+      "type": "sphere",
+      "center": [
+        -4,
+        2.6,
+        -3
+      ],
+      "radius": 0.7,
+      "material": "end_crystal"
+    },
+    {
+      "type": "box",
+      "center": [
+        7,
+        0.6,
+        0
+      ],
+      "material": "purpur",
+      "size": [
+        1.2,
+        1.2,
+        1.2
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        7,
+        1.6,
+        0
+      ],
+      "material": "purpur",
+      "size": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        7,
+        2.4,
+        0
+      ],
+      "material": "purpur",
+      "size": [
+        0.8,
+        0.8,
+        0.8
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -7,
+        0.6,
+        0
+      ],
+      "material": "purpur",
+      "size": [
+        1.2,
+        1.2,
+        1.2
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -7,
+        1.6,
+        0
+      ],
+      "material": "purpur",
+      "size": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -7,
+        2.4,
+        0
+      ],
+      "material": "chorus",
+      "size": [
+        0.8,
+        0.8,
+        0.8
+      ]
+    },
+    {
+      "type": "sphere",
+      "center": [
+        2,
+        0.35,
+        6
+      ],
+      "radius": 0.35,
+      "material": "ender_eye"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        -2,
+        0.35,
+        6
+      ],
+      "radius": 0.35,
+      "material": "ender_eye"
+    },
+    {
+      "type": "triangle",
+      "v0": [
+        -2,
+        0,
+        -7
+      ],
+      "v1": [
+        2,
+        0,
+        -7
+      ],
+      "v2": [
+        0,
+        0,
+        -9
+      ],
+      "material": "bedrock"
+    }
   ],
   "lights": [
     {
       "type": "area",
-      "position": [0, 12, 0],
-      "intensity": [0.5, 0.35, 0.65],
+      "position": [
+        0,
+        12,
+        0
+      ],
+      "intensity": [
+        0.5,
+        0.35,
+        0.65
+      ],
       "radius": 2.0
     },
     {
       "type": "spot",
-      "position": [0, 10, 0],
-      "intensity": [0.8, 0.6, 0.95],
-      "direction": [0, -1, 0],
+      "position": [
+        0,
+        10,
+        0
+      ],
+      "intensity": [
+        0.8,
+        0.6,
+        0.95
+      ],
+      "direction": [
+        0,
+        -1,
+        0
+      ],
       "inner_deg": 20,
       "outer_deg": 40,
       "radius": 0.5
     },
     {
       "type": "area",
-      "position": [5, 5, 5],
-      "intensity": [0.3, 0.2, 0.4],
+      "position": [
+        5,
+        5,
+        5
+      ],
+      "intensity": [
+        0.3,
+        0.2,
+        0.4
+      ],
       "radius": 0.5,
-      "orbit": { "center": [0, 0, 0], "radius": 7, "height": 5, "speed": 1.5, "phase": 0 }
+      "orbit": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "radius": 7,
+        "height": 5,
+        "speed": 1.5,
+        "phase": 0
+      }
     }
   ]
 }

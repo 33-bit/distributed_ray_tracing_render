@@ -15,6 +15,7 @@
 #include "scene/sphere.hpp"
 #include "scene/plane.hpp"
 #include "scene/triangle.hpp"
+#include "scene/box.hpp"
 #include "scene/material.hpp"
 #include "scene/light.hpp"
 #include "render/shading.hpp"   // ISceneQuery
@@ -31,6 +32,7 @@ struct Scene : ISceneQuery {
     void add_sphere(const Vec3& c, double r, int mat) { objects.push_back(std::make_unique<Sphere>(c, r, mat)); }
     void add_plane(const Vec3& p, const Vec3& n, int mat) { objects.push_back(std::make_unique<Plane>(p, n, mat)); }
     void add_triangle(const Vec3& a, const Vec3& b, const Vec3& c, int mat) { objects.push_back(std::make_unique<Triangle>(a, b, c, mat)); }
+    void add_box(const Vec3& center, const Vec3& size, int mat) { objects.push_back(std::make_unique<Box>(center, size, mat)); }
 
     // --- ISceneQuery ---
     bool hit(const Ray& r, double tmin, double tmax, HitRecord& rec) const override {

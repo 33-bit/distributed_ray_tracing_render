@@ -1,14 +1,34 @@
 {
   "background": {
-    "top": [0.02, 0.02, 0.03],
-    "bottom": [0.05, 0.04, 0.03]
+    "top": [
+      0.02,
+      0.02,
+      0.03
+    ],
+    "bottom": [
+      0.05,
+      0.04,
+      0.03
+    ]
   },
   "camera": {
-    "lookat": [0, 1.5, 0],
-    "up": [0, 1, 0],
+    "lookat": [
+      0,
+      1.5,
+      0
+    ],
+    "up": [
+      0,
+      1,
+      0
+    ],
     "vfov": 52,
     "orbit": {
-      "center": [0, 1.5, 0],
+      "center": [
+        0,
+        1.5,
+        0
+      ],
       "radius": 12,
       "height": 4,
       "speed": 0.6,
@@ -16,77 +36,550 @@
     }
   },
   "materials": {
-    "stone_floor":   { "type": "checkerboard", "albedo": [0.35, 0.33, 0.30], "albedo2": [0.28, 0.26, 0.24], "scale": 1.5 },
-    "stone":         { "type": "glossy", "albedo": [0.40, 0.38, 0.36], "specular": 0.1, "shininess": 6 },
-    "deepslate":     { "type": "glossy", "albedo": [0.22, 0.22, 0.24], "specular": 0.15, "shininess": 10 },
-    "diamond_ore":   { "type": "mirror", "albedo": [0.30, 0.75, 0.85], "reflectivity": 0.65 },
-    "gold_ore":      { "type": "glossy", "albedo": [0.88, 0.72, 0.15], "specular": 0.5, "shininess": 40 },
-    "redstone_ore":  { "type": "emissive", "emission": [0.7, 0.08, 0.05] },
-    "lava":          { "type": "emissive", "emission": [1.0, 0.45, 0.05] },
-    "lava_glow":     { "type": "emissive", "emission": [0.9, 0.35, 0.02] },
-    "iron_ore":      { "type": "glossy", "albedo": [0.60, 0.55, 0.50], "specular": 0.3, "shininess": 16 },
-    "coal_ore":      { "type": "diffuse", "albedo": [0.12, 0.10, 0.10] },
-    "amethyst":      { "type": "dielectric", "ior": 1.55, "albedo": [0.65, 0.40, 0.80] },
-    "torch":         { "type": "emissive", "emission": [1.0, 0.75, 0.3] }
+    "stone_floor": {
+      "type": "checkerboard",
+      "albedo": [
+        0.35,
+        0.33,
+        0.3
+      ],
+      "albedo2": [
+        0.28,
+        0.26,
+        0.24
+      ],
+      "scale": 1.5
+    },
+    "stone": {
+      "type": "glossy",
+      "albedo": [
+        0.4,
+        0.38,
+        0.36
+      ],
+      "specular": 0.1,
+      "shininess": 6
+    },
+    "deepslate": {
+      "type": "glossy",
+      "albedo": [
+        0.22,
+        0.22,
+        0.24
+      ],
+      "specular": 0.15,
+      "shininess": 10
+    },
+    "diamond_ore": {
+      "type": "mirror",
+      "albedo": [
+        0.3,
+        0.75,
+        0.85
+      ],
+      "reflectivity": 0.65
+    },
+    "gold_ore": {
+      "type": "glossy",
+      "albedo": [
+        0.88,
+        0.72,
+        0.15
+      ],
+      "specular": 0.5,
+      "shininess": 40
+    },
+    "redstone_ore": {
+      "type": "emissive",
+      "emission": [
+        0.7,
+        0.08,
+        0.05
+      ]
+    },
+    "lava": {
+      "type": "emissive",
+      "emission": [
+        1.0,
+        0.45,
+        0.05
+      ]
+    },
+    "lava_glow": {
+      "type": "emissive",
+      "emission": [
+        0.9,
+        0.35,
+        0.02
+      ]
+    },
+    "iron_ore": {
+      "type": "glossy",
+      "albedo": [
+        0.6,
+        0.55,
+        0.5
+      ],
+      "specular": 0.3,
+      "shininess": 16
+    },
+    "coal_ore": {
+      "type": "diffuse",
+      "albedo": [
+        0.12,
+        0.1,
+        0.1
+      ]
+    },
+    "amethyst": {
+      "type": "dielectric",
+      "ior": 1.55,
+      "albedo": [
+        0.65,
+        0.4,
+        0.8
+      ]
+    },
+    "torch": {
+      "type": "emissive",
+      "emission": [
+        1.0,
+        0.75,
+        0.3
+      ]
+    }
   },
   "objects": [
-    { "type": "plane", "point": [0, 0, 0], "normal": [0, 1, 0], "material": "stone_floor" },
-
-    { "type": "sphere", "center": [-3, 1.5, -4], "radius": 0.45, "material": "diamond_ore" },
-    { "type": "sphere", "center": [-2.2, 1.2, -4.2], "radius": 0.4, "material": "diamond_ore" },
-    { "type": "sphere", "center": [-3.5, 0.8, -3.8], "radius": 0.35, "material": "diamond_ore" },
-
-    { "type": "sphere", "center": [3, 1.0, -3], "radius": 0.5, "material": "gold_ore" },
-    { "type": "sphere", "center": [3.6, 0.7, -2.5], "radius": 0.4, "material": "gold_ore" },
-    { "type": "sphere", "center": [2.5, 0.5, -3.5], "radius": 0.35, "material": "gold_ore" },
-
-    { "type": "sphere", "center": [-4, 0.5, 2], "radius": 0.4, "material": "redstone_ore" },
-    { "type": "sphere", "center": [-3.5, 0.8, 2.5], "radius": 0.35, "material": "redstone_ore" },
-    { "type": "sphere", "center": [-4.3, 0.3, 1.5], "radius": 0.3, "material": "redstone_ore" },
-
-    { "type": "triangle", "v0": [1, 0.01, 3], "v1": [4, 0.01, 3], "v2": [2.5, 0.01, 6], "material": "lava" },
-    { "type": "sphere", "center": [2.5, 0.15, 4], "radius": 0.15, "material": "lava_glow" },
-
-    { "type": "sphere", "center": [0, 5.0, -1], "radius": 0.3, "material": "stone" },
-    { "type": "sphere", "center": [1, 4.8, 0], "radius": 0.25, "material": "deepslate" },
-    { "type": "sphere", "center": [-1, 5.2, 0.5], "radius": 0.28, "material": "stone" },
-    { "type": "sphere", "center": [0.5, 4.6, -2], "radius": 0.22, "material": "deepslate" },
-    { "type": "sphere", "center": [-0.5, 5.0, 1], "radius": 0.20, "material": "stone" },
-
-    { "type": "sphere", "center": [5, 0.5, 0], "radius": 0.5, "material": "iron_ore" },
-    { "type": "sphere", "center": [-5, 0.4, -2], "radius": 0.4, "material": "coal_ore" },
-    { "type": "sphere", "center": [-5.3, 0.3, -1.5], "radius": 0.3, "material": "coal_ore" },
-
-    { "type": "sphere", "center": [1, 0.3, -5], "radius": 0.3, "material": "amethyst" },
-    { "type": "sphere", "center": [0.5, 0.5, -5.3], "radius": 0.25, "material": "amethyst" },
-    { "type": "sphere", "center": [1.5, 0.4, -4.8], "radius": 0.28, "material": "amethyst" },
-
-    { "type": "sphere", "center": [-1, 2.5, -2], "radius": 0.12, "material": "torch" },
-    { "type": "sphere", "center": [2, 2.8, 1], "radius": 0.12, "material": "torch" },
-
-    { "type": "sphere", "center": [0, 0.8, 0], "radius": 0.8, "material": "deepslate" },
-    { "type": "sphere", "center": [0, 2.2, 0], "radius": 0.7, "material": "stone" }
+    {
+      "type": "plane",
+      "point": [
+        0,
+        0,
+        0
+      ],
+      "normal": [
+        0,
+        1,
+        0
+      ],
+      "material": "stone_floor"
+    },
+    {
+      "type": "box",
+      "center": [
+        -3,
+        1.5,
+        -4
+      ],
+      "material": "diamond_ore",
+      "size": [
+        0.9,
+        0.9,
+        0.9
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -2.2,
+        1.2,
+        -4.2
+      ],
+      "material": "diamond_ore",
+      "size": [
+        0.8,
+        0.8,
+        0.8
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -3.5,
+        0.8,
+        -3.8
+      ],
+      "material": "diamond_ore",
+      "size": [
+        0.7,
+        0.7,
+        0.7
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        3,
+        1.0,
+        -3
+      ],
+      "material": "gold_ore",
+      "size": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        3.6,
+        0.7,
+        -2.5
+      ],
+      "material": "gold_ore",
+      "size": [
+        0.8,
+        0.8,
+        0.8
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        2.5,
+        0.5,
+        -3.5
+      ],
+      "material": "gold_ore",
+      "size": [
+        0.7,
+        0.7,
+        0.7
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -4,
+        0.5,
+        2
+      ],
+      "material": "redstone_ore",
+      "size": [
+        0.8,
+        0.8,
+        0.8
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -3.5,
+        0.8,
+        2.5
+      ],
+      "material": "redstone_ore",
+      "size": [
+        0.7,
+        0.7,
+        0.7
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -4.3,
+        0.3,
+        1.5
+      ],
+      "material": "redstone_ore",
+      "size": [
+        0.6,
+        0.6,
+        0.6
+      ]
+    },
+    {
+      "type": "triangle",
+      "v0": [
+        1,
+        0.01,
+        3
+      ],
+      "v1": [
+        4,
+        0.01,
+        3
+      ],
+      "v2": [
+        2.5,
+        0.01,
+        6
+      ],
+      "material": "lava"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        2.5,
+        0.15,
+        4
+      ],
+      "radius": 0.15,
+      "material": "lava_glow"
+    },
+    {
+      "type": "box",
+      "center": [
+        0,
+        5.0,
+        -1
+      ],
+      "material": "stone",
+      "size": [
+        0.6,
+        0.6,
+        0.6
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        1,
+        4.8,
+        0
+      ],
+      "material": "deepslate",
+      "size": [
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -1,
+        5.2,
+        0.5
+      ],
+      "material": "stone",
+      "size": [
+        0.56,
+        0.56,
+        0.56
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        0.5,
+        4.6,
+        -2
+      ],
+      "material": "deepslate",
+      "size": [
+        0.44,
+        0.44,
+        0.44
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -0.5,
+        5.0,
+        1
+      ],
+      "material": "stone",
+      "size": [
+        0.4,
+        0.4,
+        0.4
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        5,
+        0.5,
+        0
+      ],
+      "material": "iron_ore",
+      "size": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -5,
+        0.4,
+        -2
+      ],
+      "material": "coal_ore",
+      "size": [
+        0.8,
+        0.8,
+        0.8
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -5.3,
+        0.3,
+        -1.5
+      ],
+      "material": "coal_ore",
+      "size": [
+        0.6,
+        0.6,
+        0.6
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        1,
+        0.3,
+        -5
+      ],
+      "material": "amethyst",
+      "size": [
+        0.6,
+        0.6,
+        0.6
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        0.5,
+        0.5,
+        -5.3
+      ],
+      "material": "amethyst",
+      "size": [
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        1.5,
+        0.4,
+        -4.8
+      ],
+      "material": "amethyst",
+      "size": [
+        0.56,
+        0.56,
+        0.56
+      ]
+    },
+    {
+      "type": "sphere",
+      "center": [
+        -1,
+        2.5,
+        -2
+      ],
+      "radius": 0.12,
+      "material": "torch"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        2,
+        2.8,
+        1
+      ],
+      "radius": 0.12,
+      "material": "torch"
+    },
+    {
+      "type": "box",
+      "center": [
+        0,
+        0.8,
+        0
+      ],
+      "material": "deepslate",
+      "size": [
+        1.6,
+        1.6,
+        1.6
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        0,
+        2.2,
+        0
+      ],
+      "material": "stone",
+      "size": [
+        1.4,
+        1.4,
+        1.4
+      ]
+    }
   ],
   "lights": [
     {
       "type": "area",
-      "position": [2.5, 3, 4],
-      "intensity": [0.8, 0.4, 0.08],
+      "position": [
+        2.5,
+        3,
+        4
+      ],
+      "intensity": [
+        0.8,
+        0.4,
+        0.08
+      ],
       "radius": 1.0,
-      "orbit": { "center": [0, 0, 0], "radius": 5, "height": 4, "speed": 0.4, "phase": 0.7 }
+      "orbit": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "radius": 5,
+        "height": 4,
+        "speed": 0.4,
+        "phase": 0.7
+      }
     },
     {
       "type": "spot",
-      "position": [-1, 3, -2],
-      "direction": [0, -1, 0],
-      "intensity": [0.9, 0.65, 0.25],
+      "position": [
+        -1,
+        3,
+        -2
+      ],
+      "direction": [
+        0,
+        -1,
+        0
+      ],
+      "intensity": [
+        0.9,
+        0.65,
+        0.25
+      ],
       "angle": 45,
       "radius": 0.2
     },
     {
       "type": "area",
-      "position": [-4, 2.5, 2],
-      "intensity": [0.5, 0.06, 0.04],
+      "position": [
+        -4,
+        2.5,
+        2
+      ],
+      "intensity": [
+        0.5,
+        0.06,
+        0.04
+      ],
       "radius": 0.4
     }
   ]

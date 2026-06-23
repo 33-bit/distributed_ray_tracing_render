@@ -1,14 +1,34 @@
 {
   "background": {
-    "top": [0.55, 0.30, 0.15],
-    "bottom": [0.85, 0.55, 0.30]
+    "top": [
+      0.55,
+      0.3,
+      0.15
+    ],
+    "bottom": [
+      0.85,
+      0.55,
+      0.3
+    ]
   },
   "camera": {
-    "lookat": [0, 3, 0],
-    "up": [0, 1, 0],
+    "lookat": [
+      0,
+      3,
+      0
+    ],
+    "up": [
+      0,
+      1,
+      0
+    ],
     "vfov": 48,
     "orbit": {
-      "center": [0, 3, 0],
+      "center": [
+        0,
+        3,
+        0
+      ],
       "radius": 16,
       "height": 7,
       "speed": 0.6,
@@ -16,66 +36,495 @@
     }
   },
   "materials": {
-    "red_sand":        { "type": "checkerboard", "albedo": [0.72, 0.38, 0.15], "albedo2": [0.65, 0.34, 0.12], "scale": 2.0 },
-    "orange_terra":    { "type": "diffuse", "albedo": [0.78, 0.45, 0.18] },
-    "red_terra":       { "type": "diffuse", "albedo": [0.70, 0.25, 0.12] },
-    "brown_terra":     { "type": "diffuse", "albedo": [0.52, 0.30, 0.15] },
-    "yellow_terra":    { "type": "diffuse", "albedo": [0.82, 0.72, 0.30] },
-    "white_terra":     { "type": "diffuse", "albedo": [0.85, 0.82, 0.78] },
-    "light_gray_terra": { "type": "diffuse", "albedo": [0.65, 0.58, 0.52] },
-    "gold_exposed":    { "type": "glossy", "albedo": [0.88, 0.72, 0.15], "specular": 0.5, "shininess": 36 },
-    "cactus":          { "type": "diffuse", "albedo": [0.20, 0.52, 0.18] },
-    "dead_bush":       { "type": "diffuse", "albedo": [0.52, 0.40, 0.20] }
+    "red_sand": {
+      "type": "checkerboard",
+      "albedo": [
+        0.72,
+        0.38,
+        0.15
+      ],
+      "albedo2": [
+        0.65,
+        0.34,
+        0.12
+      ],
+      "scale": 2.0
+    },
+    "orange_terra": {
+      "type": "diffuse",
+      "albedo": [
+        0.78,
+        0.45,
+        0.18
+      ]
+    },
+    "red_terra": {
+      "type": "diffuse",
+      "albedo": [
+        0.7,
+        0.25,
+        0.12
+      ]
+    },
+    "brown_terra": {
+      "type": "diffuse",
+      "albedo": [
+        0.52,
+        0.3,
+        0.15
+      ]
+    },
+    "yellow_terra": {
+      "type": "diffuse",
+      "albedo": [
+        0.82,
+        0.72,
+        0.3
+      ]
+    },
+    "white_terra": {
+      "type": "diffuse",
+      "albedo": [
+        0.85,
+        0.82,
+        0.78
+      ]
+    },
+    "light_gray_terra": {
+      "type": "diffuse",
+      "albedo": [
+        0.65,
+        0.58,
+        0.52
+      ]
+    },
+    "gold_exposed": {
+      "type": "glossy",
+      "albedo": [
+        0.88,
+        0.72,
+        0.15
+      ],
+      "specular": 0.5,
+      "shininess": 36
+    },
+    "cactus": {
+      "type": "diffuse",
+      "albedo": [
+        0.2,
+        0.52,
+        0.18
+      ]
+    },
+    "dead_bush": {
+      "type": "diffuse",
+      "albedo": [
+        0.52,
+        0.4,
+        0.2
+      ]
+    }
   },
   "objects": [
-    { "type": "plane", "point": [0, 0, 0], "normal": [0, 1, 0], "material": "red_sand" },
-
-    { "type": "sphere", "center": [-3, 0.8, -2], "radius": 0.8, "material": "brown_terra" },
-    { "type": "sphere", "center": [-3, 2.2, -2], "radius": 0.8, "material": "red_terra" },
-    { "type": "sphere", "center": [-3, 3.6, -2], "radius": 0.8, "material": "orange_terra" },
-    { "type": "sphere", "center": [-3, 5.0, -2], "radius": 0.8, "material": "yellow_terra" },
-    { "type": "sphere", "center": [-3, 6.4, -2], "radius": 0.8, "material": "white_terra" },
-    { "type": "sphere", "center": [-3, 7.6, -2], "radius": 0.7, "material": "orange_terra" },
-
-    { "type": "sphere", "center": [3, 0.8, -2], "radius": 0.8, "material": "brown_terra" },
-    { "type": "sphere", "center": [3, 2.2, -2], "radius": 0.8, "material": "orange_terra" },
-    { "type": "sphere", "center": [3, 3.6, -2], "radius": 0.8, "material": "red_terra" },
-    { "type": "sphere", "center": [3, 5.0, -2], "radius": 0.8, "material": "yellow_terra" },
-    { "type": "sphere", "center": [3, 6.4, -2], "radius": 0.8, "material": "light_gray_terra" },
-
-    { "type": "sphere", "center": [0, 0.8, -4], "radius": 0.8, "material": "red_terra" },
-    { "type": "sphere", "center": [0, 2.2, -4], "radius": 0.8, "material": "orange_terra" },
-    { "type": "sphere", "center": [0, 3.6, -4], "radius": 0.8, "material": "white_terra" },
-    { "type": "sphere", "center": [0, 5.0, -4], "radius": 0.8, "material": "red_terra" },
-
-    { "type": "sphere", "center": [0, 1.5, -3.2], "radius": 0.4, "material": "gold_exposed" },
-    { "type": "sphere", "center": [3, 1.5, -1.2], "radius": 0.35, "material": "gold_exposed" },
-
-    { "type": "sphere", "center": [-6, 0.25, 3], "radius": 0.25, "material": "cactus" },
-    { "type": "sphere", "center": [-6, 0.75, 3], "radius": 0.25, "material": "cactus" },
-    { "type": "sphere", "center": [-6, 1.25, 3], "radius": 0.22, "material": "cactus" },
-
-    { "type": "sphere", "center": [5, 0.25, 4], "radius": 0.25, "material": "cactus" },
-    { "type": "sphere", "center": [5, 0.75, 4], "radius": 0.25, "material": "cactus" },
-
-    { "type": "sphere", "center": [2, 0.12, 5], "radius": 0.12, "material": "dead_bush" },
-    { "type": "sphere", "center": [-4, 0.10, 5], "radius": 0.10, "material": "dead_bush" },
-
-    { "type": "triangle", "v0": [-5, 0.8, -5], "v1": [-1, 0.8, -5], "v2": [-3, 4.0, -5.5], "material": "red_terra" },
-    { "type": "triangle", "v0": [1, 0.8, -5], "v1": [5, 0.8, -5], "v2": [3, 3.5, -5.5], "material": "orange_terra" }
+    {
+      "type": "plane",
+      "point": [
+        0,
+        0,
+        0
+      ],
+      "normal": [
+        0,
+        1,
+        0
+      ],
+      "material": "red_sand"
+    },
+    {
+      "type": "box",
+      "center": [
+        -3,
+        0.8,
+        -2
+      ],
+      "material": "brown_terra",
+      "size": [
+        1.6,
+        1.6,
+        1.6
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -3,
+        2.2,
+        -2
+      ],
+      "material": "red_terra",
+      "size": [
+        1.6,
+        1.6,
+        1.6
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -3,
+        3.6,
+        -2
+      ],
+      "material": "orange_terra",
+      "size": [
+        1.6,
+        1.6,
+        1.6
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -3,
+        5.0,
+        -2
+      ],
+      "material": "yellow_terra",
+      "size": [
+        1.6,
+        1.6,
+        1.6
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -3,
+        6.4,
+        -2
+      ],
+      "material": "white_terra",
+      "size": [
+        1.6,
+        1.6,
+        1.6
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -3,
+        7.6,
+        -2
+      ],
+      "material": "orange_terra",
+      "size": [
+        1.4,
+        1.4,
+        1.4
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        3,
+        0.8,
+        -2
+      ],
+      "material": "brown_terra",
+      "size": [
+        1.6,
+        1.6,
+        1.6
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        3,
+        2.2,
+        -2
+      ],
+      "material": "orange_terra",
+      "size": [
+        1.6,
+        1.6,
+        1.6
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        3,
+        3.6,
+        -2
+      ],
+      "material": "red_terra",
+      "size": [
+        1.6,
+        1.6,
+        1.6
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        3,
+        5.0,
+        -2
+      ],
+      "material": "yellow_terra",
+      "size": [
+        1.6,
+        1.6,
+        1.6
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        3,
+        6.4,
+        -2
+      ],
+      "material": "light_gray_terra",
+      "size": [
+        1.6,
+        1.6,
+        1.6
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        0,
+        0.8,
+        -4
+      ],
+      "material": "red_terra",
+      "size": [
+        1.6,
+        1.6,
+        1.6
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        0,
+        2.2,
+        -4
+      ],
+      "material": "orange_terra",
+      "size": [
+        1.6,
+        1.6,
+        1.6
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        0,
+        3.6,
+        -4
+      ],
+      "material": "white_terra",
+      "size": [
+        1.6,
+        1.6,
+        1.6
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        0,
+        5.0,
+        -4
+      ],
+      "material": "red_terra",
+      "size": [
+        1.6,
+        1.6,
+        1.6
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        0,
+        1.5,
+        -3.2
+      ],
+      "material": "gold_exposed",
+      "size": [
+        0.8,
+        0.8,
+        0.8
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        3,
+        1.5,
+        -1.2
+      ],
+      "material": "gold_exposed",
+      "size": [
+        0.7,
+        0.7,
+        0.7
+      ]
+    },
+    {
+      "type": "sphere",
+      "center": [
+        -6,
+        0.25,
+        3
+      ],
+      "radius": 0.25,
+      "material": "cactus"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        -6,
+        0.75,
+        3
+      ],
+      "radius": 0.25,
+      "material": "cactus"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        -6,
+        1.25,
+        3
+      ],
+      "radius": 0.22,
+      "material": "cactus"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        5,
+        0.25,
+        4
+      ],
+      "radius": 0.25,
+      "material": "cactus"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        5,
+        0.75,
+        4
+      ],
+      "radius": 0.25,
+      "material": "cactus"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        2,
+        0.12,
+        5
+      ],
+      "radius": 0.12,
+      "material": "dead_bush"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        -4,
+        0.1,
+        5
+      ],
+      "radius": 0.1,
+      "material": "dead_bush"
+    },
+    {
+      "type": "triangle",
+      "v0": [
+        -5,
+        0.8,
+        -5
+      ],
+      "v1": [
+        -1,
+        0.8,
+        -5
+      ],
+      "v2": [
+        -3,
+        4.0,
+        -5.5
+      ],
+      "material": "red_terra"
+    },
+    {
+      "type": "triangle",
+      "v0": [
+        1,
+        0.8,
+        -5
+      ],
+      "v1": [
+        5,
+        0.8,
+        -5
+      ],
+      "v2": [
+        3,
+        3.5,
+        -5.5
+      ],
+      "material": "orange_terra"
+    }
   ],
   "lights": [
     {
       "type": "area",
-      "position": [8, 14, 6],
-      "intensity": [1.15, 0.90, 0.60],
+      "position": [
+        8,
+        14,
+        6
+      ],
+      "intensity": [
+        1.15,
+        0.9,
+        0.6
+      ],
       "radius": 2.0,
-      "orbit": { "center": [0, 0, 0], "radius": 10, "height": 14, "speed": -0.3, "phase": 0.1 }
+      "orbit": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "radius": 10,
+        "height": 14,
+        "speed": -0.3,
+        "phase": 0.1
+      }
     },
     {
       "type": "area",
-      "position": [-6, 8, -4],
-      "intensity": [0.40, 0.28, 0.18],
+      "position": [
+        -6,
+        8,
+        -4
+      ],
+      "intensity": [
+        0.4,
+        0.28,
+        0.18
+      ],
       "radius": 0.8
     }
   ]

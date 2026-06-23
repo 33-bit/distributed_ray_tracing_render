@@ -1,14 +1,34 @@
 {
   "background": {
-    "top": [0.01, 0.01, 0.02],
-    "bottom": [0.03, 0.04, 0.05]
+    "top": [
+      0.01,
+      0.01,
+      0.02
+    ],
+    "bottom": [
+      0.03,
+      0.04,
+      0.05
+    ]
   },
   "camera": {
-    "lookat": [0, 1.5, 0],
-    "up": [0, 1, 0],
+    "lookat": [
+      0,
+      1.5,
+      0
+    ],
+    "up": [
+      0,
+      1,
+      0
+    ],
     "vfov": 52,
     "orbit": {
-      "center": [0, 1.5, 0],
+      "center": [
+        0,
+        1.5,
+        0
+      ],
       "radius": 13,
       "height": 4.5,
       "speed": 0.5,
@@ -16,79 +36,552 @@
     }
   },
   "materials": {
-    "sculk_floor":   { "type": "checkerboard", "albedo": [0.03, 0.12, 0.14], "albedo2": [0.02, 0.08, 0.10], "scale": 1.5 },
-    "deepslate":     { "type": "glossy", "albedo": [0.18, 0.18, 0.20], "specular": 0.15, "shininess": 10 },
-    "sculk_block":   { "type": "diffuse", "albedo": [0.04, 0.15, 0.18] },
-    "sculk_vein":    { "type": "diffuse", "albedo": [0.02, 0.10, 0.12] },
-    "sculk_sensor":  { "type": "emissive", "emission": [0.05, 0.45, 0.55] },
-    "sculk_catalyst": { "type": "emissive", "emission": [0.08, 0.35, 0.42] },
-    "sculk_shrieker": { "type": "emissive", "emission": [0.10, 0.50, 0.58] },
-    "soul_lantern":  { "type": "emissive", "emission": [0.20, 0.55, 0.65] },
-    "warden_body":   { "type": "diffuse", "albedo": [0.06, 0.12, 0.14] },
-    "warden_chest":  { "type": "emissive", "emission": [0.05, 0.40, 0.48] },
-    "warden_horns":  { "type": "diffuse", "albedo": [0.04, 0.08, 0.10] },
-    "reinforced_deepslate": { "type": "glossy", "albedo": [0.12, 0.14, 0.16], "specular": 0.3, "shininess": 24 },
-    "bone":          { "type": "diffuse", "albedo": [0.75, 0.72, 0.65] }
+    "sculk_floor": {
+      "type": "checkerboard",
+      "albedo": [
+        0.03,
+        0.12,
+        0.14
+      ],
+      "albedo2": [
+        0.02,
+        0.08,
+        0.1
+      ],
+      "scale": 1.5
+    },
+    "deepslate": {
+      "type": "glossy",
+      "albedo": [
+        0.18,
+        0.18,
+        0.2
+      ],
+      "specular": 0.15,
+      "shininess": 10
+    },
+    "sculk_block": {
+      "type": "diffuse",
+      "albedo": [
+        0.04,
+        0.15,
+        0.18
+      ]
+    },
+    "sculk_vein": {
+      "type": "diffuse",
+      "albedo": [
+        0.02,
+        0.1,
+        0.12
+      ]
+    },
+    "sculk_sensor": {
+      "type": "emissive",
+      "emission": [
+        0.05,
+        0.45,
+        0.55
+      ]
+    },
+    "sculk_catalyst": {
+      "type": "emissive",
+      "emission": [
+        0.08,
+        0.35,
+        0.42
+      ]
+    },
+    "sculk_shrieker": {
+      "type": "emissive",
+      "emission": [
+        0.1,
+        0.5,
+        0.58
+      ]
+    },
+    "soul_lantern": {
+      "type": "emissive",
+      "emission": [
+        0.2,
+        0.55,
+        0.65
+      ]
+    },
+    "warden_body": {
+      "type": "diffuse",
+      "albedo": [
+        0.06,
+        0.12,
+        0.14
+      ]
+    },
+    "warden_chest": {
+      "type": "emissive",
+      "emission": [
+        0.05,
+        0.4,
+        0.48
+      ]
+    },
+    "warden_horns": {
+      "type": "diffuse",
+      "albedo": [
+        0.04,
+        0.08,
+        0.1
+      ]
+    },
+    "reinforced_deepslate": {
+      "type": "glossy",
+      "albedo": [
+        0.12,
+        0.14,
+        0.16
+      ],
+      "specular": 0.3,
+      "shininess": 24
+    },
+    "bone": {
+      "type": "diffuse",
+      "albedo": [
+        0.75,
+        0.72,
+        0.65
+      ]
+    }
   },
   "objects": [
-    { "type": "plane", "point": [0, 0, 0], "normal": [0, 1, 0], "material": "sculk_floor" },
-
-    { "type": "sphere", "center": [4, 1.5, -3], "radius": 1.0, "material": "warden_body" },
-    { "type": "sphere", "center": [4, 2.8, -3], "radius": 0.7, "material": "warden_body" },
-    { "type": "sphere", "center": [4, 3.8, -3], "radius": 0.55, "material": "warden_body" },
-    { "type": "sphere", "center": [4, 2.5, -3], "radius": 0.4, "material": "warden_chest" },
-    { "type": "triangle", "v0": [3.6, 4.3, -3], "v1": [3.3, 5.2, -3.2], "v2": [3.7, 5.0, -2.8], "material": "warden_horns" },
-    { "type": "triangle", "v0": [4.4, 4.3, -3], "v1": [4.7, 5.2, -3.2], "v2": [4.3, 5.0, -2.8], "material": "warden_horns" },
-
-    { "type": "sphere", "center": [-3, 0.25, 1], "radius": 0.25, "material": "sculk_sensor" },
-    { "type": "sphere", "center": [-1, 0.20, 3], "radius": 0.20, "material": "sculk_sensor" },
-    { "type": "sphere", "center": [2, 0.22, 4], "radius": 0.22, "material": "sculk_sensor" },
-    { "type": "sphere", "center": [-5, 0.18, -2], "radius": 0.18, "material": "sculk_sensor" },
-    { "type": "sphere", "center": [1, 0.20, -5], "radius": 0.20, "material": "sculk_sensor" },
-
-    { "type": "sphere", "center": [-4, 0.4, -4], "radius": 0.4, "material": "sculk_catalyst" },
-    { "type": "sphere", "center": [5, 0.35, 2], "radius": 0.35, "material": "sculk_shrieker" },
-
-    { "type": "sphere", "center": [-2, 2.0, -3], "radius": 0.18, "material": "soul_lantern" },
-    { "type": "sphere", "center": [0, 2.5, -5], "radius": 0.18, "material": "soul_lantern" },
-
-    { "type": "sphere", "center": [-5, 0.8, 3], "radius": 0.8, "material": "deepslate" },
-    { "type": "sphere", "center": [-5, 2.2, 3], "radius": 0.7, "material": "deepslate" },
-    { "type": "sphere", "center": [6, 0.7, -1], "radius": 0.7, "material": "deepslate" },
-    { "type": "sphere", "center": [6, 1.9, -1], "radius": 0.6, "material": "deepslate" },
-
-    { "type": "sphere", "center": [0, 0.6, 0], "radius": 0.6, "material": "reinforced_deepslate" },
-    { "type": "sphere", "center": [0, 1.6, 0], "radius": 0.5, "material": "reinforced_deepslate" },
-
-    { "type": "sphere", "center": [0, 0.5, -2], "radius": 0.5, "material": "sculk_block" },
-    { "type": "sphere", "center": [-1, 0.4, -1.5], "radius": 0.4, "material": "sculk_block" },
-    { "type": "sphere", "center": [1, 0.4, -1.5], "radius": 0.4, "material": "sculk_vein" },
-
-    { "type": "sphere", "center": [3, 0.15, 6], "radius": 0.15, "material": "bone" },
-    { "type": "sphere", "center": [3.3, 0.12, 5.8], "radius": 0.12, "material": "bone" },
-
-    { "type": "triangle", "v0": [-3, 0.01, -1], "v1": [-1, 0.01, -1], "v2": [-2, 0.01, 1], "material": "sculk_vein" }
+    {
+      "type": "plane",
+      "point": [
+        0,
+        0,
+        0
+      ],
+      "normal": [
+        0,
+        1,
+        0
+      ],
+      "material": "sculk_floor"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        4,
+        1.5,
+        -3
+      ],
+      "radius": 1.0,
+      "material": "warden_body"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        4,
+        2.8,
+        -3
+      ],
+      "radius": 0.7,
+      "material": "warden_body"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        4,
+        3.8,
+        -3
+      ],
+      "radius": 0.55,
+      "material": "warden_body"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        4,
+        2.5,
+        -3
+      ],
+      "radius": 0.4,
+      "material": "warden_chest"
+    },
+    {
+      "type": "triangle",
+      "v0": [
+        3.6,
+        4.3,
+        -3
+      ],
+      "v1": [
+        3.3,
+        5.2,
+        -3.2
+      ],
+      "v2": [
+        3.7,
+        5.0,
+        -2.8
+      ],
+      "material": "warden_horns"
+    },
+    {
+      "type": "triangle",
+      "v0": [
+        4.4,
+        4.3,
+        -3
+      ],
+      "v1": [
+        4.7,
+        5.2,
+        -3.2
+      ],
+      "v2": [
+        4.3,
+        5.0,
+        -2.8
+      ],
+      "material": "warden_horns"
+    },
+    {
+      "type": "box",
+      "center": [
+        -3,
+        0.25,
+        1
+      ],
+      "material": "sculk_sensor",
+      "size": [
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -1,
+        0.2,
+        3
+      ],
+      "material": "sculk_sensor",
+      "size": [
+        0.4,
+        0.4,
+        0.4
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        2,
+        0.22,
+        4
+      ],
+      "material": "sculk_sensor",
+      "size": [
+        0.44,
+        0.44,
+        0.44
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -5,
+        0.18,
+        -2
+      ],
+      "material": "sculk_sensor",
+      "size": [
+        0.36,
+        0.36,
+        0.36
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        1,
+        0.2,
+        -5
+      ],
+      "material": "sculk_sensor",
+      "size": [
+        0.4,
+        0.4,
+        0.4
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -4,
+        0.4,
+        -4
+      ],
+      "material": "sculk_catalyst",
+      "size": [
+        0.8,
+        0.8,
+        0.8
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        5,
+        0.35,
+        2
+      ],
+      "material": "sculk_shrieker",
+      "size": [
+        0.7,
+        0.7,
+        0.7
+      ]
+    },
+    {
+      "type": "sphere",
+      "center": [
+        -2,
+        2.0,
+        -3
+      ],
+      "radius": 0.18,
+      "material": "soul_lantern"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        0,
+        2.5,
+        -5
+      ],
+      "radius": 0.18,
+      "material": "soul_lantern"
+    },
+    {
+      "type": "box",
+      "center": [
+        -5,
+        0.8,
+        3
+      ],
+      "material": "deepslate",
+      "size": [
+        1.6,
+        1.6,
+        1.6
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -5,
+        2.2,
+        3
+      ],
+      "material": "deepslate",
+      "size": [
+        1.4,
+        1.4,
+        1.4
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        6,
+        0.7,
+        -1
+      ],
+      "material": "deepslate",
+      "size": [
+        1.4,
+        1.4,
+        1.4
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        6,
+        1.9,
+        -1
+      ],
+      "material": "deepslate",
+      "size": [
+        1.2,
+        1.2,
+        1.2
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        0,
+        0.6,
+        0
+      ],
+      "material": "reinforced_deepslate",
+      "size": [
+        1.2,
+        1.2,
+        1.2
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        0,
+        1.6,
+        0
+      ],
+      "material": "reinforced_deepslate",
+      "size": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        0,
+        0.5,
+        -2
+      ],
+      "material": "sculk_block",
+      "size": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "type": "box",
+      "center": [
+        -1,
+        0.4,
+        -1.5
+      ],
+      "material": "sculk_block",
+      "size": [
+        0.8,
+        0.8,
+        0.8
+      ]
+    },
+    {
+      "type": "sphere",
+      "center": [
+        1,
+        0.4,
+        -1.5
+      ],
+      "radius": 0.4,
+      "material": "sculk_vein"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        3,
+        0.15,
+        6
+      ],
+      "radius": 0.15,
+      "material": "bone"
+    },
+    {
+      "type": "sphere",
+      "center": [
+        3.3,
+        0.12,
+        5.8
+      ],
+      "radius": 0.12,
+      "material": "bone"
+    },
+    {
+      "type": "triangle",
+      "v0": [
+        -3,
+        0.01,
+        -1
+      ],
+      "v1": [
+        -1,
+        0.01,
+        -1
+      ],
+      "v2": [
+        -2,
+        0.01,
+        1
+      ],
+      "material": "sculk_vein"
+    }
   ],
   "lights": [
     {
       "type": "area",
-      "position": [0, 8, 0],
-      "intensity": [0.08, 0.20, 0.25],
+      "position": [
+        0,
+        8,
+        0
+      ],
+      "intensity": [
+        0.08,
+        0.2,
+        0.25
+      ],
       "radius": 2.0,
-      "orbit": { "center": [0, 0, 0], "radius": 6, "height": 8, "speed": 0.3, "phase": 0.6 }
+      "orbit": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "radius": 6,
+        "height": 8,
+        "speed": 0.3,
+        "phase": 0.6
+      }
     },
     {
       "type": "spot",
-      "position": [-2, 4, -3],
-      "direction": [0, -1, 0],
-      "intensity": [0.15, 0.40, 0.48],
+      "position": [
+        -2,
+        4,
+        -3
+      ],
+      "direction": [
+        0,
+        -1,
+        0
+      ],
+      "intensity": [
+        0.15,
+        0.4,
+        0.48
+      ],
       "angle": 35,
       "radius": 0.3
     },
     {
       "type": "area",
-      "position": [4, 4, -3],
-      "intensity": [0.06, 0.30, 0.35],
+      "position": [
+        4,
+        4,
+        -3
+      ],
+      "intensity": [
+        0.06,
+        0.3,
+        0.35
+      ],
       "radius": 0.5
     }
   ]

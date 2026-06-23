@@ -44,6 +44,22 @@ struct RNG {
             if (p.length_squared() < 1.0) return p;
         }
     }
+
+    // Cosine-weighted random direction in hemisphere around `normal`.
+    // PDF = cos(theta)/PI. With Lambertian BRDF (albedo/PI), the Monte Carlo
+    // estimate simplifies to: albedo * Li (cos and PI cancel).
+    Vec3 cosine_hemisphere(const Vec3& normal) {
+        double r1 = next(), r2 = next();
+        double sqrt_r2 = std::sqrt(r2);
+        double phi = 2.0 * PI * r1;
+        Vec3 w = normalized(normal);
+        Vec3 a = (std::fabs(w.x) > 0.9) ? Vec3(0, 1, 0) : Vec3(1, 0, 0);
+        Vec3 u = normalized(cross(a, w));
+        Vec3 v = cross(w, u);
+        return normalized(u * (std::cos(phi) * sqrt_r2) +
+                          v * (std::sin(phi) * sqrt_r2) +
+                          w * std::sqrt(1.0 - r2));
+    }
 };
 
 // Combine four integers into one 64-bit seed (boost-style hash_combine).

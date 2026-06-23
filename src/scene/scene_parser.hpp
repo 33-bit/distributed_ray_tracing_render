@@ -35,6 +35,8 @@ struct CameraConfig {
     Vec3   lookat = Vec3(0, 1, 0);
     Vec3   up     = Vec3(0, 1, 0);
     double vfov   = 40.0;
+    double aperture   = 0.0;
+    double focus_dist = 0.0;
     bool   has_orbit = false;
     OrbitConfig orbit;
 };
@@ -51,6 +53,7 @@ struct MaterialConfig {
     double ior       = 1.5;
     Color  emission  = Color(0, 0, 0);
     Color  absorption = Color(0, 0, 0);
+    double roughness = -1.0;
 };
 
 struct ObjectConfig {
@@ -58,6 +61,7 @@ struct ObjectConfig {
     std::string material;   // material name reference
     Vec3   center, point, normal;
     double radius = 1.0;
+    Vec3   size = Vec3(1, 1, 1);
     Vec3   v0, v1, v2;
 };
 
@@ -116,7 +120,9 @@ inline CameraConfig parse_camera(const JsonValue& v) {
     if (v.has("eye"))    c.eye    = to_vec3(v["eye"]);
     if (v.has("lookat")) c.lookat = to_vec3(v["lookat"]);
     if (v.has("up"))     c.up     = to_vec3(v["up"]);
-    if (v.has("vfov"))   c.vfov   = v["vfov"].as_num();
+    if (v.has("vfov"))       c.vfov       = v["vfov"].as_num();
+    if (v.has("aperture"))   c.aperture   = v["aperture"].as_num();
+    if (v.has("focus_dist")) c.focus_dist = v["focus_dist"].as_num();
     if (v.has("orbit")) {
         c.has_orbit = true;
         c.orbit = to_orbit(v["orbit"]);
@@ -137,6 +143,7 @@ inline MaterialConfig parse_material(const std::string& name, const JsonValue& v
     if (v.has("ior"))          m.ior          = v["ior"].as_num();
     if (v.has("emission"))     m.emission     = to_vec3(v["emission"]);
     if (v.has("absorption"))   m.absorption   = to_vec3(v["absorption"]);
+    if (v.has("roughness"))    m.roughness    = v["roughness"].as_num();
     return m;
 }
 
@@ -148,6 +155,7 @@ inline ObjectConfig parse_object(const JsonValue& v) {
     if (v.has("radius")) o.radius = v["radius"].as_num();
     if (v.has("point"))  o.point  = to_vec3(v["point"]);
     if (v.has("normal")) o.normal = to_vec3(v["normal"]);
+    if (v.has("size"))   o.size   = to_vec3(v["size"]);
     if (v.has("v0"))     o.v0     = to_vec3(v["v0"]);
     if (v.has("v1"))     o.v1     = to_vec3(v["v1"]);
     if (v.has("v2"))     o.v2     = to_vec3(v["v2"]);
@@ -240,6 +248,7 @@ inline Scene build_scene_from_config(const SceneConfig& cfg, double aspect,
             // Unknown type, fall back to diffuse
             m = Material::diffuse(mc.albedo);
         }
+        if (mc.roughness >= 0) m.roughness = mc.roughness;
         int idx = s.add_material(m);
         mat_map[mc.name] = idx;
     }
@@ -260,6 +269,8 @@ inline Scene build_scene_from_config(const SceneConfig& cfg, double aspect,
             s.add_plane(oc.point, oc.normal, mi);
         } else if (oc.type == "triangle") {
             s.add_triangle(oc.v0, oc.v1, oc.v2, mi);
+        } else if (oc.type == "box") {
+            s.add_box(oc.center, oc.size, mi);
         } else {
             throw std::runtime_error("scene: unknown object type '" + oc.type + "'");
         }
@@ -272,10 +283,12 @@ inline Scene build_scene_from_config(const SceneConfig& cfg, double aspect,
         Vec3 eye(orb.center.x + orb.radius * std::sin(angle),
                  orb.height,
                  orb.center.z + orb.radius * std::cos(angle));
-        s.camera = Camera(eye, cfg.camera.lookat, cfg.camera.up, cfg.camera.vfov, aspect);
+        s.camera = Camera(eye, cfg.camera.lookat, cfg.camera.up, cfg.camera.vfov, aspect,
+                          cfg.camera.aperture, cfg.camera.focus_dist);
     } else {
         s.camera = Camera(cfg.camera.eye, cfg.camera.lookat, cfg.camera.up,
-                          cfg.camera.vfov, aspect);
+                          cfg.camera.vfov, aspect,
+                          cfg.camera.aperture, cfg.camera.focus_dist);
     }
 
     // --- Lights (with optional orbit animation) ---

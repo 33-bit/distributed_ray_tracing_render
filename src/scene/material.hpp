@@ -15,6 +15,7 @@ struct Material {
     Color   emission    = Color(0, 0, 0);        // self-emitted light
     double  ior         = 1.5;                   // index of refraction (Dielectric)
     Color   absorption  = Color(0, 0, 0);        // Beer-Lambert absorption/unit length (tinted glass)
+    double  roughness   = 0.0;                   // reflection blur (0=mirror, >0=frosted)
 
     // Procedural checkerboard: when set, the diffuse albedo alternates between
     // `albedo` and `albedo2` in world-space cells of size 1/checker_scale.
@@ -29,7 +30,10 @@ struct Material {
     }
     static Material glossy(const Color& a, double spec, double shin) {
         Material m; m.type = MatType::Specular; m.albedo = a;
-        m.specular = spec; m.shininess = shin; return m;
+        m.specular = spec; m.shininess = shin;
+        m.reflectivity = spec * 0.3;
+        m.roughness = 1.0 / (1.0 + shin / 8.0);
+        return m;
     }
     static Material mirror(const Color& a, double refl) {
         Material m; m.type = MatType::Reflective; m.albedo = a;
