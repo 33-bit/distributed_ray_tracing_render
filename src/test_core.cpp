@@ -20,6 +20,8 @@
 #include "scene/triangle.hpp"
 #include "scene/box.hpp"
 #include "scene/camera.hpp"
+#include "scene/aabb.hpp"
+#include "scene/bvh.hpp"
 // modules under test (Member B — shading)
 #include <vector>
 #include "scene/material.hpp"
@@ -232,6 +234,50 @@ int main() {
         Material cg = Material::colored_glass(1.5, Color(0.0, 0.4, 0.4));
         CHECK(cg.type == MatType::Dielectric && cg.absorption.y > 0.0);
         CHECK(std::exp(-cg.absorption.y * 4.0) < std::exp(-cg.absorption.y * 0.5));
+    }
+
+    // BVH (Member A — optional acceleration, off by default; see Scene::use_bvh)
+    {
+        // AABB::hit: a ray straight through the box hits; one that passes
+        // beside it misses.
+        AABB box(Vec3(-1, -1, -1), Vec3(1, 1, 1));
+        CHECK(box.hit(Ray(Vec3(0, 0, -5), Vec3(0, 0, 1)), 0.0, INF));
+        CHECK(!box.hit(Ray(Vec3(5, 5, -5), Vec3(0, 0, 1)), 0.0, INF));
+
+        // A scattered cluster of spheres + triangles, enough to force the
+        // median split past a single leaf. Compare every hit against a plain
+        // linear scan over the same object list — the BVH must agree exactly.
+        std::vector<std::unique_ptr<Hittable>> owned;
+        for (int i = 0; i < 6; ++i)
+            owned.push_back(std::make_unique<Sphere>(Vec3(i * 2.0 - 5.0, 0, 0), 0.6, 0));
+        owned.push_back(std::make_unique<Triangle>(Vec3(-1, 3, -1), Vec3(1, 3, -1), Vec3(0, 4, -1), 0));
+        owned.push_back(std::make_unique<Box>(Vec3(0, -3, 0), Vec3(1, 1, 1), 0));
+
+        std::vector<Hittable*> objs;
+        for (auto& o : owned) objs.push_back(o.get());
+        std::unique_ptr<BVHNode> bvh = BVHNode::build(objs, 0, objs.size());
+
+        auto linear_hit = [&](const Ray& r, HitRecord& rec) {
+            bool found = false; double closest = INF; HitRecord tmp;
+            for (Hittable* o : objs)
+                if (o->hit(r, 0.0, closest, tmp)) { found = true; closest = tmp.t; rec = tmp; }
+            return found;
+        };
+
+        int agreements = 0;
+        for (int i = 0; i < 9; ++i) {
+            // Rays aimed across the spheres' row, the triangle, and the box,
+            // plus a couple that should miss everything.
+            Ray r(Vec3(i * 1.5 - 6.0, (i % 3 == 0) ? 3.5 : ((i % 3 == 1) ? -3 : 0), -10),
+                  Vec3(0, 0, 1));
+            HitRecord rec_lin, rec_bvh;
+            bool hit_lin = linear_hit(r, rec_lin);
+            bool hit_bvh = bvh->hit(r, 0.0, INF, rec_bvh);
+            CHECK(hit_lin == hit_bvh);
+            if (hit_lin && hit_bvh) CHECK(approx(rec_lin.t, rec_bvh.t, 1e-6));
+            if (hit_lin == hit_bvh) ++agreements;
+        }
+        CHECK(agreements == 9);
     }
 
     std::printf("%d checks, %d failures\n", g_checks, g_failures);

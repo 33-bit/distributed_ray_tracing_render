@@ -18,6 +18,7 @@
 #include "scene/box.hpp"
 #include "scene/material.hpp"
 #include "scene/light.hpp"
+#include "scene/bvh.hpp"
 #include "render/shading.hpp"   // ISceneQuery
 
 struct Scene : ISceneQuery {
@@ -28,17 +29,46 @@ struct Scene : ISceneQuery {
     Color  bg_top    = Color(0.45, 0.62, 0.95);   // sky
     Color  bg_bottom = Color(0.95, 0.95, 0.98);    // horizon haze
 
+    // Optional BVH acceleration (off by default — see RenderParams::use_bvh).
+    // Built once after the scene's objects are all added; unbounded objects
+    // (infinite planes) are kept in their own list and always tested linearly.
+    bool use_bvh = false;
+    std::unique_ptr<BVHNode> bvh_root;
+    std::vector<Hittable*> unbounded_objects;
+
     int add_material(const Material& m) { materials.push_back(m); return static_cast<int>(materials.size()) - 1; }
     void add_sphere(const Vec3& c, double r, int mat) { objects.push_back(std::make_unique<Sphere>(c, r, mat)); }
     void add_plane(const Vec3& p, const Vec3& n, int mat) { objects.push_back(std::make_unique<Plane>(p, n, mat)); }
     void add_triangle(const Vec3& a, const Vec3& b, const Vec3& c, int mat) { objects.push_back(std::make_unique<Triangle>(a, b, c, mat)); }
     void add_box(const Vec3& center, const Vec3& size, int mat) { objects.push_back(std::make_unique<Box>(center, size, mat)); }
 
+    // Split objects into a BVH (bounded primitives) + a small linear list
+    // (unbounded primitives, e.g. planes) and build the tree. Call after every
+    // object has been added; safe to call again if the object list changes.
+    void enable_bvh(bool on) {
+        use_bvh = on;
+        if (!on) return;
+        std::vector<Hittable*> bounded;
+        unbounded_objects.clear();
+        AABB box;
+        for (const auto& o : objects) {
+            if (o->bounding_box(box)) bounded.push_back(o.get());
+            else unbounded_objects.push_back(o.get());
+        }
+        bvh_root = bounded.empty() ? nullptr : BVHNode::build(bounded, 0, bounded.size());
+    }
+
     // --- ISceneQuery ---
     bool hit(const Ray& r, double tmin, double tmax, HitRecord& rec) const override {
         bool found = false;
         double closest = tmax;
         HitRecord tmp;
+        if (use_bvh && bvh_root) {
+            if (bvh_root->hit(r, tmin, closest, tmp)) { found = true; closest = tmp.t; rec = tmp; }
+            for (Hittable* o : unbounded_objects)
+                if (o->hit(r, tmin, closest, tmp)) { found = true; closest = tmp.t; rec = tmp; }
+            return found;
+        }
         for (const auto& o : objects)
             if (o->hit(r, tmin, closest, tmp)) { found = true; closest = tmp.t; rec = tmp; }
         return found;

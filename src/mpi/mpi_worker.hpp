@@ -33,11 +33,13 @@ inline void run_worker(const RenderParams& base, BenchLog& log, bool prefetch = 
     int   cached_frame = 0;
     Scene scene = cfg ? build_scene_from_config(*cfg, aspect, 0, base.total_frames)
                       : build_demo_scene(aspect, 0, base.total_frames);
+    scene.enable_bvh(base.use_bvh);
 
     auto render = [&](const Task& task) {
         if (task.frame != cached_frame) {
             scene = cfg ? build_scene_from_config(*cfg, aspect, task.frame, base.total_frames)
                         : build_demo_scene(aspect, task.frame, base.total_frames);
+            scene.enable_bvh(base.use_bvh);
             cached_frame = task.frame;
         }
         RenderParams p = base; p.frame = task.frame;

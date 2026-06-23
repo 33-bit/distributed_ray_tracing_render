@@ -7,6 +7,7 @@
 // ray; B can then light without re-checking orientation, and refraction (if
 // ever added) knows which side it entered from via `front_face`.
 #include "core/ray.hpp"
+#include "scene/aabb.hpp"
 
 struct HitRecord {
     double t;            // ray parameter at the hit
@@ -25,4 +26,8 @@ struct Hittable {
     virtual ~Hittable() = default;
     // Report the nearest hit in (tmin, tmax); return false if none.
     virtual bool hit(const Ray& r, double tmin, double tmax, HitRecord& rec) const = 0;
+    // Report a finite world-space bounding box for BVH construction (scene/bvh.hpp).
+    // Default: unbounded (e.g. an infinite Plane) — excluded from the BVH and
+    // always tested linearly alongside it.
+    virtual bool bounding_box(AABB& /*out*/) const { return false; }
 };

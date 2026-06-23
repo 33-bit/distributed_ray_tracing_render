@@ -1,0 +1,48 @@
+{
+  "background": {
+    "top": [0.45, 0.62, 0.95],
+    "bottom": [0.92, 0.93, 0.97]
+  },
+  "camera": {
+    "lookat": [0, 1, 0],
+    "up": [0, 1, 0],
+    "vfov": 42,
+    "orbit": {
+      "center": [0, 1, 0],
+      "radius": 6.5,
+      "height": 2.2,
+      "speed": 0.4,
+      "phase": -1.2566
+    }
+  },
+  "materials": {
+    "floor":  { "type": "checkerboard", "albedo": [0.85, 0.85, 0.85], "albedo2": [0.12, 0.12, 0.12], "scale": 1.0 },
+    "wall":   { "type": "diffuse", "albedo": [0.08, 0.08, 0.1] },
+    "glass":  { "type": "dielectric", "ior": 1.5 },
+    "mirror": { "type": "mirror", "albedo": [0.9, 0.9, 0.95], "reflectivity": 0.9 },
+    "red":    { "type": "diffuse", "albedo": [1.0, 0.25, 0.12] },
+    "accent": { "type": "diffuse", "albedo": [0.35, 0.25, 0.85] }
+  },
+  "objects": [
+    { "type": "plane",  "point": [0, 0, 0],  "normal": [0, 1, 0], "material": "floor" },
+    { "type": "plane",  "point": [0, 0, -4], "normal": [0, 0, 1], "material": "wall" },
+    { "type": "sphere", "center": [0, 1, 0],        "radius": 1.0, "material": "glass" },
+    { "type": "sphere", "center": [-2.2, 0.8, 0.2], "radius": 0.8, "material": "mirror" },
+    { "type": "sphere", "center": [2.0, 0.8, -0.3], "radius": 0.8, "material": "red" },
+    { "type": "sphere", "center": [0.3, 0.45, -1.8],"radius": 0.4, "material": "accent" }
+  ],
+  "lights": [
+    {
+      "type": "area",
+      "position": [-3, 5, 2],
+      "intensity": [1.05, 1.0, 0.9],
+      "radius": 2.0,
+      "orbit": {
+        "center": [-3, 3, 2],
+        "radius": 1.2,
+        "height": 5,
+        "speed": 0.15
+      }
+    }
+  ]
+}

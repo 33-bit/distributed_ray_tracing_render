@@ -71,12 +71,14 @@ inline void run_master(const RenderParams& base, const std::string& out_dir,
         int cached_frame = 0;
         Scene sc = cfg ? build_scene_from_config(*cfg, aspect, 0, base.total_frames)
                        : build_demo_scene(aspect, 0, base.total_frames);
+        sc.enable_bvh(base.use_bvh);
         for (const Task& tk : tasks) {
             RenderParams p = base; p.frame = tk.frame;
             t.start();
             if (tk.frame != cached_frame) {
                 sc = cfg ? build_scene_from_config(*cfg, aspect, tk.frame, base.total_frames)
                          : build_demo_scene(aspect, tk.frame, base.total_frames);
+                sc.enable_bvh(base.use_bvh);
                 cached_frame = tk.frame;
             }
             Renderer::render_tile(sc, p, tk.tile, frame_buffer(tk.frame));

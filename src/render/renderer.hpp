@@ -18,6 +18,7 @@ struct RenderParams {
     int shadow_samples = 1;      // soft-shadow rays per light (area lights)
     int frame = 0, total_frames = 1;
     int tile_size = 32;          // granularity knob
+    bool use_bvh = false;        // --bvh: accelerate Scene::hit() with a BVH
 };
 
 struct Renderer {

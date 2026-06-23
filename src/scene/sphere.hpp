@@ -36,4 +36,9 @@ struct Sphere : Hittable {
         rec.material_id = material_id;
         return true;
     }
+
+    bool bounding_box(AABB& out) const override {
+        out = AABB(center - Vec3(radius, radius, radius), center + Vec3(radius, radius, radius));
+        return true;
+    }
 };

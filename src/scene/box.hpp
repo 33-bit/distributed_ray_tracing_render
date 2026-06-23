@@ -60,4 +60,9 @@ struct Box : Hittable {
         }
         return false;
     }
+
+    bool bounding_box(AABB& out) const override {
+        out = AABB(bmin, bmax);
+        return true;
+    }
 };

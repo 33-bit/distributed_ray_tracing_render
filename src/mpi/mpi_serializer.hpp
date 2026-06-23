@@ -28,13 +28,13 @@ namespace mpi_proto {
 inline void encode_params(const RenderParams& p, int out[8]) {
     out[0] = p.width;  out[1] = p.height;        out[2] = p.spp;
     out[3] = p.max_depth; out[4] = p.shadow_samples;
-    out[5] = p.total_frames; out[6] = p.tile_size; out[7] = 0;  // reserved
+    out[5] = p.total_frames; out[6] = p.tile_size; out[7] = p.use_bvh ? 1 : 0;
 }
 inline RenderParams decode_params(const int in[8]) {
     RenderParams p;
     p.width = in[0]; p.height = in[1]; p.spp = in[2];
     p.max_depth = in[3]; p.shadow_samples = in[4];
-    p.total_frames = in[5]; p.tile_size = in[6];
+    p.total_frames = in[5]; p.tile_size = in[6]; p.use_bvh = (in[7] != 0);
     return p;
 }
 

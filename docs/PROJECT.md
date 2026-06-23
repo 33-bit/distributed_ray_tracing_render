@@ -31,6 +31,21 @@ performance and a provable correctness guarantee against a sequential baseline.
 sphere, a glossy gold sphere, and a triangle pyramid, under a soft area light
 plus a cyan spotlight. Minecraft-themed scenes use axis-aligned boxes for blocks.*
 
+![Mirror glass gallery](results/mirror_glass_gallery_sample.png)
+
+*`scenes/mirror_glass_gallery.json`: checker floor, dark back wall, a glass
+sphere, a mirror sphere, a red diffuse sphere, a small purple accent sphere,
+under a soft area light that sways gently while the camera orbits a 144° front
+arc (a full 360° orbit would swing the camera behind the back wall — see the
+journal). Rendered with `--bvh` on this machine: `mpirun -np 8 ./raytracer_mpi
+--scene scenes/mirror_glass_gallery.json --width 480 --height 270 --spp 64
+--depth 6 --shadow-samples 16 --frames 48 --tile 32 --schedule dynamic --bvh`
+→ **makespan 294.0 s**, 7 workers, **0.0 % load imbalance**
+(`docs/results/master_run.csv`); preview video at
+`docs/results/mirror_glass_gallery_preview.mp4`. (A quick spp 8 / shadow 4 pass
+renders in 11.5 s but is visibly grainy — Monte Carlo noise, not blur; spp 64 /
+shadow 16 is the converged look at ~26× the cost.)
+
 ---
 
 ## 1. Why ray tracing, and why parallelize it?
@@ -259,7 +274,7 @@ compare_frames.py, assemble_video.sh}`.
 
 ```bash
 # unit tests (Members A & B)
-make test                 # 42 checks
+make test                 # 69 checks
 
 # sequential baseline
 make seq
@@ -276,6 +291,9 @@ mpirun --bind-to none -np 4 ./raytracer_mpi --threads 2 --frames 48
 # non-blocking prefetch
 mpirun -np 8 ./raytracer_mpi --prefetch --frames 48
 
+# BVH acceleration (optional, off by default; identical output, fewer hit tests)
+./raytracer_seq --scene scenes/mirror_glass_gallery.json --bvh --frames 48
+
 # video, experiments, charts, correctness
 tools/assemble_video.sh frames output/render.mp4 24
 tools/run_experiments.sh
@@ -284,7 +302,8 @@ python3 tools/compare_frames.py frames_seq frames_mpi
 ```
 
 CLI flags: `--width --height --spp --depth --shadow-samples --frames --tile
---schedule {dynamic|static} --threads <n> --prefetch --out <dir> --bench <csv>`.
+--schedule {dynamic|static} --threads <n> --prefetch --bvh --out <dir>
+--bench <csv> --scene <json>`.
 
 **Multi-machine note:** on a real cluster, add a hostfile —
 `mpirun --hostfile hosts -np 12 ./raytracer_mpi ...`. The code is unchanged; only
@@ -296,6 +315,7 @@ the launch differs. (For grading, `-np` on one node simulates the cluster.)
 src/
   core/      vec3 ray color random timer            (A, +D timer)
   scene/     object camera sphere plane triangle box (A)  # box = AABB slab method
+             aabb bvh                                (A)  # optional BVH accel, off by default
              material light                          (B)
              scene scene_parser json_parser           (D)  # JSON scene loading
   render/    shading                                 (B)  # path-traced GI + ACES tonemap
@@ -316,8 +336,10 @@ video; byte-exact correctness; full benchmark suite (speedup, granularity, load
 balance, hybrid); **path-traced global illumination** (cosine-weighted importance
 sampling + Russian Roulette); **ACES filmic tone mapping**; **rough reflections**
 for glossy materials; **depth of field** (thin-lens camera); **JSON scene configs**
-(30 scenes including 22 Minecraft-themed with box blocks + cathedral, hall of
-mirrors, frozen throne).
+(32 scenes including 24 Minecraft-themed with box blocks + cathedral, hall of
+mirrors, frozen throne, **mirror glass gallery**); optional **BVH** acceleration
+(`--bvh`, off by default — median-split tree over bounded primitives, planes
+stay linear, byte-identical output to the linear scan).
 
 **Known limitations (honest):**
 - Rank 0 is a dedicated coordinator, so flat-MPI speedup is capped at P−1 cores.
@@ -329,12 +351,14 @@ mirrors, frozen throne).
 - Tested on one 8-core node (`-np` simulates the cluster). The code is
   cluster-ready (`mpirun --hostfile`), but multi-node numbers aren't measured
   here — the prefetch benefit in particular would be larger across a network.
-- No spatial acceleration structure (BVH): every ray tests every object. Fine for
-  this scene; would matter for large ones.
+- The BVH uses a simple median split (not SAH) and is off by default, since the
+  current scenes (≤10 bounded objects) are too small for it to show a measurable
+  speedup — it exists for when a scene grows larger.
 
-**Deferred (per proposal §13):** BVH, textures, triangle *meshes* (the triangle
+**Deferred (per proposal §13):** textures, triangle *meshes* (the triangle
 primitive exists; mesh loading does not). Non-blocking MPI and the hybrid, listed
-as optional sophistication, are **implemented**. Path-traced GI, ACES tone mapping,
+as optional sophistication, are **implemented**, and **BVH** (also listed as
+optional/last) is now **implemented** too. Path-traced GI, ACES tone mapping,
 box primitive, depth of field, and JSON scene configs were added post-proposal to
 bring rendering quality closer to GPU ray tracing standards.
 

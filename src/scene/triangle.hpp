@@ -41,4 +41,14 @@ struct Triangle : Hittable {
         rec.material_id = material_id;
         return true;
     }
+
+    bool bounding_box(AABB& out) const override {
+        Vec3 lo(std::min({v0.x, v1.x, v2.x}), std::min({v0.y, v1.y, v2.y}), std::min({v0.z, v1.z, v2.z}));
+        Vec3 hi(std::max({v0.x, v1.x, v2.x}), std::max({v0.y, v1.y, v2.y}), std::max({v0.z, v1.z, v2.z}));
+        // Pad a flat triangle's degenerate axis so the slab test never sees a
+        // zero-thickness box (which would make a ray exactly in-plane miss it).
+        const Vec3 pad(1e-4, 1e-4, 1e-4);
+        out = AABB(lo - pad, hi + pad);
+        return true;
+    }
 };

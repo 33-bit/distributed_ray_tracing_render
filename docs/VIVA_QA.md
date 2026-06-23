@@ -235,10 +235,22 @@ isn't the bottleneck here. The overlap pays off as network latency grows (a real
 cluster). Showing comm is *not* the bottleneck is itself a valid result.
 
 **Q. What would you improve with more time?**
-Let the master render when idle (recover the core); add a BVH so large scenes
-scale; run a true multi-node weak-scaling study; add a denoiser (e.g. OIDN) for
-clean low-spp renders; volumetric fog/atmosphere; procedural textures (noise,
-marble, wood grain).
+Let the master render when idle (recover the core); run a true multi-node
+weak-scaling study; add a denoiser (e.g. OIDN) for clean low-spp renders;
+volumetric fog/atmosphere; procedural textures (noise, marble, wood grain).
+(A BVH was on this list — it's now implemented, `--bvh`, off by default; see
+below.)
+
+**Q. You mentioned a BVH was deferred — what does it look like now?**
+`scene/bvh.hpp`: a median-split tree over every bounded primitive (sphere,
+triangle, box) — split on the bounding box's longest axis, sort by centroid,
+divide in half, leaf size 4. Planes are unbounded (`bounding_box()` returns
+false for them) so they stay in a small linear list checked alongside the
+tree. It's opt-in (`--bvh`, default off) and verified MSE = 0 against the
+linear scan on every scene tested — the only thing it changes is how many
+ray–object tests run, not the result. It's off by default because the current
+scenes have at most ~10 bounded objects, too few for a tree to beat a linear
+scan; it exists for when a scene grows much larger.
 
 ---
 

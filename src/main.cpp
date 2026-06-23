@@ -60,6 +60,7 @@ static Options parse_args(int argc, char** argv) {
         else if (a == "--threads")        o.threads               = std::atoi(val());
         else if (a == "--prefetch")       o.prefetch              = true;
         else if (a == "--scene")          o.scene_file            = val();
+        else if (a == "--bvh")            o.params.use_bvh        = true;
         else { std::fprintf(stderr, "unknown arg: %s\n", a.c_str()); }
     }
     return o;
@@ -74,6 +75,7 @@ double render_frame_sequential(const RenderParams& base, int frame,
     double aspect = static_cast<double>(p.width) / p.height;
     Scene scene = cfg ? build_scene_from_config(*cfg, aspect, frame, p.total_frames)
                       : build_demo_scene(aspect, frame, p.total_frames);
+    scene.enable_bvh(p.use_bvh);
     Image img(p.width, p.height);
     std::vector<Tile> tiles = make_tiles(p.width, p.height, p.tile_size);
 

@@ -160,3 +160,53 @@ precomputed plane. Double-sided. Wired a 4-triangle pyramid into the demo scene.
 
 **Tests: +4** (hit at `t=2` with a camera-facing normal; miss outside the
 triangle). Member A main code now ~273 LOC.
+
+### 2026-06-23 — Optional BVH (`aabb.hpp`, `bvh.hpp`)
+
+**Idea.** §13 of the proposal deferred a BVH ("only if time permits, and don't
+let it break the demo"). `Scene::hit()` was a flat O(n) scan over every object,
+fine for a handful of spheres but the obvious next bottleneck once a scene
+grows. Added it last, behind a flag, exactly as scoped.
+
+**What I did.** `AABB` (`aabb.hpp`) is the same Kay–Kajiya slab test as
+`Box::hit()`, but boolean-only — the tree only needs "does this ray enter the
+box", not a hit record. `Hittable` gained one new virtual,
+`bounding_box(AABB&)`, defaulting to `return false` (unbounded — that's what
+lets `Plane` opt out with zero code). `Sphere`, `Triangle`, `Box` each
+implement it. `BVHNode` (`bvh.hpp`) recursively splits a list of bounded
+`Hittable*` on the box's longest axis, sorts by centroid, divides in half;
+leaves hold ≤4 objects and fall back to a linear scan among just those.
+
+`Scene` gained `use_bvh` (default `false`) and `enable_bvh(bool)`: when
+called, it partitions `objects` into "has a bounding box" (goes in the tree)
+vs "doesn't" (planes — stays in a small linear list, always tested). When
+`use_bvh` is false, `Scene::hit()` is byte-for-byte the original linear loop —
+I didn't touch that path at all, to keep the change provably additive.
+
+**Why this, not the alternative.**
+- *Median split, not SAH (surface-area heuristic).* SAH builds a better tree
+  but costs more to build and is real complexity for scenes with ≤10 objects —
+  not worth it here. Median split is O(n log n) to build, easy to verify, and
+  the right amount of acceleration for this project's scenes.
+- *Default off, opt-in `--bvh`.* Keeps every existing render, test, and
+  benchmark number in `docs/PROJECT.md` §6 unchanged — nothing regresses by
+  landing this. It's there for whoever scales the scene up later.
+- *Plane as a deliberate non-member of the tree*, rather than giving it a huge
+  fake bounding box. An infinite plane has no meaningful AABB; forcing one in
+  would either be wrong (too small, culls valid hits) or useless (so large the
+  tree never partitions around it). A handful of planes in a linear list costs
+  nothing.
+- *Wire protocol untouched.* `RenderParams::use_bvh` rides in the `reserved`
+  8th int of `mpi_serializer.hpp`'s `encode_params`/`decode_params` — no change
+  to the broadcast size or any other rank's code.
+
+**Verification.** `make test`: 69 checks (was 54) — added an `AABB::hit()`
+direct test plus a 9-ray sweep across a 6-sphere row + a triangle + a box,
+comparing the BVH's hit (`t`, `material_id`) against a plain linear scan
+object-by-object; all agree exactly. Beyond unit tests: rendered
+`scenes/mirror_glass_gallery.json` and the default demo scene with `--bvh` on
+vs off (sequential and MPI, `-np 1` vs `-np 4`) — `tools/compare_frames.py`
+reports MSE = 0 in every case. The BVH changes *how many* ray–object tests
+run, never the result.
+
+**Tests: +15.** Member A main code now ~390 LOC, 43 unit tests.
