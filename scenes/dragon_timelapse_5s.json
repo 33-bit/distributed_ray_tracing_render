@@ -1,0 +1,145 @@
+{
+  "day_night": {
+    "day_top":     [0.38, 0.60, 0.95],
+    "day_bottom":  [0.92, 0.76, 0.52],
+    "night_top":   [0.01, 0.01, 0.06],
+    "night_bottom":[0.06, 0.04, 0.10]
+  },
+  "camera": {
+    "eye":        [9.55, 3.2, 9.55],
+    "lookat":     [0, 1.0, 0.0],
+    "up":         [0, 1, 0],
+    "vfov":       42,
+    "aperture":   0.04,
+    "focus_dist": 13.5
+  },
+  "materials": {
+    "floor": {
+      "type": "glossy",
+      "albedo": [0.35, 0.30, 0.24],
+      "specular": 0.18,
+      "shininess": 32
+    },
+    "dragon_scale": {
+      "type": "glossy",
+      "albedo": [0.55, 0.36, 0.14],
+      "specular": 0.55,
+      "shininess": 50
+    },
+    "gold_coin": {
+      "type": "glossy",
+      "albedo": [0.85, 0.65, 0.15],
+      "specular": 0.6,
+      "shininess": 60
+    },
+    "ruby_gem": {
+      "type": "mirror",
+      "albedo": [0.85, 0.15, 0.18],
+      "reflectivity": 0.85
+    },
+    "emerald_gem": {
+      "type": "mirror",
+      "albedo": [0.15, 0.75, 0.38],
+      "reflectivity": 0.85
+    },
+    "sapphire_gem": {
+      "type": "mirror",
+      "albedo": [0.2, 0.4, 0.88],
+      "reflectivity": 0.85
+    },
+    "sun_glow": {
+      "type": "emissive",
+      "day_emission":   [12.0, 9.5, 5.0],
+      "night_emission": [0.0,  0.0, 0.0]
+    },
+    "moon_glow": {
+      "type": "emissive",
+      "day_emission":   [0.0,  0.0, 0.0],
+      "night_emission": [2.2,  2.8, 5.5]
+    }
+  },
+  "objects": [
+    {
+      "type": "plane",
+      "point": [0, 0, 0],
+      "normal": [0, 1, 0],
+      "material": "floor"
+    },
+    {
+      "type": "mesh",
+      "path": "assets/meshes/dragonstl/stl/Dragon 2.5_stl.stl",
+      "scale": 0.06,
+      "rotate": [-90, 0, 0],
+      "translate": [-0.0066, 0.0066, -0.9615],
+      "material": "dragon_scale"
+    },
+    {
+      "type": "sphere",
+      "radius": 0.38,
+      "material": "sun_glow",
+      "orbit": {
+        "center":   [0, 0, 0],
+        "radius":   9.5,
+        "height":   0.3,
+        "speed":    1.0,
+        "phase":    1.5707963,
+        "tilt_deg": 85
+      }
+    },
+    {
+      "type": "sphere",
+      "radius": 0.28,
+      "material": "moon_glow",
+      "orbit": {
+        "center":   [0, 0, 0],
+        "radius":   9.5,
+        "height":   0.3,
+        "speed":    1.0,
+        "phase":    4.7123889,
+        "tilt_deg": 85
+      }
+    },
+    { "type": "sphere", "center": [-2.8, 0.18, 1.6],  "radius": 0.18, "material": "gold_coin" },
+    { "type": "sphere", "center": [-1.9, 0.16, 2.3],  "radius": 0.16, "material": "gold_coin" },
+    { "type": "sphere", "center": [-1.0, 0.22, 1.4],  "radius": 0.22, "material": "ruby_gem" },
+    { "type": "sphere", "center": [ 0.0, 0.17, 2.6],  "radius": 0.17, "material": "gold_coin" },
+    { "type": "sphere", "center": [ 0.9, 0.20, 1.3],  "radius": 0.20, "material": "emerald_gem" },
+    { "type": "sphere", "center": [ 1.8, 0.15, 2.1],  "radius": 0.15, "material": "gold_coin" },
+    { "type": "sphere", "center": [ 2.7, 0.19, 1.7],  "radius": 0.19, "material": "sapphire_gem" },
+    { "type": "sphere", "center": [-3.3, 0.16, 2.8],  "radius": 0.16, "material": "gold_coin" },
+    { "type": "sphere", "center": [ 3.2, 0.21, 2.5],  "radius": 0.21, "material": "ruby_gem" },
+    { "type": "sphere", "center": [-0.6, 0.14, 3.2],  "radius": 0.14, "material": "gold_coin" },
+    { "type": "sphere", "center": [-2.2, 0.18, 3.4],  "radius": 0.18, "material": "emerald_gem" },
+    { "type": "sphere", "center": [ 1.2, 0.16, 3.6],  "radius": 0.16, "material": "gold_coin" }
+  ],
+  "lights": [
+    {
+      "type": "area",
+      "day_intensity":   [2.8, 2.2, 1.4],
+      "night_intensity": [0.0, 0.0, 0.0],
+      "radius": 0.9,
+      "orbit": {
+        "center":   [0, 0, 0],
+        "radius":   9.5,
+        "height":   0.3,
+        "speed":    1.0,
+        "phase":    1.5707963,
+        "tilt_deg": 85
+      }
+    },
+    {
+      "type": "area",
+      "day_intensity":   [0.0,  0.0,  0.0],
+      "night_intensity": [0.32, 0.42, 0.95],
+      "radius": 0.7,
+      "orbit": {
+        "center":   [0, 0, 0],
+        "radius":   9.5,
+        "height":   0.3,
+        "speed":    1.0,
+        "phase":    4.7123889,
+        "tilt_deg": 85
+      }
+    }
+  ]
+}

@@ -18,6 +18,7 @@
 // silently mis-parsing it as binary.
 #include <cstdint>
 #include <cstdio>
+#include <cmath>
 #include <fstream>
 #include <stdexcept>
 #include <vector>
@@ -27,9 +28,31 @@ struct StlTriangle {
     Vec3 v0, v1, v2;
 };
 
+inline Vec3 rotate_xyz_deg(const Vec3& v, const Vec3& deg) {
+    const double rx = deg.x * PI / 180.0;
+    const double ry = deg.y * PI / 180.0;
+    const double rz = deg.z * PI / 180.0;
+
+    Vec3 p = v;
+    if (deg.x != 0.0) {
+        double c = std::cos(rx), s = std::sin(rx);
+        p = Vec3(p.x, p.y * c - p.z * s, p.y * s + p.z * c);
+    }
+    if (deg.y != 0.0) {
+        double c = std::cos(ry), s = std::sin(ry);
+        p = Vec3(p.x * c + p.z * s, p.y, -p.x * s + p.z * c);
+    }
+    if (deg.z != 0.0) {
+        double c = std::cos(rz), s = std::sin(rz);
+        p = Vec3(p.x * c - p.y * s, p.x * s + p.y * c, p.z);
+    }
+    return p;
+}
+
 // Reads `path`, applies a uniform scale then a translation to every vertex
 // (mesh-local space -> world space): world = local * scale + translate.
 inline std::vector<StlTriangle> load_stl(const std::string& path, double scale,
+                                         const Vec3& rotate_deg,
                                          const Vec3& translate) {
     std::ifstream f(path, std::ios::binary);
     if (!f.is_open())
@@ -60,13 +83,18 @@ inline std::vector<StlTriangle> load_stl(const std::string& path, double scale,
     for (uint32_t i = 0; i < count; ++i) {
         Vec3 n = read_vec3();   // face normal — ignored, Triangle derives its own
         (void)n;
-        Vec3 a = read_vec3() * scale + translate;
-        Vec3 b = read_vec3() * scale + translate;
-        Vec3 c = read_vec3() * scale + translate;
+        Vec3 a = rotate_xyz_deg(read_vec3() * scale, rotate_deg) + translate;
+        Vec3 b = rotate_xyz_deg(read_vec3() * scale, rotate_deg) + translate;
+        Vec3 c = rotate_xyz_deg(read_vec3() * scale, rotate_deg) + translate;
         uint16_t attr = 0;
         f.read(reinterpret_cast<char*>(&attr), 2);
         if (!f) throw std::runtime_error("mesh: STL file truncated mid-triangle: " + path);
         out.push_back(StlTriangle{a, b, c});
     }
     return out;
+}
+
+inline std::vector<StlTriangle> load_stl(const std::string& path, double scale,
+                                         const Vec3& translate) {
+    return load_stl(path, scale, Vec3(0, 0, 0), translate);
 }
