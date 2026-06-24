@@ -19,6 +19,7 @@
 
 #include "scene/json_parser.hpp"
 #include "scene/scene.hpp"
+#include "scene/stl_loader.hpp"
 
 // ---- Intermediate representation -----------------------------------------
 
@@ -57,12 +58,20 @@ struct MaterialConfig {
 };
 
 struct ObjectConfig {
-    std::string type;       // "sphere", "plane", "triangle"
+    std::string type;       // "sphere", "plane", "triangle", "box", "mesh"
     std::string material;   // material name reference
     Vec3   center, point, normal;
     double radius = 1.0;
     Vec3   size = Vec3(1, 1, 1);
     Vec3   v0, v1, v2;
+    // "mesh": binary STL file, loaded as a flat list of Triangle objects
+    // sharing one material (see scene/stl_loader.hpp). `path` is resolved
+    // relative to the current working directory, the same convention as the
+    // --scene flag itself — every MPI rank must see the same file at the
+    // same relative path (single-node/shared-filesystem only).
+    std::string path;
+    double mesh_scale = 1.0;
+    Vec3   mesh_translate = Vec3(0, 0, 0);
 };
 
 struct LightConfig {
@@ -159,6 +168,9 @@ inline ObjectConfig parse_object(const JsonValue& v) {
     if (v.has("v0"))     o.v0     = to_vec3(v["v0"]);
     if (v.has("v1"))     o.v1     = to_vec3(v["v1"]);
     if (v.has("v2"))     o.v2     = to_vec3(v["v2"]);
+    if (v.has("path"))   o.path   = v["path"].as_str();
+    if (v.has("scale"))  o.mesh_scale = v["scale"].as_num();
+    if (v.has("translate")) o.mesh_translate = to_vec3(v["translate"]);
     return o;
 }
 
@@ -271,6 +283,9 @@ inline Scene build_scene_from_config(const SceneConfig& cfg, double aspect,
             s.add_triangle(oc.v0, oc.v1, oc.v2, mi);
         } else if (oc.type == "box") {
             s.add_box(oc.center, oc.size, mi);
+        } else if (oc.type == "mesh") {
+            for (const StlTriangle& t : load_stl(oc.path, oc.mesh_scale, oc.mesh_translate))
+                s.add_triangle(t.v0, t.v1, t.v2, mi);
         } else {
             throw std::runtime_error("scene: unknown object type '" + oc.type + "'");
         }

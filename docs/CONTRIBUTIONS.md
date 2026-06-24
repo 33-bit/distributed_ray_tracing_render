@@ -13,7 +13,7 @@ this measure alone.
 | **A** | Rendering core & math | `Vec3` algebra · ray · pixel-seeded deterministic **RNG** + cosine-weighted hemisphere sampling · pinhole/**thin-lens DOF** camera · ray–**sphere**/plane/**triangle**/**box (AABB)** intersection · `Hittable`/`HitRecord` interface · optional **BVH** accel (median-split, off by default) | **~390** | 43 |
 | **B** | Lighting, materials, shading | **Path-traced GI** (indirect diffuse bounce + Russian Roulette) · Phong diffuse+specular · hard + **soft shadows** (Monte Carlo) · recursive **reflection** + Schlick **Fresnel** · **rough reflections** (glossy) · **refraction** (Snell, TIR, Beer–Lambert glass) · **spotlight** + attenuation · checker texture · gamma + **ACES filmic** tone-map · all behind the `ISceneQuery` interface | **~300** | 26 |
 | **C** | MPI scheduling & communication | dynamic **master–worker** (`MPI_ANY_SOURCE`) · static baseline · scene/tile **serializer** · per-rank comp/comm/idle timing (`MPI_Gather`) · **MPI+OpenMP hybrid** · **non-blocking prefetch** (depth-2 dispatch + `Isend`/`Irecv`) | **322** | end-to-end |
-| **D** | Integration, benchmark, animation, video | `Scene` + `Renderer` glue · **anti-aliasing** · PPM image I/O · **animation** (orbiting camera + sweeping light) · **JSON scene parser** (32 scenes) · CLI/`main` · timing + **CSV** · **MSE correctness tool** · experiment runner · **charts** · ffmpeg **video** | **~450** | end-to-end |
+| **D** | Integration, benchmark, animation, video | `Scene` + `Renderer` glue · **anti-aliasing** · PPM image I/O · **animation** (orbiting camera + sweeping light) · **JSON scene parser** (33 scenes) · CLI/`main` · timing + **CSV** · **MSE correctness tool** · experiment runner · **charts** · ffmpeg **video** | **~450** | end-to-end |
 
 Member D additionally owns the ~435-line **report/tooling layer** (not counted
 above so it doesn't inflate the comparison): `benchmark/{benchmark,csv_logger}` +
@@ -56,13 +56,15 @@ member has a clear interface and nobody blocks anyone else:
 - **All 5 parallel modes** — dynamic, static, hybrid, prefetch, hybrid+prefetch —
   produce **byte-identical** output to the sequential baseline (MSE = 0). The
   optional `--bvh` accelerator is also MSE = 0 against the linear scan, on
-  every scene tested, sequential and MPI.
+  every scene tested, sequential and MPI — and **2.37× faster** (120.7 s →
+  51.0 s, single 480×270 frame) on the 93-object sphere field showcase scene,
+  the first scene with enough bounded objects for the tree to pay off.
 - Full experiment suite: speedup/efficiency, granularity, dynamic-vs-static load
   balance, and the MPI×OpenMP hybrid split (`docs/PROJECT.md` §6,
   `docs/results/`).
-- **32 JSON scene configs** (24 Minecraft-themed with box blocks, Cornell box,
+- **33 JSON scene configs** (24 Minecraft-themed with box blocks, Cornell box,
   glass spheres, spotlight show, demo, cathedral, hall of mirrors, frozen throne,
-  mirror glass gallery, cinematic village).
+  mirror glass gallery, sphere field showcase, cinematic village).
 
 _See each member's journal in `docs/members/` for the step-by-step reasoning, and
 `docs/VIVA_QA.md` for the "explain your part" pitches._

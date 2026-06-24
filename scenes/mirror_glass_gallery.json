@@ -1,18 +1,20 @@
 {
   "background": {
-    "top": [0.45, 0.62, 0.95],
-    "bottom": [0.92, 0.93, 0.97]
+    "top": [0.35, 0.5, 0.92],
+    "bottom": [0.96, 0.94, 0.9]
   },
   "camera": {
     "lookat": [0, 1, 0],
     "up": [0, 1, 0],
     "vfov": 42,
+    "aperture": 0.12,
+    "focus_dist": 6.5,
     "orbit": {
       "center": [0, 1, 0],
       "radius": 6.5,
       "height": 2.2,
-      "speed": 0.4,
-      "phase": -1.2566
+      "speed": 0.5,
+      "phase": -1.5708
     }
   },
   "materials": {
@@ -21,15 +23,28 @@
     "glass":  { "type": "dielectric", "ior": 1.5 },
     "mirror": { "type": "mirror", "albedo": [0.9, 0.9, 0.95], "reflectivity": 0.9 },
     "red":    { "type": "diffuse", "albedo": [1.0, 0.25, 0.12] },
-    "accent": { "type": "diffuse", "albedo": [0.35, 0.25, 0.85] }
+    "accent": { "type": "diffuse", "albedo": [0.35, 0.25, 0.85] },
+    "emerald_glow": { "type": "emissive", "emission": [0.15, 1.6, 0.65] },
+    "amber_glow":   { "type": "emissive", "emission": [1.7, 0.95, 0.2] },
+    "sapphire_glow": { "type": "emissive", "emission": [0.25, 0.55, 1.8] },
+    "pillar": { "type": "glossy", "albedo": [0.55, 0.55, 0.6], "specular": 0.5, "shininess": 32 }
   },
   "objects": [
     { "type": "plane",  "point": [0, 0, 0],  "normal": [0, 1, 0], "material": "floor" },
     { "type": "plane",  "point": [0, 0, -4], "normal": [0, 0, 1], "material": "wall" },
+
     { "type": "sphere", "center": [0, 1, 0],        "radius": 1.0, "material": "glass" },
     { "type": "sphere", "center": [-2.2, 0.8, 0.2], "radius": 0.8, "material": "mirror" },
     { "type": "sphere", "center": [2.0, 0.8, -0.3], "radius": 0.8, "material": "red" },
-    { "type": "sphere", "center": [0.3, 0.45, -1.8],"radius": 0.4, "material": "accent" }
+    { "type": "sphere", "center": [0.3, 0.45, -1.8],"radius": 0.4, "material": "accent" },
+
+    { "type": "box", "center": [-4.6, 1.5, -3.5], "size": [0.5, 3.0, 0.5], "material": "pillar" },
+    { "type": "box", "center": [4.6, 1.5, -3.5],  "size": [0.5, 3.0, 0.5], "material": "pillar" },
+
+    { "type": "sphere", "center": [-4.0, 2.6, -2.6], "radius": 0.22, "material": "emerald_glow" },
+    { "type": "sphere", "center": [4.0, 2.3, -2.3],  "radius": 0.22, "material": "amber_glow" },
+    { "type": "sphere", "center": [-3.0, 0.35, 2.6], "radius": 0.18, "material": "sapphire_glow" },
+    { "type": "sphere", "center": [3.2, 0.3, 2.4],   "radius": 0.18, "material": "emerald_glow" }
   ],
   "lights": [
     {
@@ -43,6 +58,12 @@
         "height": 5,
         "speed": 0.15
       }
+    },
+    {
+      "type": "area",
+      "position": [4, 2.5, 2.5],
+      "intensity": [0.3, 0.45, 0.6],
+      "radius": 1.2
     }
   ]
 }

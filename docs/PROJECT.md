@@ -35,16 +35,38 @@ plus a cyan spotlight. Minecraft-themed scenes use axis-aligned boxes for blocks
 
 *`scenes/mirror_glass_gallery.json`: checker floor, dark back wall, a glass
 sphere, a mirror sphere, a red diffuse sphere, a small purple accent sphere,
-under a soft area light that sways gently while the camera orbits a 144° front
+two glossy pillars, and four small emissive "glow orb" spheres scattered
+around the gallery (so the mirror/glass have something colourful to reflect
+besides flat sky) — under a key area light that sways gently plus a cool fill
+light, with a thin-lens **depth of field** (`aperture 0.12`, `focus_dist 6.5`,
+focused on the central spheres) while the camera dollies across a 180° front
 arc (a full 360° orbit would swing the camera behind the back wall — see the
 journal). Rendered with `--bvh` on this machine: `mpirun -np 8 ./raytracer_mpi
 --scene scenes/mirror_glass_gallery.json --width 480 --height 270 --spp 64
 --depth 6 --shadow-samples 16 --frames 48 --tile 32 --schedule dynamic --bvh`
-→ **makespan 294.0 s**, 7 workers, **0.0 % load imbalance**
+→ **makespan 754.5 s**, 7 workers, **0.0 % load imbalance**
 (`docs/results/master_run.csv`); preview video at
-`docs/results/mirror_glass_gallery_preview.mp4`. (A quick spp 8 / shadow 4 pass
-renders in 11.5 s but is visibly grainy — Monte Carlo noise, not blur; spp 64 /
-shadow 16 is the converged look at ~26× the cost.)
+`docs/results/mirror_glass_gallery_preview.mp4`. (The second light + extra
+glow-orb objects make this scene ~2.6× more expensive per frame than the
+simpler version; a quick spp 8 / shadow 4 pass is visibly grainy — Monte Carlo
+noise, not blur — spp 64 / shadow 16 is the converged look.)
+
+![Sphere field showcase](results/sphere_field_showcase_sample.png)
+
+*`scenes/sphere_field_showcase.json`: the classic "field of random material
+spheres" composition (the *Ray Tracing in One Weekend* book-cover layout) —
+3 large feature spheres (diffuse, glass, mirror) plus **89 small spheres**
+procedurally scattered on a checker floor (deterministic Python generator,
+seed 42; ~55 % diffuse, ~27 % metal-tinted mirror, ~18 % glass), under a sun-like
+area light and a cool fill light, thin-lens DOF, camera orbiting at a distance.
+**93 objects total — the first scene where the optional BVH is actually worth
+turning on**: same single frame (480×270, spp 64, depth 6, shadow 16),
+`--bvh` off → **120.7 s**, `--bvh` on → **51.0 s** (**2.37× faster**,
+`tools/compare_frames.py` confirms MSE = 0 — same image, fewer ray–object
+tests). Full 48-frame render on this machine (`mpirun -np 8 ... --bvh`):
+**makespan 501.6 s**, 7 workers, **0.0 % load imbalance**
+(`docs/results/master_run_sphere_field.csv`); preview video at
+`docs/results/sphere_field_showcase_preview.mp4`.
 
 ---
 
@@ -336,10 +358,11 @@ video; byte-exact correctness; full benchmark suite (speedup, granularity, load
 balance, hybrid); **path-traced global illumination** (cosine-weighted importance
 sampling + Russian Roulette); **ACES filmic tone mapping**; **rough reflections**
 for glossy materials; **depth of field** (thin-lens camera); **JSON scene configs**
-(32 scenes including 24 Minecraft-themed with box blocks + cathedral, hall of
-mirrors, frozen throne, **mirror glass gallery**); optional **BVH** acceleration
-(`--bvh`, off by default — median-split tree over bounded primitives, planes
-stay linear, byte-identical output to the linear scan).
+(33 scenes including 24 Minecraft-themed with box blocks + cathedral, hall of
+mirrors, frozen throne, mirror glass gallery, **sphere field showcase**);
+optional **BVH** acceleration (`--bvh`, off by default — median-split tree over
+bounded primitives, planes stay linear, byte-identical output to the linear
+scan, **2.37× faster on the 93-object sphere field scene**, §2 sample gallery).
 
 **Known limitations (honest):**
 - Rank 0 is a dedicated coordinator, so flat-MPI speedup is capped at P−1 cores.
@@ -351,9 +374,10 @@ stay linear, byte-identical output to the linear scan).
 - Tested on one 8-core node (`-np` simulates the cluster). The code is
   cluster-ready (`mpirun --hostfile`), but multi-node numbers aren't measured
   here — the prefetch benefit in particular would be larger across a network.
-- The BVH uses a simple median split (not SAH) and is off by default, since the
-  current scenes (≤10 bounded objects) are too small for it to show a measurable
-  speedup — it exists for when a scene grows larger.
+- The BVH uses a simple median split (not SAH) and is off by default. It only
+  pays off once a scene has enough bounded objects to amortize tree traversal —
+  measured 2.37× on the 93-object sphere field scene, but no measurable gain on
+  the ≤10-object scenes (gallery, demo), where a linear scan is already cheap.
 
 **Deferred (per proposal §13):** textures, triangle *meshes* (the triangle
 primitive exists; mesh loading does not). Non-blocking MPI and the hybrid, listed

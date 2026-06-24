@@ -1,0 +1,54 @@
+{
+  "background": {
+    "top": [0.25, 0.38, 0.7],
+    "bottom": [0.98, 0.72, 0.45]
+  },
+  "camera": {
+    "lookat": [0, 1.1, 0],
+    "up": [0, 1, 0],
+    "vfov": 46,
+    "aperture": 0.1,
+    "focus_dist": 7.5,
+    "orbit": {
+      "center": [0, 1.1, 0],
+      "radius": 7.5,
+      "height": 1.7,
+      "speed": 1.0,
+      "phase": 0.0
+    }
+  },
+  "materials": {
+    "floor":      { "type": "glossy", "albedo": [0.5, 0.42, 0.34], "specular": 0.22, "shininess": 40 },
+    "glass":      { "type": "dielectric", "ior": 1.5 },
+    "mirror":     { "type": "mirror", "albedo": [0.92, 0.88, 0.8], "reflectivity": 0.9 },
+    "terracotta": { "type": "diffuse", "albedo": [0.75, 0.33, 0.16] },
+    "teal":       { "type": "diffuse", "albedo": [0.1, 0.42, 0.4] },
+    "lantern_glow": { "type": "emissive", "emission": [1.6, 0.85, 0.25] },
+    "sun_glow":   { "type": "emissive", "emission": [10.0, 7.2, 3.4] }
+  },
+  "objects": [
+    { "type": "plane",  "point": [0, 0, 0], "normal": [0, 1, 0], "material": "floor" },
+
+    { "type": "sphere", "center": [0, 1.0, 0],         "radius": 1.0,  "material": "glass" },
+    { "type": "sphere", "center": [-2.4, 0.9, 0.4],    "radius": 0.9,  "material": "mirror" },
+    { "type": "sphere", "center": [2.3, 0.85, -0.2],   "radius": 0.85, "material": "terracotta" },
+    { "type": "sphere", "center": [0.4, 0.4, -2.0],    "radius": 0.35, "material": "teal" },
+    { "type": "sphere", "center": [-1.6, 0.22, 2.0],   "radius": 0.22, "material": "lantern_glow" },
+
+    { "type": "sphere", "center": [0, 9, -25], "radius": 2.5, "material": "sun_glow" }
+  ],
+  "lights": [
+    {
+      "type": "area",
+      "position": [0, 9, -25],
+      "intensity": [1.7, 1.4, 1.0],
+      "radius": 1.6
+    },
+    {
+      "type": "area",
+      "position": [0, 14, 6],
+      "intensity": [0.13, 0.16, 0.22],
+      "radius": 5.0
+    }
+  ]
+}

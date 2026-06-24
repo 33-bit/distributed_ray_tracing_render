@@ -22,6 +22,7 @@
 #include "scene/camera.hpp"
 #include "scene/aabb.hpp"
 #include "scene/bvh.hpp"
+#include "scene/stl_loader.hpp"
 // modules under test (Member B — shading)
 #include <vector>
 #include "scene/material.hpp"
@@ -278,6 +279,55 @@ int main() {
             if (hit_lin == hit_bvh) ++agreements;
         }
         CHECK(agreements == 9);
+    }
+
+    // STL mesh import (Member D — scene/stl_loader.hpp)
+    {
+        // Hand-build a minimal binary STL: 2 triangles, in-memory, written to
+        // a throwaway file under build/ (gitignored) so the test stays
+        // dependency-free — no fixture asset checked into the repo.
+        const std::string path = "build/_test_fixture.stl";
+        {
+            std::ofstream out(path, std::ios::binary);
+            char header[80] = {0};
+            out.write(header, 80);
+            uint32_t count = 2;
+            out.write(reinterpret_cast<const char*>(&count), 4);
+            auto write_tri = [&](float nx, float ny, float nz,
+                                  float ax, float ay, float az,
+                                  float bx, float by, float bz,
+                                  float cx, float cy, float cz) {
+                float buf[12] = {nx, ny, nz, ax, ay, az, bx, by, bz, cx, cy, cz};
+                out.write(reinterpret_cast<const char*>(buf), 48);
+                uint16_t attr = 0;
+                out.write(reinterpret_cast<const char*>(&attr), 2);
+            };
+            write_tri(0, 0, 1,  0, 0, 0,  1, 0, 0,  0, 1, 0);
+            write_tri(0, 0, 1,  2, 0, 0,  3, 0, 0,  2, 1, 0);
+        }
+
+        std::vector<StlTriangle> tris = load_stl(path, 2.0, Vec3(10, 0, 0));
+        CHECK(tris.size() == 2);
+        // world = local * scale(2.0) + translate(10,0,0)
+        CHECK(approx(tris[0].v0.x, 10.0) && approx(tris[0].v0.y, 0.0));
+        CHECK(approx(tris[0].v1.x, 12.0) && approx(tris[0].v1.y, 0.0));
+        CHECK(approx(tris[0].v2.x, 10.0) && approx(tris[0].v2.y, 2.0));
+        CHECK(approx(tris[1].v0.x, 14.0));
+        CHECK(approx(tris[1].v2.x, 14.0) && approx(tris[1].v2.y, 2.0));
+
+        // ASCII STL ("solid ...") must be rejected, not silently mis-parsed.
+        const std::string ascii_path = "build/_test_fixture_ascii.stl";
+        {
+            std::ofstream out(ascii_path);
+            out << "solid test\nendsolid test\n";
+        }
+        bool threw = false;
+        try { load_stl(ascii_path, 1.0, Vec3(0, 0, 0)); }
+        catch (const std::runtime_error&) { threw = true; }
+        CHECK(threw);
+
+        std::remove(path.c_str());
+        std::remove(ascii_path.c_str());
     }
 
     std::printf("%d checks, %d failures\n", g_checks, g_failures);
