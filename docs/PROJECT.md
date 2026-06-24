@@ -68,6 +68,37 @@ tests). Full 48-frame render on this machine (`mpirun -np 8 ... --bvh`):
 (`docs/results/master_run_sphere_field.csv`); preview video at
 `docs/results/sphere_field_showcase_preview.mp4`.
 
+![Lakeside sunset](results/lakeside_sunset_sample.png)
+
+*`scenes/lakeside_sunset.json`: a mirror-floored "lake" (a large flat box,
+slight `roughness` for a rippled look) reflecting a low sun, framed by
+procedurally placed trees (box trunk + sphere canopy). The camera looks
+roughly level (ground/eye height), which exposed a real gap in the renderer:
+the sky gradient is `lerp(bottom, top, 0.5*(dir.y+1))` over the *full*
+elevation range, so a level camera only ever samples `dir.y` near 0 — a
+saturated horizon color always rendered as a 50/50 blend with the zenith
+color (gray, not gold). Fixed with a new optional `Scene::bg_horizon`
+(`"horizon"` in the JSON `background` block, default `1.0` = old behavior,
+byte-identical for every other scene) that compresses the gradient near the
+horizon instead, like a real sky. Full 48-frame render on this machine
+(`mpirun -np 8 ... --bvh`, 854×480, spp 32, depth 4, shadow 8): **makespan
+272.4 s**, 7 workers, **0.0 % load imbalance**
+(`docs/results/master_run_lakeside.csv`); preview video at
+`docs/results/lakeside_sunset_preview.mp4`.
+
+![Castle (OBJ import)](results/castle_sample.png)
+
+*`scenes/castle.json`: a downloaded OBJ model (19,850 vertices, 16,473 faces,
+5 `usemtl` groups) imported via the new `scene/obj_loader.hpp` — fan-
+triangulated faces, each group remapped to one of this scene's own materials
+via `"material_map"` (walls/doors/floor/roof/windows each get a distinct flat
+material; there's no texture-mapping support, so the original `.jpg` maps
+aren't used). The BVH (`--bvh`) is what makes a 16k-triangle import practical
+at all. Full 48-frame render, full 360° camera orbit (no occluders, so unlike
+the gallery scenes this one didn't need an arc limit): **makespan 1015.9 s**,
+7 workers, **0.1 % load imbalance** (`docs/results/master_run_castle.csv`);
+preview video at `docs/results/castle_preview.mp4`.
+
 ---
 
 ## 1. Why ray tracing, and why parallelize it?
@@ -296,7 +327,7 @@ compare_frames.py, assemble_video.sh}`.
 
 ```bash
 # unit tests (Members A & B)
-make test                 # 69 checks
+make test                 # 82 checks
 
 # sequential baseline
 make seq
@@ -340,6 +371,7 @@ src/
              aabb bvh                                (A)  # optional BVH accel, off by default
              material light                          (B)
              scene scene_parser json_parser           (D)  # JSON scene loading
+             stl_loader obj_loader                    (D)  # binary STL + text OBJ mesh import
   render/    shading                                 (B)  # path-traced GI + ACES tonemap
              renderer image tile                     (D)  # render_tile has the OpenMP pragma
   mpi/       tags serializer master worker           (C)  # hybrid + prefetch live here
@@ -358,11 +390,16 @@ video; byte-exact correctness; full benchmark suite (speedup, granularity, load
 balance, hybrid); **path-traced global illumination** (cosine-weighted importance
 sampling + Russian Roulette); **ACES filmic tone mapping**; **rough reflections**
 for glossy materials; **depth of field** (thin-lens camera); **JSON scene configs**
-(33 scenes including 24 Minecraft-themed with box blocks + cathedral, hall of
-mirrors, frozen throne, mirror glass gallery, **sphere field showcase**);
-optional **BVH** acceleration (`--bvh`, off by default — median-split tree over
-bounded primitives, planes stay linear, byte-identical output to the linear
-scan, **2.37× faster on the 93-object sphere field scene**, §2 sample gallery).
+(35 scenes including 24 Minecraft-themed with box blocks + cathedral, hall of
+mirrors, frozen throne, mirror glass gallery, sphere field showcase, lakeside
+sunset, **castle**); optional **BVH** acceleration (`--bvh`, off by default —
+median-split tree over bounded primitives, planes stay linear, byte-identical
+output to the linear scan, **2.37× faster on the 93-object sphere field
+scene**, §2 sample gallery); **mesh import** (binary STL and text OBJ, with
+per-group materials for multi-material OBJ files — `scene/stl_loader.hpp`,
+`scene/obj_loader.hpp`, tested with a 38k-triangle dragon and a 16k-triangle
+castle); an optional **horizon-compressed sky gradient** (`Scene::bg_horizon`)
+for believable sunset colors from a level camera.
 
 **Known limitations (honest):**
 - Rank 0 is a dedicated coordinator, so flat-MPI speedup is capped at P−1 cores.
