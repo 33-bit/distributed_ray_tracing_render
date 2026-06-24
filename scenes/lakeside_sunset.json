@@ -1,0 +1,62 @@
+{
+  "background": {
+    "top": [0.22, 0.38, 0.68],
+    "bottom": [1.9, 0.68, 0.06],
+    "horizon": 0.3
+  },
+  "camera": {
+    "lookat": [0, 1.2, -15],
+    "up": [0, 1, 0],
+    "vfov": 46,
+    "aperture": 0.05,
+    "focus_dist": 24.0,
+    "orbit": {
+      "center": [0, 2.0, 9],
+      "radius": 1.0,
+      "height": 2.0,
+      "speed": 0.15
+    }
+  },
+  "materials": {
+    "grass":  { "type": "glossy", "albedo": [0.22, 0.32, 0.14], "specular": 0.15, "shininess": 20 },
+    "water":  { "type": "mirror", "albedo": [0.78, 0.8, 0.78], "reflectivity": 0.88, "roughness": 0.06 },
+    "trunk":  { "type": "diffuse", "albedo": [0.35, 0.22, 0.12] },
+    "canopy1": { "type": "diffuse", "albedo": [0.18, 0.42, 0.16] },
+    "canopy2": { "type": "diffuse", "albedo": [0.25, 0.48, 0.2] },
+    "sun_glow": { "type": "emissive", "emission": [10.0, 7.6, 2.6] }
+  },
+  "objects": [
+    { "type": "plane", "point": [0, -0.3, 0], "normal": [0, 1, 0], "material": "grass" },
+    { "type": "box", "center": [0, -0.15, -8], "size": [10, 0.3, 26], "material": "water" },
+
+    { "type": "box", "center": [-8, 0.9, 4],  "size": [0.3, 1.8, 0.3], "material": "trunk" },
+    { "type": "sphere", "center": [-8, 2.1, 4], "radius": 0.9, "material": "canopy1" },
+
+    { "type": "box", "center": [-9, 0.8, 1],  "size": [0.28, 1.6, 0.28], "material": "trunk" },
+    { "type": "sphere", "center": [-9, 1.9, 1], "radius": 0.8, "material": "canopy2" },
+
+    { "type": "box", "center": [-7.5, 1.0, -3], "size": [0.32, 2.0, 0.32], "material": "trunk" },
+    { "type": "sphere", "center": [-7.5, 2.3, -3], "radius": 1.0, "material": "canopy1" },
+
+    { "type": "box", "center": [8, 0.85, 3],  "size": [0.3, 1.7, 0.3], "material": "trunk" },
+    { "type": "sphere", "center": [8, 2.0, 3], "radius": 0.85, "material": "canopy2" },
+
+    { "type": "box", "center": [9, 0.95, -1], "size": [0.3, 1.9, 0.3], "material": "trunk" },
+    { "type": "sphere", "center": [9, 2.15, -1], "radius": 0.9, "material": "canopy1" },
+
+    { "type": "box", "center": [7.5, 0.8, -6], "size": [0.28, 1.6, 0.28], "material": "trunk" },
+    { "type": "sphere", "center": [7.5, 1.9, -6], "radius": 0.8, "material": "canopy2" },
+
+    { "type": "box", "center": [-6, 0.7, -9], "size": [0.25, 1.4, 0.25], "material": "trunk" },
+    { "type": "sphere", "center": [-6, 1.7, -9], "radius": 0.7, "material": "canopy1" },
+
+    { "type": "box", "center": [6.5, 0.75, -10], "size": [0.26, 1.5, 0.26], "material": "trunk" },
+    { "type": "sphere", "center": [6.5, 1.75, -10], "radius": 0.75, "material": "canopy2" },
+
+    { "type": "sphere", "center": [0, 4, -40], "radius": 3.5, "material": "sun_glow" }
+  ],
+  "lights": [
+    { "type": "area", "position": [0, 4, -40], "intensity": [2.3, 1.55, 0.45], "radius": 1.5 },
+    { "type": "area", "position": [0, 15, 10], "intensity": [0.04, 0.05, 0.08], "radius": 4.0 }
+  ]
+}

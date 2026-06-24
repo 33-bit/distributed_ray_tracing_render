@@ -23,6 +23,7 @@
 #include "scene/aabb.hpp"
 #include "scene/bvh.hpp"
 #include "scene/stl_loader.hpp"
+#include "scene/obj_loader.hpp"
 // modules under test (Member B — shading)
 #include <vector>
 #include "scene/material.hpp"
@@ -328,6 +329,39 @@ int main() {
 
         std::remove(path.c_str());
         std::remove(ascii_path.c_str());
+    }
+
+    // OBJ mesh import (Member D — scene/obj_loader.hpp)
+    {
+        // A triangle, then a usemtl switch, then a quad (must fan-triangulate
+        // into 2 triangles) — covers face triangulation and per-group
+        // material tagging in one small fixture.
+        const std::string path = "build/_test_fixture.obj";
+        {
+            std::ofstream out(path);
+            out << "# comment\n"
+                << "v 0 0 0\n"
+                << "v 1 0 0\n"
+                << "v 0 1 0\n"
+                << "f 1 2 3\n"
+                << "usemtl roof\n"
+                << "v 2 0 0\n"
+                << "v 3 0 0\n"
+                << "v 3 1 0\n"
+                << "v 2 1 0\n"
+                << "f 4/1/1 5/2/1 6/3/1 7/4/1\n";
+        }
+
+        std::vector<ObjTriangle> tris = load_obj(path, 2.0, Vec3(5, 0, 0));
+        CHECK(tris.size() == 3);   // 1 (triangle) + 2 (quad fan-triangulated)
+        CHECK(tris[0].group == "default");
+        CHECK(approx(tris[0].v1.x, 5.0 + 2.0));   // world = local*scale + translate
+        CHECK(tris[1].group == "roof");
+        CHECK(tris[2].group == "roof");
+        // fan triangulation shares the quad's first vertex across both tris
+        CHECK(approx(tris[1].v0.x, tris[2].v0.x) && approx(tris[1].v0.y, tris[2].v0.y));
+
+        std::remove(path.c_str());
     }
 
     std::printf("%d checks, %d failures\n", g_checks, g_failures);

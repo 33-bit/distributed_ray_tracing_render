@@ -28,6 +28,16 @@ struct Scene : ISceneQuery {
     Camera camera;
     Color  bg_top    = Color(0.45, 0.62, 0.95);   // sky
     Color  bg_bottom = Color(0.95, 0.95, 0.98);    // horizon haze
+    // How many units of dir.y it takes to reach pure bg_top, starting from the
+    // horizon (dir.y=0). Default 1.0 reproduces the original plain linear
+    // gradient over the full [-1,1] range (every existing scene keeps its
+    // exact look). A camera that looks roughly level (common for ground-level,
+    // human-eye-height shots) only ever sees a narrow dir.y band near 0, so a
+    // real sunset's saturated horizon color would otherwise always render as
+    // a 50/50 blend with the zenith color — gray, not gold. Set this below 1.0
+    // (e.g. 0.45) to concentrate the gradient near the horizon instead, like a
+    // real sky's color actually behaves.
+    double bg_horizon = 1.0;
 
     // Optional BVH acceleration (off by default — see RenderParams::use_bvh).
     // Built once after the scene's objects are all added; unbounded objects
@@ -76,7 +86,8 @@ struct Scene : ISceneQuery {
     const Material& material(int id) const override { return materials[id]; }
     const std::vector<Light>& lights() const override { return lights_; }
     Color background(const Ray& r) const override {
-        double t = 0.5 * (normalized(r.dir).y + 1.0);   // vertical gradient
+        double t = 0.5 * (normalized(r.dir).y / bg_horizon + 1.0);   // vertical gradient
+        t = clampd(t, 0.0, 1.0);
         return lerp(bg_bottom, bg_top, t);
     }
 };

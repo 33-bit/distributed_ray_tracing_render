@@ -20,6 +20,7 @@
 #include "scene/json_parser.hpp"
 #include "scene/scene.hpp"
 #include "scene/stl_loader.hpp"
+#include "scene/obj_loader.hpp"
 
 // ---- Intermediate representation -----------------------------------------
 
@@ -64,14 +65,21 @@ struct ObjectConfig {
     double radius = 1.0;
     Vec3   size = Vec3(1, 1, 1);
     Vec3   v0, v1, v2;
-    // "mesh": binary STL file, loaded as a flat list of Triangle objects
-    // sharing one material (see scene/stl_loader.hpp). `path` is resolved
+    // "mesh": a binary STL or a text OBJ file, loaded as a flat list of
+    // Triangle objects (see scene/stl_loader.hpp, scene/obj_loader.hpp); the
+    // ".obj"/".stl" extension on `path` picks the loader. `path` is resolved
     // relative to the current working directory, the same convention as the
     // --scene flag itself — every MPI rank must see the same file at the
     // same relative path (single-node/shared-filesystem only).
+    //
+    // OBJ files can carry several "usemtl" groups (e.g. a building's walls,
+    // roof, doors, windows); `mesh_material_map` maps each OBJ group name to
+    // one of this scene's own material names. A group with no entry falls
+    // back to `material`. STL has no groups, so it always uses `material`.
     std::string path;
     double mesh_scale = 1.0;
     Vec3   mesh_translate = Vec3(0, 0, 0);
+    std::map<std::string, std::string> mesh_material_map;
 };
 
 struct LightConfig {
@@ -91,6 +99,7 @@ struct LightConfig {
 struct SceneConfig {
     Color  bg_top    = Color(0.45, 0.62, 0.95);
     Color  bg_bottom = Color(0.95, 0.95, 0.98);
+    double bg_horizon = 1.0;   // see Scene::bg_horizon (scene.hpp)
     CameraConfig camera;
     std::vector<MaterialConfig> materials;
     std::vector<ObjectConfig>   objects;
@@ -171,6 +180,9 @@ inline ObjectConfig parse_object(const JsonValue& v) {
     if (v.has("path"))   o.path   = v["path"].as_str();
     if (v.has("scale"))  o.mesh_scale = v["scale"].as_num();
     if (v.has("translate")) o.mesh_translate = to_vec3(v["translate"]);
+    if (v.has("material_map"))
+        for (const auto& [group, mat] : v["material_map"].obj)
+            o.mesh_material_map[group] = mat.as_str();
     return o;
 }
 
@@ -203,8 +215,9 @@ inline SceneConfig parse_scene_config(const std::string& json_text) {
 
     if (root.has("background")) {
         const auto& bg = root["background"];
-        if (bg.has("top"))    cfg.bg_top    = to_vec3(bg["top"]);
-        if (bg.has("bottom")) cfg.bg_bottom = to_vec3(bg["bottom"]);
+        if (bg.has("top"))     cfg.bg_top     = to_vec3(bg["top"]);
+        if (bg.has("bottom"))  cfg.bg_bottom  = to_vec3(bg["bottom"]);
+        if (bg.has("horizon")) cfg.bg_horizon = bg["horizon"].as_num();
     }
     if (root.has("camera")) {
         cfg.camera = parse_camera(root["camera"]);
@@ -228,8 +241,9 @@ inline SceneConfig parse_scene_config(const std::string& json_text) {
 inline Scene build_scene_from_config(const SceneConfig& cfg, double aspect,
                                      int frame, int total_frames) {
     Scene s;
-    s.bg_top    = cfg.bg_top;
-    s.bg_bottom = cfg.bg_bottom;
+    s.bg_top     = cfg.bg_top;
+    s.bg_bottom  = cfg.bg_bottom;
+    s.bg_horizon = cfg.bg_horizon;
 
     // Normalized animation time
     double t = (total_frames > 1) ? static_cast<double>(frame) / total_frames : 0.0;
@@ -284,8 +298,19 @@ inline Scene build_scene_from_config(const SceneConfig& cfg, double aspect,
         } else if (oc.type == "box") {
             s.add_box(oc.center, oc.size, mi);
         } else if (oc.type == "mesh") {
-            for (const StlTriangle& t : load_stl(oc.path, oc.mesh_scale, oc.mesh_translate))
-                s.add_triangle(t.v0, t.v1, t.v2, mi);
+            bool is_obj = oc.path.size() >= 4 &&
+                          (oc.path.compare(oc.path.size() - 4, 4, ".obj") == 0 ||
+                           oc.path.compare(oc.path.size() - 4, 4, ".OBJ") == 0);
+            if (is_obj) {
+                for (const ObjTriangle& t : load_obj(oc.path, oc.mesh_scale, oc.mesh_translate)) {
+                    auto it = oc.mesh_material_map.find(t.group);
+                    int gi = (it != oc.mesh_material_map.end()) ? resolve_mat(it->second) : mi;
+                    s.add_triangle(t.v0, t.v1, t.v2, gi);
+                }
+            } else {
+                for (const StlTriangle& t : load_stl(oc.path, oc.mesh_scale, oc.mesh_translate))
+                    s.add_triangle(t.v0, t.v1, t.v2, mi);
+            }
         } else {
             throw std::runtime_error("scene: unknown object type '" + oc.type + "'");
         }
