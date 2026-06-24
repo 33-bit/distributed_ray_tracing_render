@@ -16,6 +16,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <cmath>
+#include <algorithm>
 
 #include "scene/json_parser.hpp"
 #include "scene/scene.hpp"
@@ -62,6 +63,47 @@ struct MaterialConfig {
     double roughness = -1.0;
 };
 
+struct ObjectMotionConfig {
+    bool        enabled = false;
+    std::string type;       // "linear" or "orbit"
+
+    // Linear motion: add offset * normalized_frame_time to the object's base
+    // position over the full animation.
+    Vec3 offset = Vec3(0, 0, 0);
+
+    // Orbit motion: rotate the object's base anchor around center on the XZ
+    // plane. If radius/height are provided, use the same absolute orbit style
+    // as camera/lights instead.
+    Vec3   center = Vec3(0, 0, 0);
+    double radius = 0.0;
+    double height = 0.0;
+    bool   has_radius = false;
+    bool   has_height = false;
+    double phase  = 0.0;
+    double speed  = 1.0;
+
+    // Optional self-rotation around the Y axis, in rotations per animation.
+    // Useful for STL meshes: orbit moves the object through the world, spin_y
+    // changes the silhouette.
+    double spin_x = 0.0;
+    double spin_phase_x = 0.0;
+    double spin_y = 0.0;
+    double spin_phase = 0.0;
+    bool   has_spin_center = false;
+    Vec3   spin_center = Vec3(0, 0, 0);
+
+    // Optional mesh deformation for simple wing flapping. Coordinates are in
+    // world units relative to the object's anchor after scale/translate.
+    double wing_flap_deg = 0.0;
+    double wing_flap_speed = 1.0;
+    double wing_flap_phase = 0.0;
+    double wing_start = 0.0;
+    double wing_falloff = 0.4;
+    double wing_hinge_x = 0.0;
+    double wing_hinge_y = 0.0;
+    std::string wing_axis = "z";
+};
+
 struct ObjectConfig {
     std::string type;       // "sphere", "plane", "triangle", "box", "mesh"
     std::string material;   // material name reference
@@ -87,6 +129,7 @@ struct ObjectConfig {
     std::map<std::string, std::string> mesh_material_map;
     bool   has_orbit = false;
     OrbitConfig orbit;
+    ObjectMotionConfig motion;
 };
 
 struct LightConfig {
@@ -193,6 +236,53 @@ inline MaterialConfig parse_material(const std::string& name, const JsonValue& v
     return m;
 }
 
+inline ObjectMotionConfig parse_object_motion(const JsonValue& v) {
+    ObjectMotionConfig m;
+    m.enabled = true;
+    m.type = v.has("type") ? v["type"].as_str() : "linear";
+
+    if (m.type == "linear") {
+        if (v.has("offset"))   m.offset = to_vec3(v["offset"]);
+        if (v.has("velocity")) m.offset = to_vec3(v["velocity"]);
+        if (v.has("delta"))    m.offset = to_vec3(v["delta"]);
+    } else if (m.type == "orbit") {
+        if (v.has("center")) {
+            m.center = to_vec3(v["center"]);
+        }
+        if (v.has("radius")) {
+            m.radius = v["radius"].as_num();
+            m.has_radius = true;
+        }
+        if (v.has("height")) {
+            m.height = v["height"].as_num();
+            m.has_height = true;
+        }
+        if (v.has("phase")) m.phase = v["phase"].as_num();
+        if (v.has("speed")) m.speed = v["speed"].as_num();
+    } else {
+        throw std::runtime_error("scene: unknown object motion type '" + m.type + "'");
+    }
+
+    if (v.has("spin_x"))       m.spin_x = v["spin_x"].as_num();
+    if (v.has("spin_phase_x")) m.spin_phase_x = v["spin_phase_x"].as_num();
+    if (v.has("spin_y"))       m.spin_y = v["spin_y"].as_num();
+    if (v.has("spin_phase"))   m.spin_phase = v["spin_phase"].as_num();
+    if (v.has("spin_center")) {
+        m.spin_center = to_vec3(v["spin_center"]);
+        m.has_spin_center = true;
+    }
+    if (v.has("wing_flap_deg"))   m.wing_flap_deg = v["wing_flap_deg"].as_num();
+    if (v.has("wing_flap_speed")) m.wing_flap_speed = v["wing_flap_speed"].as_num();
+    if (v.has("wing_flap_phase")) m.wing_flap_phase = v["wing_flap_phase"].as_num();
+    if (v.has("wing_start"))      m.wing_start = v["wing_start"].as_num();
+    if (v.has("wing_falloff"))    m.wing_falloff = v["wing_falloff"].as_num();
+    if (v.has("wing_hinge_x"))    m.wing_hinge_x = v["wing_hinge_x"].as_num();
+    if (v.has("wing_hinge_y"))    m.wing_hinge_y = v["wing_hinge_y"].as_num();
+    if (v.has("wing_axis"))       m.wing_axis = v["wing_axis"].as_str();
+
+    return m;
+}
+
 inline ObjectConfig parse_object(const JsonValue& v) {
     ObjectConfig o;
     o.type = v["type"].as_str();
@@ -216,6 +306,7 @@ inline ObjectConfig parse_object(const JsonValue& v) {
         o.has_orbit = true;
         o.orbit = to_orbit(v["orbit"]);
     }
+    if (v.has("motion")) o.motion = parse_object_motion(v["motion"]);
     return o;
 }
 
@@ -253,6 +344,108 @@ inline DayNightConfig parse_day_night(const JsonValue& v) {
     if (v.has("night_top"))    d.night_top    = to_vec3(v["night_top"]);
     if (v.has("night_bottom")) d.night_bottom = to_vec3(v["night_bottom"]);
     return d;
+}
+
+inline Vec3 rotate_y_around(const Vec3& p, const Vec3& center, double angle) {
+    double s = std::sin(angle);
+    double c = std::cos(angle);
+    Vec3 rel = p - center;
+    return Vec3(center.x + rel.x * c + rel.z * s,
+                p.y,
+                center.z - rel.x * s + rel.z * c);
+}
+
+inline Vec3 rotate_x_around(const Vec3& p, const Vec3& center, double angle) {
+    double s = std::sin(angle);
+    double c = std::cos(angle);
+    Vec3 rel = p - center;
+    return Vec3(p.x,
+                center.y + rel.y * c - rel.z * s,
+                center.z + rel.y * s + rel.z * c);
+}
+
+inline Vec3 rotate_z_around(const Vec3& p, const Vec3& center, double angle) {
+    double s = std::sin(angle);
+    double c = std::cos(angle);
+    Vec3 rel = p - center;
+    return Vec3(center.x + rel.x * c - rel.y * s,
+                center.y + rel.x * s + rel.y * c,
+                p.z);
+}
+
+inline Vec3 object_anchor(const ObjectConfig& oc) {
+    if (oc.type == "sphere" || oc.type == "box") return oc.center;
+    if (oc.type == "plane") return oc.point;
+    if (oc.type == "triangle") return (oc.v0 + oc.v1 + oc.v2) / 3.0;
+    if (oc.type == "mesh") return oc.mesh_translate;
+    return Vec3(0, 0, 0);
+}
+
+inline Vec3 object_motion_delta(const ObjectConfig& oc, double t) {
+    if (!oc.motion.enabled) return Vec3(0, 0, 0);
+
+    if (oc.motion.type == "linear") {
+        return oc.motion.offset * t;
+    }
+
+    if (oc.motion.type == "orbit") {
+        Vec3 anchor = object_anchor(oc);
+        double angle = oc.motion.speed * 2.0 * PI * t + oc.motion.phase;
+
+        if (oc.motion.has_radius || oc.motion.has_height) {
+            double radius = oc.motion.has_radius
+                          ? oc.motion.radius
+                          : std::sqrt((anchor.x - oc.motion.center.x) * (anchor.x - oc.motion.center.x) +
+                                      (anchor.z - oc.motion.center.z) * (anchor.z - oc.motion.center.z));
+            double height = oc.motion.has_height ? oc.motion.height : anchor.y;
+            Vec3 target(oc.motion.center.x + radius * std::sin(angle),
+                        height,
+                        oc.motion.center.z + radius * std::cos(angle));
+            return target - anchor;
+        }
+
+        return rotate_y_around(anchor, oc.motion.center, angle) - anchor;
+    }
+
+    return Vec3(0, 0, 0);
+}
+
+inline double object_spin_angle_x(const ObjectConfig& oc, double t) {
+    if (!oc.motion.enabled) return 0.0;
+    return oc.motion.spin_x * 2.0 * PI * t + oc.motion.spin_phase_x;
+}
+
+inline double object_spin_angle(const ObjectConfig& oc, double t) {
+    if (!oc.motion.enabled) return 0.0;
+    return oc.motion.spin_y * 2.0 * PI * t + oc.motion.spin_phase;
+}
+
+inline Vec3 object_spin_center(const ObjectConfig& oc, const Vec3& motion) {
+    return oc.motion.has_spin_center ? oc.motion.spin_center : object_anchor(oc) + motion;
+}
+
+inline Vec3 apply_wing_flap(const ObjectConfig& oc, const Vec3& p, const Vec3& anchor,
+                            double t) {
+    if (!oc.motion.enabled || oc.motion.wing_flap_deg == 0.0) return p;
+
+    double rel_x = p.x - anchor.x;
+    double side = (rel_x >= 0.0) ? 1.0 : -1.0;
+    double outboard = std::fabs(rel_x);
+    double falloff = std::max(oc.motion.wing_falloff, 1e-6);
+    double weight = smoothstep(oc.motion.wing_start,
+                               oc.motion.wing_start + falloff,
+                               outboard);
+    if (weight <= 0.0) return p;
+
+    double flap = oc.motion.wing_flap_deg * PI / 180.0 *
+                  std::sin(oc.motion.wing_flap_speed * 2.0 * PI * t +
+                           oc.motion.wing_flap_phase);
+    Vec3 hinge(anchor.x + side * oc.motion.wing_hinge_x,
+               anchor.y + oc.motion.wing_hinge_y,
+               anchor.z);
+    double angle = side * flap * weight;
+    if (oc.motion.wing_axis == "y") return rotate_y_around(p, hinge, angle);
+    return rotate_z_around(p, hinge, angle);
 }
 
 } // namespace scene_parse_detail
@@ -352,6 +545,27 @@ inline Scene build_scene_from_config(const SceneConfig& cfg, double aspect,
     // --- Objects ---
     for (const auto& oc : cfg.objects) {
         int mi = resolve_mat(oc.material);
+        Vec3 motion = scene_parse_detail::object_motion_delta(oc, t);
+        double spin_x_angle = scene_parse_detail::object_spin_angle_x(oc, t);
+        double spin_angle = scene_parse_detail::object_spin_angle(oc, t);
+        Vec3 spin_center = scene_parse_detail::object_spin_center(oc, motion);
+        Vec3 anchor = scene_parse_detail::object_anchor(oc) + motion;
+        auto add_deformed_triangle = [&](Vec3 a, Vec3 b, Vec3 c, int mat) {
+            a = scene_parse_detail::apply_wing_flap(oc, a, anchor, t);
+            b = scene_parse_detail::apply_wing_flap(oc, b, anchor, t);
+            c = scene_parse_detail::apply_wing_flap(oc, c, anchor, t);
+            if (spin_x_angle != 0.0) {
+                a = scene_parse_detail::rotate_x_around(a, spin_center, spin_x_angle);
+                b = scene_parse_detail::rotate_x_around(b, spin_center, spin_x_angle);
+                c = scene_parse_detail::rotate_x_around(c, spin_center, spin_x_angle);
+            }
+            if (spin_angle != 0.0) {
+                a = scene_parse_detail::rotate_y_around(a, spin_center, spin_angle);
+                b = scene_parse_detail::rotate_y_around(b, spin_center, spin_angle);
+                c = scene_parse_detail::rotate_y_around(c, spin_center, spin_angle);
+            }
+            s.add_triangle(a, b, c, mat);
+        };
         if (oc.type == "sphere") {
             Vec3 center = oc.center;
             if (oc.has_orbit) {
@@ -363,26 +577,27 @@ inline Scene build_scene_from_config(const SceneConfig& cfg, double aspect,
                               oc.orbit.height   + local_y * std::sin(tilt),
                               oc.orbit.center.z + local_y * std::cos(tilt));
             }
-            s.add_sphere(center, oc.radius, mi);
+            s.add_sphere(center + motion, oc.radius, mi);
         } else if (oc.type == "plane") {
-            s.add_plane(oc.point, oc.normal, mi);
+            s.add_plane(oc.point + motion, oc.normal, mi);
         } else if (oc.type == "triangle") {
-            s.add_triangle(oc.v0, oc.v1, oc.v2, mi);
+            add_deformed_triangle(oc.v0 + motion, oc.v1 + motion, oc.v2 + motion, mi);
         } else if (oc.type == "box") {
-            s.add_box(oc.center, oc.size, mi);
+            s.add_box(oc.center + motion, oc.size, mi);
         } else if (oc.type == "mesh") {
             bool is_obj = oc.path.size() >= 4 &&
                           (oc.path.compare(oc.path.size() - 4, 4, ".obj") == 0 ||
                            oc.path.compare(oc.path.size() - 4, 4, ".OBJ") == 0);
             if (is_obj) {
-                for (const ObjTriangle& t : load_obj(oc.path, oc.mesh_scale, oc.mesh_translate)) {
+                for (const ObjTriangle& t : load_obj(oc.path, oc.mesh_scale, oc.mesh_translate + motion)) {
                     auto it = oc.mesh_material_map.find(t.group);
                     int gi = (it != oc.mesh_material_map.end()) ? resolve_mat(it->second) : mi;
-                    s.add_triangle(t.v0, t.v1, t.v2, gi);
+                    add_deformed_triangle(t.v0, t.v1, t.v2, gi);
                 }
             } else {
-                for (const StlTriangle& t : load_stl(oc.path, oc.mesh_scale, oc.mesh_rotate, oc.mesh_translate))
-                    s.add_triangle(t.v0, t.v1, t.v2, mi);
+                for (const StlTriangle& t : load_stl(oc.path, oc.mesh_scale, oc.mesh_rotate, oc.mesh_translate + motion)) {
+                    add_deformed_triangle(t.v0, t.v1, t.v2, mi);
+                }
             }
         } else {
             throw std::runtime_error("scene: unknown object type '" + oc.type + "'");

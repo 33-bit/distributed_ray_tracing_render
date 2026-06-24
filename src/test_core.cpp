@@ -24,6 +24,7 @@
 #include "scene/bvh.hpp"
 #include "scene/stl_loader.hpp"
 #include "scene/obj_loader.hpp"
+#include "scene/scene_parser.hpp"
 // modules under test (Member B — shading)
 #include <vector>
 #include "scene/material.hpp"
@@ -280,6 +281,92 @@ int main() {
             if (hit_lin == hit_bvh) ++agreements;
         }
         CHECK(agreements == 9);
+    }
+
+    // JSON object motion (Member D — scene_parser.hpp)
+    {
+        const std::string json = R"json({
+          "materials": {
+            "mat": { "type": "diffuse", "albedo": [0.8, 0.8, 0.8] }
+          },
+          "objects": [
+            {
+              "type": "sphere",
+              "center": [0, 0, -5],
+              "radius": 1,
+              "material": "mat",
+              "motion": { "type": "linear", "offset": [4, 0, 0] }
+            },
+            {
+              "type": "sphere",
+              "center": [2, 0, 0],
+              "radius": 1,
+              "material": "mat",
+              "motion": { "type": "orbit", "center": [0, 0, 0], "speed": 1.0 }
+            },
+            {
+              "type": "triangle",
+              "v0": [1, 0, 0],
+              "v1": [2, 0, 0],
+              "v2": [1, 1, 0],
+              "material": "mat",
+              "motion": { "spin_y": 1.0, "spin_center": [0, 0, 0] }
+            },
+            {
+              "type": "triangle",
+              "v0": [1, 0, 0],
+              "v1": [2, 0, 0],
+              "v2": [1, 1, 0],
+              "material": "mat",
+              "motion": { "spin_phase": 1.5707963267948966, "spin_center": [0, 0, 0] }
+            },
+            {
+              "type": "triangle",
+              "v0": [0, 1, 0],
+              "v1": [0, 2, 0],
+              "v2": [1, 1, 0],
+              "material": "mat",
+              "motion": { "spin_phase_x": -1.5707963267948966, "spin_center": [0, 0, 0] }
+            }
+          ]
+        })json";
+
+        SceneConfig cfg = parse_scene_config(json);
+        Scene f0 = build_scene_from_config(cfg, 1.0, 0, 4);
+        Scene f1 = build_scene_from_config(cfg, 1.0, 1, 4);
+        Scene f2 = build_scene_from_config(cfg, 1.0, 2, 4);
+
+        const Sphere* linear0 = dynamic_cast<const Sphere*>(f0.objects[0].get());
+        const Sphere* linear2 = dynamic_cast<const Sphere*>(f2.objects[0].get());
+        const Sphere* orbit0  = dynamic_cast<const Sphere*>(f0.objects[1].get());
+        const Sphere* orbit1  = dynamic_cast<const Sphere*>(f1.objects[1].get());
+        const Triangle* spin1 = dynamic_cast<const Triangle*>(f1.objects[2].get());
+        const Triangle* static_spin0 = dynamic_cast<const Triangle*>(f0.objects[3].get());
+        const Triangle* pitch0 = dynamic_cast<const Triangle*>(f0.objects[4].get());
+        CHECK(linear0 && linear2 && orbit0 && orbit1 && spin1 && static_spin0 && pitch0);
+        if (linear0 && linear2 && orbit0 && orbit1 && spin1 && static_spin0 && pitch0) {
+            CHECK(approx(linear0->center.x, 0.0));
+            CHECK(approx(linear2->center.x, 2.0));      // half of offset at frame 2/4
+            CHECK(approx(orbit0->center.x, 2.0));
+            CHECK(approx(orbit1->center.x, 0.0, 1e-6));
+            CHECK(approx(orbit1->center.z, -2.0, 1e-6)); // quarter orbit around origin
+            CHECK(approx(spin1->v0.x, 0.0, 1e-6));
+            CHECK(approx(spin1->v0.z, -1.0, 1e-6));      // quarter spin around Y
+            CHECK(approx(static_spin0->v0.x, 0.0, 1e-6));
+            CHECK(approx(static_spin0->v0.z, -1.0, 1e-6)); // static 90-degree rotation
+            CHECK(approx(pitch0->v0.y, 0.0, 1e-6));
+            CHECK(approx(pitch0->v0.z, -1.0, 1e-6));       // static -90-degree pitch
+
+            ObjectConfig wing;
+            wing.motion.enabled = true;
+            wing.motion.wing_flap_deg = 90.0;
+            wing.motion.wing_start = 0.0;
+            wing.motion.wing_falloff = 1e-6;
+            Vec3 right = scene_parse_detail::apply_wing_flap(wing, Vec3(1, 0, 0), Vec3(0, 0, 0), 0.25);
+            Vec3 left  = scene_parse_detail::apply_wing_flap(wing, Vec3(-1, 0, 0), Vec3(0, 0, 0), 0.25);
+            CHECK(approx(right.x, 0.0, 1e-6) && approx(right.y, 1.0, 1e-6));
+            CHECK(approx(left.x, 0.0, 1e-6) && approx(left.y, 1.0, 1e-6));
+        }
     }
 
     // STL mesh import (Member D — scene/stl_loader.hpp)
