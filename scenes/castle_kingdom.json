@@ -1,0 +1,256 @@
+{
+  "day_night": {
+    "day_top": [
+      0.32,
+      0.48,
+      0.85
+    ],
+    "day_bottom": [
+      1.1,
+      0.62,
+      0.32
+    ],
+    "night_top": [
+      0.015,
+      0.02,
+      0.05
+    ],
+    "night_bottom": [
+      0.05,
+      0.04,
+      0.09
+    ]
+  },
+  "background": {
+    "top": [
+      0.32,
+      0.48,
+      0.85
+    ],
+    "bottom": [
+      1.1,
+      0.62,
+      0.32
+    ],
+    "horizon": 0.35
+  },
+  "camera": {
+    "lookat": [
+      0,
+      6,
+      -2
+    ],
+    "up": [
+      0,
+      1,
+      0
+    ],
+    "vfov": 44,
+    "aperture": 0.06,
+    "focus_dist": 22.0,
+    "orbit": {
+      "center": [
+        0,
+        6,
+        -2
+      ],
+      "radius": 22,
+      "height": 7.5,
+      "speed": 1.0
+    }
+  },
+  "materials": {
+    "ground": {
+      "type": "diffuse",
+      "albedo": [
+        0.45,
+        0.32,
+        0.22
+      ]
+    },
+    "stone": {
+      "type": "diffuse",
+      "albedo": [
+        0.55,
+        0.53,
+        0.5
+      ]
+    },
+    "door": {
+      "type": "diffuse",
+      "albedo": [
+        0.32,
+        0.2,
+        0.1
+      ]
+    },
+    "floor": {
+      "type": "diffuse",
+      "albedo": [
+        0.45,
+        0.38,
+        0.28
+      ]
+    },
+    "roof": {
+      "type": "diffuse",
+      "albedo": [
+        0.22,
+        0.16,
+        0.18
+      ]
+    },
+    "window": {
+      "type": "glossy",
+      "albedo": [
+        0.55,
+        0.7,
+        0.75
+      ],
+      "specular": 0.5,
+      "shininess": 40
+    },
+    "dragon_scale": {
+      "type": "glossy",
+      "albedo": [
+        0.55,
+        0.36,
+        0.14
+      ],
+      "specular": 0.55,
+      "shininess": 50
+    }
+  },
+  "objects": [
+    {
+      "type": "plane",
+      "point": [
+        0,
+        0,
+        0
+      ],
+      "normal": [
+        0,
+        1,
+        0
+      ],
+      "material": "ground"
+    },
+    {
+      "type": "mesh",
+      "path": "assets/meshes/castle/castle.obj",
+      "scale": 0.035,
+      "translate": [
+        0.4366,
+        2.3975,
+        3.4325
+      ],
+      "material": "stone",
+      "material_map": {
+        "default": "stone",
+        "default_doors": "door",
+        "default_floor": "floor",
+        "default_roof": "roof",
+        "default_windows": "window"
+      }
+    },
+    {
+      "type": "mesh",
+      "path": "assets/meshes/dragon.stl",
+      "scale": 0.06,
+      "translate": [
+        0,
+        0,
+        0
+      ],
+      "material": "dragon_scale",
+      "motion": {
+        "type": "orbit",
+        "center": [
+          0,
+          6,
+          -2
+        ],
+        "radius": 10,
+        "height": 8,
+        "speed": 2.3,
+        "phase": 0.0,
+        "spin_phase_x": -1.5707963267948966,
+        "spin_y": 2.3,
+        "spin_phase": 1.5707963267948966,
+        "wing_flap_deg": 35.0,
+        "wing_flap_speed": 5.3,
+        "wing_axis": "y",
+        "wing_start": 0.65,
+        "wing_falloff": 0.65,
+        "wing_hinge_x": 0.35,
+        "wing_hinge_y": -0.2
+      }
+    }
+  ],
+  "lights": [
+    {
+      "type": "area",
+      "position": [
+        0,
+        30,
+        -42
+      ],
+      "day_intensity": [
+        1.7,
+        1.35,
+        0.85
+      ],
+      "night_intensity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "radius": 2.2,
+      "orbit": {
+        "center": [
+          0,
+          10,
+          -2
+        ],
+        "radius": 45,
+        "height": 10,
+        "speed": 1.0,
+        "tilt_deg": 85
+      }
+    },
+    {
+      "type": "area",
+      "position": [
+        -35,
+        28,
+        20
+      ],
+      "day_intensity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "night_intensity": [
+        0.28,
+        0.3,
+        0.42
+      ],
+      "radius": 3.0
+    },
+    {
+      "type": "area",
+      "position": [
+        0,
+        14,
+        8
+      ],
+      "intensity": [
+        0.07,
+        0.08,
+        0.11
+      ],
+      "radius": 4.0
+    }
+  ]
+}
